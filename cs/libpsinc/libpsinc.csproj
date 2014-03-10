@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FB86B194-CDFE-434C-9ADD-676CDCC48B75}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>libpsinc</RootNamespace>
+    <AssemblyName>libpsinc</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\Acquirer.cs" />
+    <Compile Include="src\Common\Bayer.cs" />
+    <Compile Include="src\Transport\Usb.cs" />
+    <Compile Include="src\Driver\Register.cs" />
+    <Compile Include="src\Driver\Camera.cs" />
+    <Compile Include="src\Driver\Device.cs" />
+    <Compile Include="src\Driver\Feature.cs" />
+    <Compile Include="src\Transport\Transport.cs" />
+    <Compile Include="src\Common\AliasCollection.cs" />
+    <Compile Include="src\Common\Structures.cs" />
+    <Compile Include="src\Common\ImageHandler.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Properties\" />
+    <Folder Include="src\" />
+    <Folder Include="xml\" />
+    <Folder Include="src\Transport\" />
+    <Folder Include="src\Common\" />
+    <Folder Include="lib\" />
+    <Folder Include="src\Driver\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="xml\asc_v024.xml">
+      <LogicalName>asc_v024</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="lib\libusb-1.0-x64.dll">
+      <LogicalName>libusb-1.0-x64.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="lib\libusb-1.0-x86.dll">
+      <LogicalName>libusb-1.0-x86.dll</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

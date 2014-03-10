@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<metadata>
+		<id>libpsinc</id>
+		<version>1.0.0</version>
+		<authors>Dan Parnham,Justen Hyde</authors>
+		<owners>throctukes,teadriven</owners>
+		<description>Acquisition library for PSI devices</description>
+		<copyright>Copyright Emergent Design Ltd 2014</copyright>
+		<dependencies></dependencies>
+	</metadata>
+	<files>
+		<file src="libpsinc/bin/Release/libpsinc.dll" target="lib" />
+	</files>
+</package>
