@@ -6,10 +6,66 @@ using System.Drawing.Imaging;
 namespace libpsinc
 {
 	/// <summary>
-	/// Bayer decoder
+	/// The default image handler produces a System.Drawing.Bitmap
 	/// </summary>
-	internal class Bayer
+	public class DefaultImageHandler : ImageHandler
 	{
+		public override dynamic Decode(ColourMode colour, byte [] data, int width, int height)
+		{
+			switch (colour)
+			{
+				case ColourMode.Monochrome:		return this.DecodeMono(data, width, height);
+				case ColourMode.BayerGrey:		return this.DecodeGrey(data, width, height);
+				case ColourMode.BayerColour:	return this.DecodeColour(data, width, height);
+				default:						return null;
+			}
+		}
+		
+		
+		/// <summary>
+		/// Decode the specified buffer (as data produced by a monochrome imaging chip).
+		/// </summary>
+		/// <param name="buffer">Buffer to decode</param>
+		/// <param name="width">Width of the byte image</param>
+		/// <param name="height">Height of the byte image</param>
+		unsafe Bitmap DecodeMono(byte [] buffer, int width, int height)
+		{
+			Bitmap result	= new Bitmap(width, height, PixelFormat.Format24bppRgb);
+			BitmapData data	= result.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+			
+			fixed (byte *b = buffer)
+			{
+				int size	= width * height;
+				int jump	= data.Stride - width * 3;
+				byte *dst	= (byte *)data.Scan0.ToPointer();
+				byte *src	= b;
+				
+				if (jump > 0)
+				{
+					for (int y=0; y<height; y++, dst += jump)
+					{
+						for (int x=0; x<width; x++)
+						{
+							*dst++ = *src;
+							*dst++ = *src;
+							*dst++ = *src++;
+						}
+					}
+				}
+				else for (int i=0; i<size; i++)
+				{
+					*dst++ = *src;
+					*dst++ = *src;
+					*dst++ = *src++;
+				}
+			}
+			
+			result.UnlockBits(data);
+			
+			return result;
+		}
+		
+		
 		/// <summary>
 		/// Decodes a bayer image to a greyscale output.
 		/// </summary>
@@ -17,10 +73,10 @@ namespace libpsinc
 		/// <param name="receive">Raw bayer encoded byte data.</param>
 		/// <param name="bayerWidth">Width of the bayer encoded image.</param>
 		/// <param name="bayerHeight">Height of the bayer encoded image.</param>
-		unsafe public static Bitmap DecodeGrey(byte [] receive, int bayerWidth, int bayerHeight)
+		unsafe Bitmap DecodeGrey(byte [] receive, int bayerWidth, int bayerHeight)
 		{
 			if (bayerHeight < 5 || bayerWidth < 5) return null;
-	
+			
 			int width		= bayerWidth - 4;
 			int height		= bayerHeight - 4;
 			Bitmap result	= new Bitmap(width, height, PixelFormat.Format24bppRgb);
@@ -48,7 +104,7 @@ namespace libpsinc
 				int x, y;
 				byte value;
 				bool oddPixel, oddLine = false;
-			
+				
 				for (y=0; y<height; y++, pa+=4, pb+=4, pc+=4, pd+=4, pe+=4, pf+=4, pg+=4, ph+=4, pi+=4, pj+=4, pk+=4, pl+=4, pm+=4)
 				{
 					oddPixel = false;
@@ -81,7 +137,7 @@ namespace libpsinc
 			return result;
 		}
 		
-
+		
 		/// <summary>
 		/// Decodes a bayer image to a colour output.
 		/// </summary>
@@ -89,10 +145,10 @@ namespace libpsinc
 		/// <param name="receive">Raw bayer encoded byte data.</param>
 		/// <param name="bayerWidth">Width of the bayer encoded image.</param>
 		/// <param name="bayerHeight">Height of the bayer encoded image.</param>
-		unsafe public static Bitmap DecodeColour(byte [] receive, int bayerWidth, int bayerHeight)
+		unsafe Bitmap DecodeColour(byte [] receive, int bayerWidth, int bayerHeight)
 		{
 			if (bayerHeight < 5 || bayerWidth < 5) return null;
-
+			
 			int width		= bayerWidth - 4;
 			int height		= bayerHeight - 4;
 			Bitmap result	= new Bitmap(width, height, PixelFormat.Format24bppRgb);
@@ -156,8 +212,8 @@ namespace libpsinc
 								b = *pg++;
 							}
 						}
-			
-
+						
+						
 						*dst++ = b; *dst++ = g; *dst++ = r;
 						oddPixel = !oddPixel;
 					}
@@ -173,6 +229,7 @@ namespace libpsinc
 			return result;
 		}
 		
+		
 		/// <summary>
 		/// Clamp the specified value to the range 0-255.
 		/// </summary>
@@ -184,5 +241,4 @@ namespace libpsinc
 		}
 	}
 }
-
 

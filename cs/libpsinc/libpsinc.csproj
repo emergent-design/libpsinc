@@ -40,7 +40,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Acquirer.cs" />
-    <Compile Include="src\Common\Bayer.cs" />
     <Compile Include="src\Transport\Usb.cs" />
     <Compile Include="src\Driver\Register.cs" />
     <Compile Include="src\Driver\Camera.cs" />
@@ -49,7 +48,8 @@
     <Compile Include="src\Transport\Transport.cs" />
     <Compile Include="src\Common\AliasCollection.cs" />
     <Compile Include="src\Common\Structures.cs" />
-    <Compile Include="src\Common\ImageHandler.cs" />
+    <Compile Include="src\Handlers\Image\ImageHandler.cs" />
+    <Compile Include="src\Handlers\Image\DefaultImageHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

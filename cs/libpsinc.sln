@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libpsinc", "libpsinc\libpsinc.csproj", "{FB86B194-CDFE-434C-9ADD-676CDCC48B75}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iconograph", "example\iconograph.csproj", "{B19055CA-F3A7-4051-AD91-B6D0894FB455}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -11,6 +13,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B19055CA-F3A7-4051-AD91-B6D0894FB455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B19055CA-F3A7-4051-AD91-B6D0894FB455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B19055CA-F3A7-4051-AD91-B6D0894FB455}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B19055CA-F3A7-4051-AD91-B6D0894FB455}.Debug|x86.Build.0 = Debug|Any CPU
+		{B19055CA-F3A7-4051-AD91-B6D0894FB455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B19055CA-F3A7-4051-AD91-B6D0894FB455}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B19055CA-F3A7-4051-AD91-B6D0894FB455}.Release|x86.ActiveCfg = Release|Any CPU
+		{B19055CA-F3A7-4051-AD91-B6D0894FB455}.Release|x86.Build.0 = Release|Any CPU
 		{FB86B194-CDFE-434C-9ADD-676CDCC48B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB86B194-CDFE-434C-9ADD-676CDCC48B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB86B194-CDFE-434C-9ADD-676CDCC48B75}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -25,7 +35,7 @@ Global
 		{445BFC50-6BC6-4444-9B7F-17CD51237312}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = libpsinc\libpsinc.csproj
+		StartupItem = example\iconograph.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
