@@ -223,7 +223,7 @@ namespace libpsinc
 		/// The default devices available on the camera if the camera
 		/// reports back no device list is currently empty
 		/// </summary>
-		protected static byte[] defaultDevices = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+		protected static byte[] defaultDevices = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xe};
 
 
 		/// <summary>
@@ -265,7 +265,7 @@ namespace libpsinc
 				{1, new Device(this.transport, "Lock",			0x01, Device.DataDirection.Output,	Device.DataType.Integer)},
 
 				//LED array
-				{2, new Device(this.transport, "LED", 			0x02, Device.DataDirection.Output,	Device.DataType.Integer)}, 
+				{2, new Device(this.transport, "LEDArray", 		0x02, Device.DataDirection.Output,	Device.DataType.Integer)}, 
 
 				//Encrypted lock control
 				{3, new Device(this.transport, "SecureLock", 	0x03)},
@@ -288,6 +288,9 @@ namespace libpsinc
 
 				//Default settings for this device. Modify with care.
 				{9, new Device(this.transport, "Defaults", 		0x09)},
+
+				//Simple LED pair
+				{2, new Device(this.transport, "LEDPair",		0x0e, Device.DataDirection.Output,	Device.DataType.Integer)},
 
 				//Query the camera for a list of available devices and chip type
 				{0xFF, new Device(this.transport, "Query", 		0xFF, Device.DataDirection.Input)}
