@@ -290,7 +290,7 @@ namespace libpsinc
 				{9, new Device(this.transport, "Defaults", 		0x09)},
 
 				//Simple LED pair
-				{2, new Device(this.transport, "LEDPair",		0x0e, Device.DataDirection.Output,	Device.DataType.Integer)},
+				{0xe, new Device(this.transport, "LEDPair",		0x0e, Device.DataDirection.Output,	Device.DataType.Integer)},
 
 				//Query the camera for a list of available devices and chip type
 				{0xFF, new Device(this.transport, "Query", 		0xFF, Device.DataDirection.Input)}
