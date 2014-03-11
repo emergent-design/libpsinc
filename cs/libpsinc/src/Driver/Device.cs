@@ -13,7 +13,7 @@ namespace libpsinc
 		/// <summary>
 		/// Data direction of the device
 		/// </summary>
-		protected enum Direction
+		public enum DataDirection
 		{
 			/// <summary>
 			/// The device provides data to the camera
@@ -35,7 +35,7 @@ namespace libpsinc
 		///<summary>
 		/// The type of data provided by the device
 		/// </summary>
-		protected enum InputType
+		public enum DataType
 		{
 			/// <summary>
 			/// Byte array
@@ -68,12 +68,12 @@ namespace libpsinc
 		/// Direction of data (i.e., is this an input device or
 		/// an output device?)
 		/// </summary>
-		protected Direction direction;
+		protected DataDirection Direction { get; private set; }
 
 		/// <summary>
 		/// Type of data provided by this device
 		/// </summary>
-		protected InputType type;
+		protected DataType Type { get; private set; }
 
 		/// <summary>
 		/// The transport layer connection to this device
@@ -84,17 +84,19 @@ namespace libpsinc
 		/// Creates a new instance of the <see cref="libpsinc.Device"/> class.
 		/// </summary>
 		/// <param name="transport">Transport layer for this device.</param>
-		/// <param name="xml">Xml description of the properties of this device.</param>
-		internal Device(Transport transport, XElement xml)
+		/// <param name="name">Name of this device.</param>
+		/// /// <param name="index">Index (on-camera) of this device. </param>
+		/// /// <param name="direction">Data direction of this device. </param>
+		/// /// <param name="type">Data type for the device.</param>
+		internal Device(Transport transport, string name, byte index, DataDirection direction = DataDirection.Both, DataType type = DataType.Default)
 		{
 			this.transport		= transport;
-			this.index			= (byte)(int)xml.Attribute("index");
-			this.Name			= (string)xml.Attribute("name");
-			
-			Enum.TryParse<Direction>((string)xml.Attribute("direction"), true, out this.direction);
-			Enum.TryParse<InputType>((string)(xml.Attribute("type") ?? new XAttribute("type", "default")), true, out this.type);
+			this.index			= index;
+			this.Name			= name;
+			this.Direction		= direction;
+			this.Type			= type;
 		}
-		
+
 		/// <summary>
 		/// Initialise the device with the specified configuration
 		/// </summary>
@@ -110,7 +112,7 @@ namespace libpsinc
 		/// <param name="buffer">Buffer to write.</param>
 		public bool Write(byte [] buffer)
 		{
-			if (this.direction != Direction.Input && buffer != null && buffer.Length > 0)
+			if (this.Direction != DataDirection.Input && buffer != null && buffer.Length > 0)
 			{
 				int size			= buffer.Length;
 				byte [] terminator	= new byte [] { 0xff };
@@ -135,7 +137,7 @@ namespace libpsinc
 		/// <param name="value">Value to write.</param>
 		public bool Write(byte value)
 		{
-			return (this.direction == Direction.Input) ? false : this.transport.Command(new byte [] { (byte)Commands.WriteDevice, this.index, value }, null);
+			return (this.Direction == DataDirection.Input) ? false : this.transport.Command(new byte [] { (byte)Commands.WriteDevice, this.index, value }, null);
 		}
 		
 		/// <summary>
@@ -143,7 +145,7 @@ namespace libpsinc
 		/// </summary>
 		public byte [] Read()
 		{
-			if (this.direction != Direction.Output)
+			if (this.Direction != DataDirection.Output)
 			{
 				byte [] receive = new byte[512];
 
@@ -166,7 +168,7 @@ namespace libpsinc
 		/// </summary>
 		public uint ReadInteger()
 		{
-			if (this.type == InputType.Integer)
+			if (this.Type == DataType.Integer)
 			{
 				var data = this.Read();
 				
@@ -181,7 +183,7 @@ namespace libpsinc
 		/// </summary>
 		public string ReadString()
 		{
-			if (this.type == InputType.String)
+			if (this.Type == DataType.String)
 			{
 				var data = this.Read();
 				

@@ -22,6 +22,21 @@ namespace libpsinc
 		/// </summary>
 		public event TransferErrorEvent TransferError	= delegate {};
 
+		/// <summary>
+		/// Gets or sets the serial string that this Transport will
+		/// attempt to connect to (the string can be a regular 
+		/// expression). If empty, this instance will connect to the
+		/// first camera it finds.
+		/// </summary>
+		public string Serial			{ get; set; }
+
+
+		/// <summary>
+		/// Gets or sets the bus that this Transport will attempt to
+		/// connect over. If zero, this instance will search all busses.
+		/// </summary>
+		/// <value>The bus.</value>
+		public uint Bus 				{ get; set; }
 
 		const ushort VENDOR				= 0x0525;
 		const ushort PRODUCT			= 0xaaca;
@@ -34,8 +49,6 @@ namespace libpsinc
 		bool connected					= false;
 		bool raiseError					= false;
 		string lastError				= null;
-		string serial;
-		uint bus						= 0;
 		byte[] buffer			 	 	= new byte[64];
 
 
@@ -44,6 +57,9 @@ namespace libpsinc
 		/// </summary>
 		public Transport()
 		{
+			this.Serial = "";
+			this.Bus = 0;
+
 			if (Environment.OSVersion.Platform != PlatformID.Unix)
 			{
 				if (!Windows.Instance.Loaded) 
@@ -90,16 +106,14 @@ namespace libpsinc
 		}
 
 		/// <summary>
-		/// Initialise the transport layer with a connection to the 
-		/// specified serial and bus.
+		/// Initialise the transport layer with a connection to a 
+		/// camera matching the current Serial pattern on the current
+		/// Bus. By default this will attempt to connect to the first
+		/// camera found on any bus. Set Transport.Serial and
+		/// Transport.Bus to modify this behaviour.
 		/// </summary>
-		/// <param name="serial">Serial.</param>
-		/// <param name="bus">Bus.</param>
-		public bool Initialise(string serial, uint bus)
+		public bool Initialise()
 		{
-			this.bus = bus;
-			this.serial = serial;
-
 			this.Release();
 			bool result = false;
 
@@ -122,7 +136,7 @@ namespace libpsinc
 							{
 								if (descriptor.VendorID == VENDOR && descriptor.ProductID == PRODUCT)
 								{
-									if (this.Claim(device, descriptor.SerialStringIndex, this.serial)) 
+									if (this.Claim(device, descriptor.SerialStringIndex)) 
 									{
 										result = true;
 										break;
@@ -255,7 +269,7 @@ namespace libpsinc
 		/// </summary>
 		/// <param name="camera">Camera to query.</param>
 		/// <param name="index">Descriptor index to query.</param>
-		string Serial(IntPtr camera, int index)
+		string RetrieveSerial(IntPtr camera, int index)
 		{	
 			Usb.GetStringDescriptorASCII(camera, index, this.buffer, 64);
 			return System.Text.Encoding.ASCII.GetString(this.buffer);
@@ -263,19 +277,18 @@ namespace libpsinc
 
 
 		/// <summary>
-		/// Claim specified usb device with the specified serial string present
-		/// at the descriptor index supplied
+		/// Claim specified usb device with a serial string matching the pattern
+		/// in this.String on the bus specified by this.Bus.
 		/// </summary>
 		/// <param name="device">Device (camera) to claim.</param>
 		/// <param name="index">Index of the serial descriptor on the device.</param>
-		/// <param name="serial">Serial string</param>
-		bool Claim(IntPtr device, int index, string serial)
+		bool Claim(IntPtr device, int index)
 		{
 			uint bus = (uint)Usb.GetBusNumber(device);
-			if (this.bus == 0 || this.bus == bus)
+			if (this.Bus == 0 || this.Bus == bus)
 			{
 			
-				if ((serial == string.Empty || Regex.IsMatch(this.Serial(this.handle, index), (serial)))
+				if ((this.Serial == string.Empty || Regex.IsMatch(this.RetrieveSerial(this.handle, index), (this.Serial)))
 					&& (Usb.Open(device, ref this.handle) == 0))
 				{
 					// Disabled this while solving an issue on Windows with 
@@ -299,7 +312,7 @@ namespace libpsinc
 		/// <summary>
 		/// Release the currently connected camera.
 		/// </summary>
-		void Release()
+		internal void Release()
 		{
 			lock (this)
 			{
@@ -310,9 +323,8 @@ namespace libpsinc
 
 					this.handle = IntPtr.Zero;
 				}
+				this.connected = false;
 			}
-
-			this.Connected = false;
 		}
 
 
