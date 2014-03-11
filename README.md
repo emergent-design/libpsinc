@@ -10,9 +10,11 @@ libpsinc relies upon [libusb](http://libusb.info/).
 The main interface with libpsinc is through the Camera class:
 
 ```csharp
+using libpsinc;
+
 public class Example
 {
-  Camera camera = new Acquirer();
+  Camera camera = new Camera();
   
   public Example()
   {
