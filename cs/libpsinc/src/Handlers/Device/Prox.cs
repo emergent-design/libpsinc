@@ -4,11 +4,6 @@ using System.Threading;
 namespace libpsinc.device
 {
 	/// <summary>
-	/// Card removed event
-	/// </summary>
-	public delegate void CardRemovedEvent();
-
-	/// <summary>
 	/// Card presented event.
 	/// </summary>
 	/// <param name="ID">Unique, immutable identifier of the card</param>
@@ -21,11 +16,6 @@ namespace libpsinc.device
 	/// </summary>
 	public class Prox : DeviceHandler, IDisposable
 	{
-		/// <summary>
-		/// Occurs when the proxcard is removed.
-		/// </summary>
-		public event CardRemovedEvent CardRemoved = delegate {};
-
 
 		/// <summary>
 		/// Occurs when a proxcard is presented.
@@ -103,13 +93,6 @@ namespace libpsinc.device
 
 
 		/// <summary>
-		/// Tracks whether the Camera currently has
-		/// a card or not, to prevent event spamming.
-		/// </summary>
-		private bool hasCard = false;
-
-
-		/// <summary>
 		/// Initializes a new instance of the <see cref="libpsinc.Prox"/> class.
 		/// </summary>
 		/// <param name="camera">Camera that the prox reader resides on</param>
@@ -178,23 +161,11 @@ namespace libpsinc.device
 							this.camera.Devices[this.name].Initialise(this.currentLength);
 						}
 						var result = this.camera.Devices[this.name].Read();
-						if (result != null)
+						if (result != null && result.Length >= 20)
 						{
-							if (!this.hasCard && result.Length >= 20)
-							{
-								byte[] id = new byte[4];
-								Array.Copy(result, id, 4);
-								this.hasCard = true;
-								this.CardPresented(BitConverter.ToUInt32(id, 0), result);
-							}
-						}
-						else
-						{
-							if (this.hasCard)
-							{
-								this.hasCard = false;
-								this.CardRemoved();
-							}
+							byte[] id = new byte[4];
+							Array.Copy(result, id, 4);
+							this.CardPresented(BitConverter.ToUInt32(id, 0), result);
 						}
 					}
 				}

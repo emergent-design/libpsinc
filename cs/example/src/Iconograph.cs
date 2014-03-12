@@ -32,7 +32,8 @@ namespace iconograph
 		Label statusLabel		= new Label();
 		DrawingArea canvas		= new DrawingArea();
 		Camera camera			= new Camera();
-
+		Prox prox				= null;
+		LEDArray led			= null;
 		
 		public MainWindow() : base(WindowType.Toplevel)
 		{
@@ -48,6 +49,10 @@ namespace iconograph
 			this.mainBox.PackStart(this.statusLabel, false, true, 4);
 			this.mainBox.ShowAll();
 			this.Add(this.mainBox);
+
+			// For clarity, some optional device initialisation is kept
+			// in another function. Take a look if you're interested.
+			this.InitialiseDevices();
 
 			// Override the default image handler with a custom Gtk one
 			this.camera.ImageHandler = new GtkImageHandler();
@@ -73,12 +78,17 @@ namespace iconograph
 		}
 
 
+
 		protected void OnDeleteEvent(object sender, DeleteEventArgs a)
 		{
+			// The prox device needs to be disposed to ensure
+			// that the polling thread exits
+			this.prox.Dispose();
+
 			// The camera instance should be disposed when quitting so that
 			// it can ensure the internal thread is exited
 			this.camera.Dispose();
-			
+		
 			Application.Quit();
 			a.RetVal = true;
 		}
@@ -124,9 +134,67 @@ namespace iconograph
 
 				// Read the serial number from the camera using a SerialNumber device handler
 				Console.WriteLine(new SerialNumber(this.camera).Read());
+
+				// The following section is only really of interest if you want to see
+				// how to use the LED array device...
+
+					// Set the LED Array to have a sweeping red light
+					this.led.PrimaryMode = LEDArray.Mode.Sweep;
+					this.led.PrimaryColour = LEDArray.Colour.Red;
+				
+					// Flush the LED setting to the camera
+					this.led.Flush();
 			}
 
 			Application.Invoke((s, e) => this.statusLabel.Text = connected ? "Connected" : "Disconnected");
+		}
+
+
+		protected void InitialiseDevices()
+		{
+			// An example of how to use some of the more
+			// complex devices the camera can connect to.
+			// Here we set up a prox card reader and the LED
+			// array. When a card is presented we're going to
+			// output the ID of the card and then change the
+			// light pattern temporarily on the LEDs.
+
+			// Create a new Prox device handler on our camera
+			this.prox = new Prox(this.camera);
+			
+			// Create a new LED Array handler on our camera
+			this.led = new LEDArray(this.camera);
+			
+			// Hook into the CardPresented event on the prox reader.
+			// When a card is presented, report the ID of the card
+			// on the command line and switch the LED array to green
+			prox.CardPresented+= (ID, data) => {
+				Console.WriteLine("Card " + ID +" presented");
+				
+				//Set the LEDArray to flashing green
+				led.PrimaryMode = LEDArray.Mode.Flash;
+				led.PrimaryColour = LEDArray.Colour.Green;
+				
+				//But set the central LED to constant blue
+				led.OverrideMode = LEDArray.Override.Central;
+				led.OverrideColour = LEDArray.Colour.Blue;
+				
+				//Flush the new settings to the LED device
+				led.Flush();
+				
+				//After a couple of seconds, switch the LED
+				// array back to red sweeping.
+				System.Threading.Timer timer = null;
+				timer = new System.Threading.Timer(
+					(callback) =>
+					{
+					timer.Dispose();
+					led.PrimaryMode = LEDArray.Mode.Sweep;
+					led.PrimaryColour = LEDArray.Colour.Red;
+					led.OverrideMode = LEDArray.Override.None;
+					led.Flush();	
+				}, null, 3000, System.Threading.Timeout.Infinite);
+			};
 		}
 	}
 }
