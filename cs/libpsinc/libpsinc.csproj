@@ -51,6 +51,9 @@
     <Compile Include="src\Camera.cs" />
     <Compile Include="src\Driver\Commands.cs" />
     <Compile Include="src\Handlers\Device\DeviceHandler.cs" />
+    <Compile Include="src\Handlers\Device\LEDArray.cs" />
+    <Compile Include="src\Handlers\Device\SerialNumber.cs" />
+    <Compile Include="src\Handlers\Device\SimpleLock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

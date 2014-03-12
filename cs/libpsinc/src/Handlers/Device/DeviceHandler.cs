@@ -1,7 +1,4 @@
-using System;
-
-
-namespace libpsinc
+namespace libpsinc.device
 {
 	/// <summary>
 	/// The abstract base for dealing with devices

@@ -32,6 +32,7 @@ namespace libpsinc
 			Both
 		}
 	
+
 		///<summary>
 		/// The type of data provided by the device
 		/// </summary>
@@ -52,6 +53,7 @@ namespace libpsinc
 			/// </summary>
 			Integer
 		}
+
 
 		/// <summary>
 		/// Gets the name of the device

@@ -21,14 +21,15 @@ namespace libpsinc
 		/// <param name="height">Height of the byte array representation of the image</param>
 		public abstract object Decode(ColourMode colour, byte [] buffer, int width, int height);
 
-
 			
 		/// <summary>
 		/// Decode the specified buffer (as data produced by a monochrome imaging chip).
 		/// </summary>
-		/// <param name="buffer">Buffer to decode</param>
+		/// <param name="buffer">Raw bayer encoded byte data.</param>]
+		/// <param name="dst">Destination pointer to the raw pixels of a 24-bit image</param>
 		/// <param name="width">Width of the byte image</param>
 		/// <param name="height">Height of the byte image</param>
+		/// <param name="stride">Number of bytes in a row of the destination image</param>
 		unsafe protected void DecodeMono(byte [] buffer, byte *dst, int width, int height, int stride)
 		{	
 			fixed (byte *b = buffer)
@@ -63,9 +64,11 @@ namespace libpsinc
 		/// Decodes a bayer image to a greyscale output.
 		/// </summary>
 		/// <returns>The decoded greyscale image.</returns>
-		/// <param name="receive">Raw bayer encoded byte data.</param>
+		/// <param name="buffer">Raw bayer encoded byte data.</param>]
+		/// <param name="dst">Destination pointer to the raw pixels of a 24-bit image</param>
 		/// <param name="bayerWidth">Width of the bayer encoded image.</param>
 		/// <param name="bayerHeight">Height of the bayer encoded image.</param>
+		/// <param name="stride">Number of bytes in a row of the destination image</param>
 		unsafe protected void DecodeGrey(byte [] buffer, byte *dst, int bayerWidth, int bayerHeight, int stride)
 		{
 			if (bayerHeight < 5 || bayerWidth < 5) return;
@@ -127,9 +130,12 @@ namespace libpsinc
 		/// Decodes a bayer image to a colour output.
 		/// </summary>
 		/// <returns>The decoded colour image.</returns>
-		/// <param name="receive">Raw bayer encoded byte data.</param>
+		/// <param name="buffer">Raw bayer encoded byte data.</param>]
+		/// <param name="dst">Destination pointer to the raw pixels of a 24-bit image</param>
 		/// <param name="bayerWidth">Width of the bayer encoded image.</param>
 		/// <param name="bayerHeight">Height of the bayer encoded image.</param>
+		/// <param name="stride">Number of bytes in a row of the destination image</param>
+		/// <param name="rgb">Flag to indicate channel order. If true the order is RGB otherwise it is BGR</param>
 		unsafe protected void DecodeColour(byte [] buffer, byte *dst, int bayerWidth, int bayerHeight, int stride, bool rgb)
 		{
 			if (bayerHeight < 5 || bayerWidth < 5) return;
@@ -208,8 +214,7 @@ namespace libpsinc
 					
 					dst		+= jump;
 					oddLine  = !oddLine;
-				}
-				
+				}	
 			}
 		}
 		

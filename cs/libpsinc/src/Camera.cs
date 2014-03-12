@@ -252,7 +252,10 @@ namespace libpsinc
 			this.ImageHandler	= new DefaultImageHandler();
 			this.Flash			= 0;
 			this.Sleep			= 1;
-
+			this.Features		= new SortedDictionary<string, Feature>();
+			this.Devices		= new Dictionary<string, Device>();
+			this.Aliases		= new AliasCollection() { features = this.Features };
+			
 			// Notes:
 			// The "Name" also appears as part of the serial in the USB descriptor for this device.
 			this.devicePool = new Dictionary<byte, Device>() {
@@ -266,7 +269,7 @@ namespace libpsinc
 				{ 0x07, new Device(transport, "Name", 		0x07, Device.DataDirection.Both,	Device.DataType.String) },	// User-settable name of the camera.
 				{ 0x08, new Device(transport, "Storage1", 	0x08) },														// Storage block 1 (free for use - 127 bytes)
 				{ 0x09, new Device(transport, "Defaults", 	0x09) },														// Default settings for this device. Modify with care.
-				{ 0x0e, new Device(transport, "LEDPair",	0x0e, Device.DataDirection.Output,	Device.DataType.Integer)},	//Simple LED pair
+				{ 0x0e, new Device(transport, "LEDPair",	0x0e, Device.DataDirection.Output,	Device.DataType.Integer)},	// Simple LED pair
 				{ 0xff, new Device(transport, "Query", 		0xff, Device.DataDirection.Input) }								// Query the camera for a list of available devices and chip type
 			};
 

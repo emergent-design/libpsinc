@@ -102,7 +102,6 @@ namespace iconograph
 		{
 			if (connected)
 			{
-
 				this.camera.Aliases.AutoGain.Value		= 1;
 				this.camera.Aliases.AutoExposure.Value	= 1;
 				//this.camera.Aliases.Exposure.Value		= 10;
