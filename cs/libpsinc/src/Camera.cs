@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Drawing;
 using System.Xml.Linq;
 using System.Threading;
 using System.Reflection;
@@ -15,7 +14,6 @@ namespace libpsinc
 	/// </summary>
 	public class Camera : IDisposable
 	{
-
 		/// <summary>
 		/// Occurs when an image acquisition is completed
 		/// </summary>
@@ -33,9 +31,18 @@ namespace libpsinc
 		/// </summary>
 		public event TransferErrorEvent TransferError
 		{
-			add	 { this.transport.TransferError += value; }
+			add		{ this.transport.TransferError += value; }
 			remove	{ this.transport.TransferError -= value; }
 		}
+
+
+		/// <summary>
+		/// Gets or sets the image handler used to process data from the camera
+		/// and convert it to the required image type. The initial value is the
+		/// DefaultImageHandler which decodes the data to a System.Drawing.Bitmap.
+		/// </summary>
+		/// <value>The image handler.</value>
+		public ImageHandler ImageHandler { get; set; }
 
 
 		/// <summary>
@@ -57,14 +64,14 @@ namespace libpsinc
 		/// as a greyscale bitmap regardless of Colour.
 		/// </remarks>
 		/// <value><c>true</c> if colour; otherwise, <c>false</c>.</value>
-		public bool Colour				{ get; set; }
+		public bool Colour { get; set; }
 
 
 		/// <summary>
 		/// Gets or sets the flash power
 		/// </summary>
 		/// <value>The flash power</value>
-		public byte Flash				{ get; set; }
+		public byte Flash { get; set; }
 
 
 		/// <summary>
@@ -76,7 +83,7 @@ namespace libpsinc
 		/// to your application rather than manipulating the sleep period.
 		/// </remarks>
 		/// <value>The sleep period in ms.</value>
-		public int Sleep				{ get; set; }
+		public int Sleep { get; set; }
 
 
 		/// <summary>
@@ -88,14 +95,14 @@ namespace libpsinc
 		/// CaptureMode enum for more information.
 		/// </remarks>
 		/// <value>The mode.</value>
-		public CaptureMode Mode 		{ get; set; }
+		public CaptureMode Mode { get; set; }
 
 
 		/// <summary>
 		/// Gets the features available on the camera as a dictionary of <feature name, Feature>
 		/// </summary>
 		/// <value>The available features.</value>
-		public SortedDictionary<string, Feature> Features	{ get; protected set; }
+		public SortedDictionary<string, Feature> Features { get; protected set; }
 		
 		
 		/// <summary>
@@ -111,7 +118,7 @@ namespace libpsinc
 		/// gain control.
 		/// </remarks>
 		/// <value>The aliases.</value>
-		public AliasCollection Aliases						{ get; protected set; }
+		public AliasCollection Aliases { get; protected set; }
 
 
 		/// <summary>
@@ -123,7 +130,7 @@ namespace libpsinc
 		/// readers and visual feedback decvices such as LEDs.
 		/// </remarks>
 		/// <value>The devices.</value>
-		public Dictionary<string, Device> Devices			{ get; protected set; }
+		public Dictionary<string, Device> Devices { get; protected set; }
 		
 		
 		/// <summary>
@@ -173,43 +180,43 @@ namespace libpsinc
 		/// Exit flag - signals that the main acquisition thread is to 
 		/// terminate
 		/// </summary>
-		protected bool exit				= false;
+		protected bool exit = false;
 		
 		
 		/// <summary>
 		/// True if the camera has a monochrome imaging chip, otherwise false.
 		/// </summary>
-		protected bool monochrome		= false;
+		protected bool monochrome = false;
 		
 		
 		/// <summary>
 		/// The acquisition thread.
 		/// </summary>
-		protected Thread thread			= null;
+		protected Thread thread = null;
 		
 		
 		/// <summary>
 		/// Pauses the acquisition thread if reset.
 		/// </summary>
-		protected ManualResetEvent pause		= new ManualResetEvent(true);
+		protected ManualResetEvent pause = new ManualResetEvent(true);
 		
 		
 		/// <summary>
 		/// The transport layer of the camera
 		/// </summary>
-		Transport transport 			= new Transport();
+		Transport transport = new Transport();
 
 
 		/// <summary>
 		/// The control registers on the camera.
 		/// </summary>
-		List<Register> registers		= new List<Register>();
+		List<Register> registers = new List<Register>();
 
 
 		/// <summary>
 		/// The number of control contexts available
 		/// </summary>
-		protected byte contextCount				= 1;
+		protected byte contextCount = 1;
 
 
 		/// <summary>
@@ -223,24 +230,13 @@ namespace libpsinc
 		/// The default devices available on the camera if the camera
 		/// reports back no device list is currently empty
 		/// </summary>
-		protected static byte[] defaultDevices = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+		protected static byte[] defaultDevices = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
 
 		/// <summary>
 		/// Pool of all supported types of sub-Device (populated in the constructor)
 		/// </summary>
 		protected Dictionary<byte, Device> devicePool = null;
-
-		/// <summary>
-		/// Available capture modes, enum to raw instruction dictionary
-		/// </summary>
-		protected static readonly Dictionary<CaptureMode, byte> COMMANDS = new Dictionary<CaptureMode, byte> {
-			{ CaptureMode.Normal,		(byte)Commands.Capture },
-			{ CaptureMode.Master,		(byte)Commands.MasterCapture },
-			{ CaptureMode.SlaveRising,	(byte)Commands.SlaveCaptureRising },
-			{ CaptureMode.SlaveFalling,	(byte)Commands.SlaveCaptureFalling }
-		};
-
 
 		/// <summary>
 		/// Constructor.
@@ -251,46 +247,26 @@ namespace libpsinc
 		/// <remarks>
 		public Camera()
 		{
-			this.Colour = false;
-			this.Mode	= CaptureMode.Normal;
-			this.Flash	= 0;
-			this.Sleep	= 1;
+			this.Colour			= false;
+			this.Mode			= CaptureMode.Normal;
+			this.ImageHandler	= new DefaultImageHandler();
+			this.Flash			= 0;
+			this.Sleep			= 1;
 
-			this.devicePool = new Dictionary<byte, Device>()
-			{
-				//Prox reader device
-				{0, new Device(this.transport, "Prox", 			0x00, Device.DataDirection.Input)},
-
-				//Electronic lock control
-				{1, new Device(this.transport, "Lock",			0x01, Device.DataDirection.Output,	Device.DataType.Integer)},
-
-				//LED array
-				{2, new Device(this.transport, "LED", 			0x02, Device.DataDirection.Output,	Device.DataType.Integer)}, 
-
-				//Encrypted lock control
-				{3, new Device(this.transport, "SecureLock", 	0x03)},
-
-				//Error reporting
-				{4, new Device(this.transport, "Error", 		0x04, Device.DataDirection.Input)},
-
-				//Serial number of the camera
-				{5, new Device(this.transport, "Serial", 		0x05)},
-
-				//Storage block 0 (free for use - 502 bytes)
-				{6, new Device(this.transport, "Storage0", 		0x06)},
-
-				//User-settable name of the camera. This persists and appears 
-				//along with the serial on the USB descriptor for this device.
-				{7, new Device(this.transport, "Name", 			0x07, Device.DataDirection.Both, Device.DataType.String)},
-
-				//Storage block 1 (free for use - 127 bytes)
-				{8, new Device(this.transport, "Storage1", 		0x08)}, 
-
-				//Default settings for this device. Modify with care.
-				{9, new Device(this.transport, "Defaults", 		0x09)},
-
-				//Query the camera for a list of available devices and chip type
-				{0xFF, new Device(this.transport, "Query", 		0xFF, Device.DataDirection.Input)}
+			// Notes:
+			// The "Name" also appears as part of the serial in the USB descriptor for this device.
+			this.devicePool = new Dictionary<byte, Device>() {
+				{ 0x00, new Device(transport, "Prox", 		0x00, Device.DataDirection.Input) },							// Prox reader device
+				{ 0x01, new Device(transport, "Lock",		0x01, Device.DataDirection.Output,	Device.DataType.Integer) },	// Electronic lock control
+				{ 0x02, new Device(transport, "LED", 		0x02, Device.DataDirection.Output,	Device.DataType.Integer) },	// LED array
+				{ 0x03, new Device(transport, "SecureLock", 0x03) },														// Encrypted lock control
+				{ 0x04, new Device(transport, "Error", 		0x04, Device.DataDirection.Input) },							// Error reporting
+				{ 0x05, new Device(transport, "Serial", 	0x05) },														// Serial number of the camera (16 bytes)
+				{ 0x06, new Device(transport, "Storage0", 	0x06) },														// Storage block 0 (free for use - 502 bytes)
+				{ 0x07, new Device(transport, "Name", 		0x07, Device.DataDirection.Both, Device.DataType.String) },		// User-settable name of the camera.
+				{ 0x08, new Device(transport, "Storage1", 	0x08) },														// Storage block 1 (free for use - 127 bytes)
+				{ 0x09, new Device(transport, "Defaults", 	0x09) },														// Default settings for this device. Modify with care.
+				{ 0xff, new Device(transport, "Query", 		0xff, Device.DataDirection.Input) }								// Query the camera for a list of available devices and chip type
 			};
 
 			this.transport.ConnectionChanged += this.OnConnection;
@@ -298,7 +274,7 @@ namespace libpsinc
 
 
 		/// <summary>
-		/// Releases all resource used by the <see cref="libpsinc.Camera"/> object.
+		/// Releases all resources used by the <see cref="libpsinc.Camera"/> object.
 		/// </summary>
 		/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="libpsinc.Camera"/>. The
 		/// <see cref="Dispose"/> method leaves the <see cref="libpsinc.Camera"/> in an unusable state. After calling
@@ -432,43 +408,26 @@ namespace libpsinc
 		{
 			while (!this.exit)
 			{
-				Bitmap image = null;
-
 				if (this.Acquired != null)
 				{
-					if (this.Connected)
+					object image = null;
+
+					if (this.transport.Connected)
 					{
 						var colour	= this.monochrome ? ColourMode.Monochrome : this.Colour ? ColourMode.BayerColour : ColourMode.BayerGrey;
 						image		= this.Capture(this.Mode, colour, this.Flash);
 					}
-					else this.Connect();
+					else this.transport.Initialise();
+
+					this.Acquired(image);
 				}
 
-				if (this.Acquired != null) this.Acquired(image);
 				Thread.Sleep(this.Sleep);
-				if(!exit)
-				{
-					this.pause.WaitOne();
-				}
+
+				if (!exit) this.pause.WaitOne();
 			}
 		}
 
-
-		/// <summary>
-		/// Connect to the camera.
-		/// </summary>
-		protected bool Connect()
-		{
-			if (!this.transport.Connected)
-			{
-				if (this.transport.Initialise()) 
-				{
-					return true;
-				}
-			}
-			
-			return false;
-		}
 
 		/// <summary>
 		/// Configures the Camera based upon the embedded XML camera description
@@ -483,7 +442,8 @@ namespace libpsinc
 				
 				if (xml.Name == "camera")
 				{
-					this.contextCount	= (byte)((int)xml.Attribute("contexts"));
+					this.contextCount = (byte)((int)xml.Attribute("contexts"));
+
 					foreach (XElement r in xml.Elements("register"))
 					{
 						var register = new Register(this.transport, r);
@@ -518,20 +478,34 @@ namespace libpsinc
 		/// Pass the connection status on to ConnectionChanged event.
 		/// </summary>
 		/// <param name="connected">If set to <c>true</c> a camera has been connected.</param>
-		protected void OnConnection( bool connected )
+		protected void OnConnection(bool connected)
 		{
 			if (connected)
 			{
 				this.Features		= new SortedDictionary<string, Feature>();
 				this.Devices		= new Dictionary<string, Device>();
 				this.Aliases		= new AliasCollection() { features = this.Features };
-				byte[] devices = Camera.defaultDevices;
-				string cameraType = Camera.defaultType;
-				var description = this.devicePool[0xFF].Read();
+				byte[] devices		= Camera.defaultDevices;
+				string cameraType	= Camera.defaultType;
+				var description		= this.devicePool[0xFF].Read();
+
 				if (description != null && description.Length > 0)
 				{
-					//TODO: initialise a non-default camera based upon the
-					//description array it returns
+					int header = description[0];
+
+					if (header > 1)
+					{
+						switch (description[1])
+						{
+							//case 0x00:	cameraType = Camera.defaultType;	break;
+							default:	cameraType = Camera.defaultType;	break;
+						}
+
+						this.monochrome = (description[2] & 0x01) > 0;
+					}
+
+					int count	= description[header + 1];
+					devices		= description.Skip(header + 2).Take(count).ToArray();
 				}
 
 				foreach (var d in devices)
@@ -540,7 +514,6 @@ namespace libpsinc
 				}
 
 				this.ConfigureCamera(Assembly.GetAssembly(this.GetType()).GetManifestResourceStream(cameraType));
-
 
 				if (!this.RefreshFeatures())
 				{
@@ -551,24 +524,31 @@ namespace libpsinc
 
 			this.ConnectionChanged(connected);
 		}
-		
+
+
 		/// <summary>
 		/// Capture an image
 		/// </summary>
 		/// <param name="mode">Capture mode</param>
 		/// <param name="colour">Colour mode</param>
 		/// <param name="flash">Flash power</param>
-		protected Bitmap Capture(CaptureMode mode, ColourMode colour, byte flash)
+		protected object Capture(CaptureMode mode, ColourMode colour, byte flash)
 		{
 			int width		= (int)this.Aliases["Width"].Value;
 			int height		= (int)this.Aliases["Height"].Value;
 			int expected 	= width * height;
 			byte [] receive	= new byte[expected];
-			byte [] command	= { COMMANDS[mode], flash, (byte)(expected & 0xff), (byte)((expected >> 8) & 0xff), (byte)((expected >> 16) & 0xff) };
+			byte [] command	= { 
+				CaptureCommands.Map[mode], 
+				flash, 
+				(byte)(expected & 0xff), 
+				(byte)((expected >> 8) & 0xff), 
+				(byte)((expected >> 16) & 0xff) 
+			};
 			
-			if (this.transport.Command(command, receive))
+			if (this.transport.Command(command, receive) && this.ImageHandler != null)
 			{
-				return ImageHandler.Decode(colour, receive, width, height);
+				return this.ImageHandler.Decode(colour, receive, width, height);
 			}
 			
 			return null;

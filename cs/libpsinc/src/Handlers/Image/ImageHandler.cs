@@ -21,6 +21,6 @@ namespace libpsinc
 		/// <param name="data">Data to decode</param>
 		/// <param name="width">Width of the byte array representation of the image</param>
 		/// <param name="height">Height of the byte array representation of the image</param>
-		public abstract dynamic Decode(ColourMode colour, byte [] data, int width, int height);
+		public abstract object Decode(ColourMode colour, byte [] data, int width, int height);
 	}
 }
