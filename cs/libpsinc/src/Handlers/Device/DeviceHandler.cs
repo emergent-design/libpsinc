@@ -7,7 +7,6 @@ namespace libpsinc.device
 	{
 		protected Camera camera;
 
-
 		public DeviceHandler(Camera camera)
 		{
 			this.camera = camera;

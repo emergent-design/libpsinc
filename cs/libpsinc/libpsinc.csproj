@@ -54,6 +54,8 @@
     <Compile Include="src\Handlers\Device\LEDArray.cs" />
     <Compile Include="src\Handlers\Device\SerialNumber.cs" />
     <Compile Include="src\Handlers\Device\SimpleLock.cs" />
+    <Compile Include="src\Handlers\Device\LEDPair.cs" />
+    <Compile Include="src\Handlers\Device\Prox.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
