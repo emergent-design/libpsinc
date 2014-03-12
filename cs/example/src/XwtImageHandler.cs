@@ -1,5 +1,6 @@
 using System;
 
+using Xwt;
 using Xwt.Drawing;
 using libpsinc;
 
@@ -7,7 +8,7 @@ using libpsinc;
 namespace iconograph
 {
 	/// <summary>
-	/// The default image handler produces a System.Drawing.Bitmap
+	/// 
 	/// </summary>
 	public class XwtImageHandler : ImageHandler
 	{

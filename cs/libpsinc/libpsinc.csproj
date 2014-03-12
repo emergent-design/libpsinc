@@ -50,6 +50,7 @@
     <Compile Include="src\Handlers\Image\DefaultImageHandler.cs" />
     <Compile Include="src\Camera.cs" />
     <Compile Include="src\Driver\Commands.cs" />
+    <Compile Include="src\Handlers\Device\DeviceHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
