@@ -21,7 +21,7 @@ public class Example
     //First of all hook up all the event handlers...
     
     //This is going to handle incoming images
-    this.camera.Acquired += this.OnCapture;
+    this.camera.Acquired += i => this.OnCapture(i as Bitmap);
     
     //If you want to do something when the camera connection
     //state changed hook into ConnectionChanged
