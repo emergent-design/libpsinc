@@ -258,14 +258,15 @@ namespace libpsinc
 			this.devicePool = new Dictionary<byte, Device>() {
 				{ 0x00, new Device(transport, "Prox", 		0x00, Device.DataDirection.Input) },							// Prox reader device
 				{ 0x01, new Device(transport, "Lock",		0x01, Device.DataDirection.Output,	Device.DataType.Integer) },	// Electronic lock control
-				{ 0x02, new Device(transport, "LED", 		0x02, Device.DataDirection.Output,	Device.DataType.Integer) },	// LED array
-				{ 0x03, new Device(transport, "SecureLock", 0x03) },														// Encrypted lock control
+				{ 0x02, new Device(transport, "LEDArray",	0x02, Device.DataDirection.Output,	Device.DataType.Integer) },	// LED array
+				{ 0x03, new Device(transport, "SecureLock",	0x03) },														// Encrypted lock control
 				{ 0x04, new Device(transport, "Error", 		0x04, Device.DataDirection.Input) },							// Error reporting
 				{ 0x05, new Device(transport, "Serial", 	0x05) },														// Serial number of the camera (16 bytes)
 				{ 0x06, new Device(transport, "Storage0", 	0x06) },														// Storage block 0 (free for use - 502 bytes)
-				{ 0x07, new Device(transport, "Name", 		0x07, Device.DataDirection.Both, Device.DataType.String) },		// User-settable name of the camera.
+				{ 0x07, new Device(transport, "Name", 		0x07, Device.DataDirection.Both,	Device.DataType.String) },	// User-settable name of the camera.
 				{ 0x08, new Device(transport, "Storage1", 	0x08) },														// Storage block 1 (free for use - 127 bytes)
 				{ 0x09, new Device(transport, "Defaults", 	0x09) },														// Default settings for this device. Modify with care.
+				{ 0x0e, new Device(transport, "LEDPair",	0x0e, Device.DataDirection.Output,	Device.DataType.Integer)},	//Simple LED pair
 				{ 0xff, new Device(transport, "Query", 		0xff, Device.DataDirection.Input) }								// Query the camera for a list of available devices and chip type
 			};
 
