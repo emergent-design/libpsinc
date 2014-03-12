@@ -391,13 +391,13 @@ namespace libpsinc
 		/// matching serial on any bus.</param>
 		public bool Initialise(string serial = "", uint bus = 0)
 		{;
-			this.transport.Serial = serial;
-			this.transport.Bus = bus;
+			this.transport.Serial	= serial;
+			this.transport.Bus		= bus;
 
-			if (this.thread==null)
+			if (this.thread == null)
 			{
-				this.exit		= false;
-				this.thread		= new Thread(new ThreadStart(this.Entry));
+				this.exit	= false;
+				this.thread	= new Thread(new ThreadStart(this.Entry));
 				this.thread.Start();
 				return true;
 			}

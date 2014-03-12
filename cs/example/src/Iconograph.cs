@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using Gtk;
 using libpsinc;
+using libpsinc.device;
 
 
 namespace iconograph
@@ -35,32 +36,47 @@ namespace iconograph
 		
 		public MainWindow() : base(WindowType.Toplevel)
 		{
-			this.Title						= "Iconograph";
-			this.WidthRequest				= 800;
-			this.HeightRequest				= 600;
-			this.WindowPosition				= WindowPosition.Center;
-
-			this.statusLabel.Text			= "Disconnected";
-			this.statusLabel.Justify		= Justification.Center;
+			this.Title					= "Iconograph";
+			this.WidthRequest			= 800;
+			this.HeightRequest			= 600;
+			this.WindowPosition			= WindowPosition.Center;
+			this.statusLabel.Text		= "Disconnected";
+			this.statusLabel.Justify	= Justification.Center;
+			this.DeleteEvent 			+= OnDeleteEvent;
 
 			this.mainBox.PackStart(this.canvas, true, true, 4);
 			this.mainBox.PackStart(this.statusLabel, false, true, 4);
 			this.mainBox.ShowAll();
-
-			this.camera.ImageHandler		= new GtkImageHandler();
-			this.camera.Colour				= true;
-			this.camera.ConnectionChanged	+= this.OnConnection;
-			this.camera.Acquired			+= i => this.Render(i as Gdk.Pixbuf);
-			this.camera.TransferError		+= e => Console.WriteLine(e);
-			this.DeleteEvent				+= OnDeleteEvent;
-
 			this.Add(this.mainBox);
+
+			// Override the default image handler with a custom Gtk one
+			this.camera.ImageHandler = new GtkImageHandler();
+
+			// Set the camera to colour mode (if the connected camera contains a monochrome
+			// chip then this will have no effect)
+			this.camera.Colour = true;
+
+			// Handle the connection/disconnection of a camera
+			this.camera.ConnectionChanged += this.OnConnection;
+
+			// Handle a captured image. The type of object passed in the event depends on
+			// the image handler. Since it was overridden above, the image will be a Pixbuf
+			// or null if capture failed.
+			this.camera.Acquired += i => this.Render(i as Gdk.Pixbuf);
+
+			// Handler a transfer error event by simply writing it to the console
+			this.camera.TransferError += e => Console.WriteLine(e);
+
+			// Initialise the camera which will tell it to start looking for
+			// devices and begin capturing from them when available
 			this.camera.Initialise();
 		}
 
 
 		protected void OnDeleteEvent(object sender, DeleteEventArgs a)
 		{
+			// The camera instance should be disposed when quitting so that
+			// it can ensure the internal thread is exited
 			this.camera.Dispose();
 			
 			Application.Quit();
@@ -102,9 +118,12 @@ namespace iconograph
 		{
 			if (connected)
 			{
+				// When a new camera is connected, turn on the auto gain and auto exposure.
 				this.camera.Aliases.AutoGain.Value		= 1;
 				this.camera.Aliases.AutoExposure.Value	= 1;
-				//this.camera.Aliases.Exposure.Value		= 10;
+
+				// Read the serial number from the camera using a SerialNumber device handler
+				Console.WriteLine(new SerialNumber(this.camera).Read());
 			}
 
 			Application.Invoke((s, e) => this.statusLabel.Text = connected ? "Connected" : "Disconnected");
