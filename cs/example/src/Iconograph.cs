@@ -3,8 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
-using Xwt;
-using Xwt.Drawing;
+using Gtk;
 using libpsinc;
 
 
@@ -15,7 +14,7 @@ namespace iconograph
 		[STAThread]
 		static void Main()
 		{
-			Application.Initialize(Environment.OSVersion.Platform == PlatformID.Unix ? ToolkitType.Gtk : ToolkitType.Wpf);
+			Application.Init();
 			
 			var window = new MainWindow();
 			
@@ -25,111 +24,91 @@ namespace iconograph
 		}
 	}
 
-
-	class IconographCanvas : Canvas
-	{
-		Image image;
-
-		DateTime last = DateTime.Now;
-		int count = 0;
-	
-
-		public Image Image
-		{
-			set 
-			{
-				lock (this)
-				{
-					if (this.image != null) this.image.Dispose();
-					this.image = value;
-
-					count++;
-
-					if ((DateTime.Now - last).TotalMilliseconds > 5000)
-					{
-						Console.WriteLine("{0:0.00} fps", (double)count / 5.0);
-						count	= 0;
-						last	= DateTime.Now;
-					}
-				}
-
-				this.QueueDraw();
-			}
-		}
-
-
-		protected override void OnDraw(Context ctx, Rectangle dirtyRect)
-		{
-			lock(this)
-			{
-				if (this.image != null)
-				{
-					double scale	= Math.Min((double)this.Size.Width / (double)this.image.Width, (double)this.Size.Height / (double)image.Height);
-					double width	= scale * image.Width;
-					double height	= scale * image.Height;
-
-					ctx.DrawImage(this.image, 0.5 * (this.Size.Width - width), 0.5 * (this.Size.Height - height), width, height);
-				}
-			}
-		}
-	}
-	
 	
 	class MainWindow : Window
 	{
 		VBox mainBox			= new VBox();
 		Label statusLabel		= new Label();
-		IconographCanvas canvas	= new IconographCanvas();
+		DrawingArea canvas		= new DrawingArea();
 		Camera camera			= new Camera();
 
 		
-		public MainWindow()
+		public MainWindow() : base(WindowType.Toplevel)
 		{
 			this.Title						= "Iconograph";
-			this.Width						= 800;
-			this.Height						= 600;
-			this.InitialLocation			= WindowLocation.CenterScreen;
+			this.WidthRequest				= 800;
+			this.HeightRequest				= 600;
+			this.WindowPosition				= WindowPosition.Center;
+
 			this.statusLabel.Text			= "Disconnected";
-			this.statusLabel.TextAlignment	= Alignment.Center;
+			this.statusLabel.Justify		= Justification.Center;
 
-			this.mainBox.PackStart(this.canvas, true);
-			this.mainBox.PackStart(this.statusLabel, false);
+			this.mainBox.PackStart(this.canvas, true, true, 4);
+			this.mainBox.PackStart(this.statusLabel, false, true, 4);
+			this.mainBox.ShowAll();
 
-			this.Content 				= this.mainBox;
-			this.camera.ImageHandler	= new XwtImageHandler();
-
-			this.CloseRequested 			+= (sender, args) => Application.Exit();
+			this.camera.ImageHandler		= new GtkImageHandler();
+			this.camera.Colour				= true;
 			this.camera.ConnectionChanged	+= this.OnConnection;
-			this.camera.Acquired			+= i => this.canvas.Image = i as Image;
+			this.camera.Acquired			+= i => this.Render(i as Gdk.Pixbuf);
 			this.camera.TransferError		+= e => Console.WriteLine(e);
+			this.DeleteEvent				+= OnDeleteEvent;
 
+			this.Add(this.mainBox);
 			this.camera.Initialise();
 		}
 
 
+		protected void OnDeleteEvent(object sender, DeleteEventArgs a)
+		{
+			this.camera.Dispose();
+			
+			Application.Quit();
+			a.RetVal = true;
+		}
+
+
+		void Render(Gdk.Pixbuf image)
+		{
+			Application.Invoke(delegate {
+
+				var allocation = this.canvas.Allocation;
+				
+				using (var context = Gdk.CairoHelper.Create(this.canvas.GdkWindow))
+				{
+					context.Rectangle(0, 0, allocation.Width, allocation.Height);
+					context.SetSourceRGB(1.0, 1.0, 1.0);
+					context.Fill();
+
+					if (image != null)
+					{	
+						double scale	= Math.Min((double)allocation.Width / (double)image.Width, (double)allocation.Height / (double)image.Height);
+						double width	= scale * image.Width;
+						double height	= scale * image.Height;
+						
+						context.Translate(0.5 * (allocation.Width - width), 0.5 * (allocation.Height - height));
+						context.Scale(scale, scale);
+						Gdk.CairoHelper.SetSourcePixbuf(context, image, 0, 0);
+						context.Paint();
+
+						image.Dispose();
+					}
+				}
+			});
+		}
+		
+		
 		void OnConnection(bool connected)
 		{
 			if (connected)
 			{
+
 				this.camera.Aliases.AutoGain.Value		= 1;
 				this.camera.Aliases.AutoExposure.Value	= 1;
-				this.camera.Aliases.Exposure.Value		= 10;
+				//this.camera.Aliases.Exposure.Value		= 10;
 			}
 
-			this.SetStatus(connected ? "Connected" : "Disconnected");
-		}
-
-
-		void SetStatus(string label)
-		{
-			Application.Invoke(() => this.statusLabel.Text = label);
-		}
-
-		
-		protected override void Dispose (bool disposing)
-		{
-			this.camera.Dispose();
-			base.Dispose(disposing);
+			Application.Invoke((s, e) => this.statusLabel.Text = connected ? "Connected" : "Disconnected");
 		}
 	}
 }

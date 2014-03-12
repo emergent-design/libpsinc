@@ -34,16 +34,18 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="Xwt">
-      <HintPath>references\Xwt.dll</HintPath>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+      <Package>gtk-sharp-2.0</Package>
     </Reference>
-    <Reference Include="Xwt.Gtk">
-      <HintPath>references\Xwt.Gtk.dll</HintPath>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+      <Package>gtk-sharp-2.0</Package>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Iconograph.cs" />
-    <Compile Include="src\XwtImageHandler.cs" />
+    <Compile Include="src\GtkImageHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libpsinc\libpsinc.csproj">

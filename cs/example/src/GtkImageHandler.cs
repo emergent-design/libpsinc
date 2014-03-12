@@ -1,16 +1,16 @@
 using System;
 
-using Xwt;
-using Xwt.Drawing;
+using Gdk;
 using libpsinc;
 
 
 namespace iconograph
 {
 	/// <summary>
-	/// 
+	/// An image handler for Gtk applications that produces Pixbuf
+	/// images from the raw camera data.
 	/// </summary>
-	public class XwtImageHandler : ImageHandler
+	public class GtkImageHandler : ImageHandler
 	{
 		public override dynamic Decode(ColourMode colour, byte [] data, int width, int height)
 		{
@@ -30,19 +30,23 @@ namespace iconograph
 		/// <param name="buffer">Buffer to decode</param>
 		/// <param name="width">Width of the byte image</param>
 		/// <param name="height">Height of the byte image</param>
-		unsafe BitmapImage DecodeMono(byte [] buffer, int width, int height)
+		unsafe Pixbuf DecodeMono(byte [] buffer, int width, int height)
 		{
-			BitmapImage result = new ImageBuilder(width, height).ToBitmap(ImageFormat.RGB24);
+			var result	= new Pixbuf(Colorspace.Rgb, false, 8, width, height);
+			int jump	= result.Rowstride - width * 3;
 			
 			fixed (byte *b = buffer)
 			{
 				byte *src = b;
+				byte *dst = (byte *)result.Pixels;
 
-				for (int y=0; y<height; y++)
+				for (int y=0; y<height; y++, dst+=jump)
 				{
-					for (int x=0; x<width; x++, src++)
+					for (int x=0; x<width; x++)
 					{
-						result.SetPixel(x, y, Color.FromBytes(*src, *src, *src));
+						*dst++ = *src;
+						*dst++ = *src;
+						*dst++ = *src++;
 					}
 				}
 			}
@@ -58,19 +62,18 @@ namespace iconograph
 		/// <param name="receive">Raw bayer encoded byte data.</param>
 		/// <param name="bayerWidth">Width of the bayer encoded image.</param>
 		/// <param name="bayerHeight">Height of the bayer encoded image.</param>
-		unsafe BitmapImage DecodeGrey(byte [] receive, int bayerWidth, int bayerHeight)
+		unsafe Pixbuf DecodeGrey(byte [] receive, int bayerWidth, int bayerHeight)
 		{
 			if (bayerHeight < 5 || bayerWidth < 5) return null;
 			
-			int width			= bayerWidth - 4;
-			int height			= bayerHeight - 4;
-			BitmapImage result	= new ImageBuilder(width, height).ToBitmap(ImageFormat.RGB24);
+			int width	= bayerWidth - 4;
+			int height	= bayerHeight - 4;
+			var result	= new Pixbuf(Colorspace.Rgb, false, 8, width, height);
+			int jump	= result.Rowstride - width * 3;
 			
 			fixed (byte *src = receive)
 			{
-				//int jump	= data.Stride - width * 3;
-				//byte *dst	= (byte *)data.Scan0.ToPointer();
-				
+				byte *dst	= (byte *)result.Pixels;	
 				byte *pg	= src + (bayerWidth << 1) + 2;
 				byte *pa	= pg - (bayerWidth << 1);
 				byte *pc	= pg - bayerWidth;
@@ -89,7 +92,7 @@ namespace iconograph
 				byte value;
 				bool oddPixel, oddLine = false;
 				
-				for (y=0; y<height; y++, pa+=4, pb+=4, pc+=4, pd+=4, pe+=4, pf+=4, pg+=4, ph+=4, pi+=4, pj+=4, pk+=4, pl+=4, pm+=4)
+				for (y=0; y<height; y++, pa+=4, pb+=4, pc+=4, pd+=4, pe+=4, pf+=4, pg+=4, ph+=4, pi+=4, pj+=4, pk+=4, pl+=4, pm+=4, dst+=jump)
 				{
 					oddPixel = false;
 					for (x=0; x<width; x++)
@@ -105,9 +108,10 @@ namespace iconograph
 							else			value = Clamp((*pg++ * 36 + ((*pc++ + *pf++ + *ph++ + *pk++ + *pb++ + *pd++ + *pj++ + *pl++) << 2) - (*pa++ + *pe++ + *pi++ + *pm++) * 5) / 48);
 						}
 
-						result.SetPixel(x, y, Color.FromBytes(value, value, value));
-
-						oddPixel = !oddPixel;
+						*dst++		= value;
+						*dst++		= value;
+						*dst++		= value;
+						oddPixel 	= !oddPixel;
 					}
 
 					oddLine  = !oddLine;
@@ -125,16 +129,18 @@ namespace iconograph
 		/// <param name="receive">Raw bayer encoded byte data.</param>
 		/// <param name="bayerWidth">Width of the bayer encoded image.</param>
 		/// <param name="bayerHeight">Height of the bayer encoded image.</param>
-		unsafe BitmapImage DecodeColour(byte [] receive, int bayerWidth, int bayerHeight)
+		unsafe Pixbuf DecodeColour(byte [] receive, int bayerWidth, int bayerHeight)
 		{
 			if (bayerHeight < 5 || bayerWidth < 5) return null;
 			
-			int width			= bayerWidth - 4;
-			int height			= bayerHeight - 4;
-			BitmapImage result	= new ImageBuilder(width, height).ToBitmap(ImageFormat.RGB24);
+			int width	= bayerWidth - 4;
+			int height	= bayerHeight - 4;
+			var result	= new Pixbuf(Colorspace.Rgb, false, 8, width, height);
+			int jump	= result.Rowstride - width * 3;
 			
 			fixed (byte *src = receive)
 			{	
+				byte *dst	= (byte *)result.Pixels;
 				byte *pg	= src + (bayerWidth << 1) + 2;
 				byte *pa	= pg - (bayerWidth << 1);
 				byte *pc	= pg - bayerWidth;
@@ -153,7 +159,7 @@ namespace iconograph
 				byte r, g, b;
 				bool oddPixel, oddLine = false;
 				
-				for (y=0; y<height; y++, pa+=4, pb+=4, pc+=4, pd+=4, pe+=4, pf+=4, pg+=4, ph+=4, pi+=4, pj+=4, pk+=4, pl+=4, pm+=4)
+				for (y=0; y<height; y++, pa+=4, pb+=4, pc+=4, pd+=4, pe+=4, pf+=4, pg+=4, ph+=4, pi+=4, pj+=4, pk+=4, pl+=4, pm+=4, dst+=jump)
 				{
 					oddPixel = false;
 					for (x=0; x<width; x++)
@@ -189,9 +195,10 @@ namespace iconograph
 							}
 						}
 
-						result.SetPixel(x, y, Color.FromBytes(r, g, b));
-
-						oddPixel = !oddPixel;
+						*dst++		= r;
+						*dst++		= g;
+						*dst++		= b;
+						oddPixel	= !oddPixel;
 					}
 
 					oddLine = !oddLine;
