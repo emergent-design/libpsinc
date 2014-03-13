@@ -33,28 +33,6 @@ namespace libpsinc
 		}
 	
 
-		///<summary>
-		/// The type of data provided by the device
-		/// </summary>
-		public enum DataType
-		{
-			/// <summary>
-			/// Byte array
-			/// </summary>
-			Default,
-
-			/// <summary>
-			/// String data
-			/// </summary>
-			String,
-
-			/// <summary>
-			/// Integer data
-			/// </summary>
-			Integer
-		}
-
-
 		/// <summary>
 		/// Gets the name of the device
 		/// </summary>
@@ -70,12 +48,7 @@ namespace libpsinc
 		/// Direction of data (i.e., is this an input device or
 		/// an output device?)
 		/// </summary>
-		protected DataDirection Direction { get; private set; }
-
-		/// <summary>
-		/// Type of data provided by this device
-		/// </summary>
-		protected DataType Type { get; private set; }
+		public DataDirection Direction { get; private set; }
 
 		/// <summary>
 		/// The transport layer connection to this device
@@ -87,16 +60,14 @@ namespace libpsinc
 		/// </summary>
 		/// <param name="transport">Transport layer for this device.</param>
 		/// <param name="name">Name of this device.</param>
-		/// /// <param name="index">Index (on-camera) of this device. </param>
-		/// /// <param name="direction">Data direction of this device. </param>
-		/// /// <param name="type">Data type for the device.</param>
-		internal Device(Transport transport, string name, byte index, DataDirection direction = DataDirection.Both, DataType type = DataType.Default)
+		/// <param name="index">Index (on-camera) of this device. </param>
+		/// <param name="direction">Data direction of this device. </param>
+		internal Device(Transport transport, string name, byte index, DataDirection direction = DataDirection.Both)
 		{
 			this.transport		= transport;
 			this.index			= index;
 			this.Name			= name;
 			this.Direction		= direction;
-			this.Type			= type;
 		}
 
 		/// <summary>
@@ -175,26 +146,11 @@ namespace libpsinc
 		}
 
 		/// <summary>
-		/// Read an integer from the device
-		/// </summary>
-		public uint ReadInteger()
-		{
-			if (this.Type == DataType.Integer)
-			{
-				var data = this.Read();
-				
-				if (data != null && data.Length == 2) return (uint)(data[1] << 8) + data[0];
-			}
-			
-			return 0;
-		}
-
-		/// <summary>
 		/// Read a string from the device
 		/// </summary>
 		public string ReadString()
 		{
-			if (this.Type == DataType.String)
+			if (this.Direction != DataDirection.Output)
 			{
 				var data = this.Read();
 				
