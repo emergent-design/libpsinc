@@ -102,10 +102,6 @@ namespace iconograph
 				
 				using (var context = Gdk.CairoHelper.Create(this.canvas.GdkWindow))
 				{
-					context.Rectangle(0, 0, allocation.Width, allocation.Height);
-					context.SetSourceRGB(1.0, 1.0, 1.0);
-					context.Fill();
-
 					if (image != null)
 					{	
 						double scale	= Math.Min((double)allocation.Width / (double)image.Width, (double)allocation.Height / (double)image.Height);
