@@ -2,14 +2,15 @@ libpsinc
 ========
 
 libpsinc is a cross-platform acquisition driver for the [Perception-SI Ltd](http://www.psi-ltd.com) range of cameras. It provides a c# implementation, suitable for use on both .net and mono. A c++ implementation will be released shortly.
+We test libpsinc on Linux and Windows, but are unable to support Mac (it may work, we have no way of checking).
 
-libpsinc relies upon [libusb](http://libusb.info/).
+libpsinc relies upon [libusb](http://libusb.info/); see the libpsinc [installation instructions](https://github.com/emergent-design/libpsinc/wiki/Installation) for your platform.
 
-More detailed documentation can be found on the [wiki](https://github.com/emergent-design/libpsinc/wiki)
+More detailed usage documentation can be found on the [wiki](https://github.com/emergent-design/libpsinc/wiki)
 
 # Using libpsinc #
 
-The main interface with libpsinc is through the Camera class:
+The main interface is through the Camera class:
 
 ```csharp
 using libpsinc;
