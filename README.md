@@ -90,3 +90,5 @@ Features are properties of the camera that you can either read or control - A to
 ## Devices ##
 
 ...Or more correctly sub-devices. The PSI camera can control or recieve data from further devices which have been connected to it such as LED arrays, prox card readers and electronic locks. These are represented in code using the Device class.
+
+More detailed documentation can be found on the [wiki](https://github.com/emergent-design/libpsinc/wiki)
