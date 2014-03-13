@@ -168,19 +168,19 @@ namespace iconograph
 			// Hook into the CardPresented event on the prox reader.
 			// When a card is presented, report the ID of the card
 			// on the command line and switch the LED array to green
-			prox.CardPresented+= (ID, data) => {
+			this.prox.CardPresented+= (ID, data) => {
 				Console.WriteLine("Card " + ID +" presented");
 				
 				//Set the LEDArray to flashing green
-				led.PrimaryMode = LEDArray.Mode.Flash;
-				led.PrimaryColour = LEDArray.Colour.Green;
+				this.led.PrimaryMode = LEDArray.Mode.Flash;
+				this.led.PrimaryColour = LEDArray.Colour.Green;
 				
 				//But set the central LED to constant blue
-				led.OverrideMode = LEDArray.Override.Central;
-				led.OverrideColour = LEDArray.Colour.Blue;
+				this.led.OverrideMode = LEDArray.Override.Central;
+				this.led.OverrideColour = LEDArray.Colour.Blue;
 				
 				//Flush the new settings to the LED device
-				led.Flush();
+				this.led.Flush();
 				
 				//After a couple of seconds, switch the LED
 				// array back to red sweeping.
@@ -189,10 +189,10 @@ namespace iconograph
 					(callback) =>
 					{
 					timer.Dispose();
-					led.PrimaryMode = LEDArray.Mode.Sweep;
-					led.PrimaryColour = LEDArray.Colour.Red;
-					led.OverrideMode = LEDArray.Override.None;
-					led.Flush();	
+					this.led.PrimaryMode = LEDArray.Mode.Sweep;
+					this.led.PrimaryColour = LEDArray.Colour.Red;
+					this.led.OverrideMode = LEDArray.Override.None;
+					this.led.Flush();	
 				}, null, 3000, System.Threading.Timeout.Infinite);
 			};
 		}

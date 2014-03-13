@@ -107,7 +107,16 @@ namespace libpsinc
 		{
 			return this.transport.Command(new byte [] { (byte)Commands.InitialiseDevice, this.index, configuration }, null);
 		}
-		
+
+		/// <summary>
+		/// Write the specified string to the device.
+		/// </summary>
+		/// <param name="text">string to write.</param>
+		public bool Write(string text)
+		{
+			return this.Write (System.Text.Encoding.ASCII.GetBytes(text));
+		}
+
 		/// <summary>
 		/// Write the specified buffer to the device
 		/// </summary>
