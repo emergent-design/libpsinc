@@ -22,6 +22,6 @@ obj/
 .build-*/
 .codelite/
 
-emergent.workspace.*
+psinc.workspace.*
 compilation.db
 

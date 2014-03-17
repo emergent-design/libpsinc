@@ -11,10 +11,6 @@ namespace psinc
 {
 	Feature::Feature()
 	{
-		// Need a default constructor because the feature map will automatically create a new instance
-		// of feature if accessed with an unknown key. Should probably respond to that here somehow! Throw
-		// an exception perhaps?
-		LOG(error, "A feature was created without configuration, probably due to accessing an invalid key in the feature map!");
 	}
 
 
