@@ -320,7 +320,7 @@ namespace libpsinc
 			{
 				if (this.transport.Command(new byte [] { (byte)Commands.ReadRegisterPage, page }, receive))
 				{
-					foreach (var register in this.registers.Where(r => r.Page == page).Cast<Register>())
+					foreach (var register in this.registers.Where(r => r.Page == page))
 					{
 						register.Refresh(receive);
 					}
