@@ -8,6 +8,16 @@ libpsinc relies upon [libusb](http://libusb.info/); see the libpsinc [installati
 
 More detailed usage documentation can be found on the [wiki](https://github.com/emergent-design/libpsinc/wiki)
 
+# License #
+
+libpsinc is freely available under the terms of the [MIT License](http://opensource.org/licenses/mit-license.html). You can use libpsinc in both proprietary and open-source applications; simply retain the copyright and permission notice from the [license](https://github.com/emergent-design/libpsinc/blob/master/LICENSE) in your source and add the following acknowledgement to your product distribution:
+
+```
+This software is based on libpsinc (https://github.com/emergent-design/libpsinc).
+Libpsinc is Copyright (C) 2014 Emergent Design
+```
+
+
 # Using libpsinc #
 
 The main interface is through the Camera class:
