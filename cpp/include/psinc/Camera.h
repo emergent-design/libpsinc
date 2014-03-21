@@ -60,17 +60,14 @@ namespace psinc
 			bool Grabbing();
 
 			/// A map of feature name to Feature instance for the connected device
-			/// (A "Feature" is a code representation of a property of the imaging chip,
-			/// or other connected device such as a flash).
-			//FeatureMap features;
+			/// A "Feature" is a representation of a property of the imaging chip.
 			std::map<std::string, Feature> features;
 			
 			
-			// Maps common features to simple names
-			//AliasMap aliases;
+			/// Maps common features to simple names
 			std::map<byte, std::map<std::string, Feature*>> aliases;
 			
-			//DeviceMap devices;
+
 			std::map<std::string, Device> devices;
 
 			/// Initialises the camera
@@ -80,8 +77,7 @@ namespace psinc
 			//bool Initialise(std::string type, std::string chip, std::string serial = "", int bus = 0, Transport::Type transport = Transport::Type::USB);
 
 
-			void SetFlash(int power);
-			//void SetSlave(bool enabled);
+			void SetFlash(byte power);
 			bool SetContext(byte context);
 			
 			/// Resets the camera.
@@ -138,11 +134,10 @@ namespace psinc
 			std::thread _thread;
 
 			Mode mode			= Mode::Normal;
-			volatile bool exit			= false;
+			volatile bool exit	= false;
 			bool monochrome		= false;
 			bool initialised	= false;
-			int flash			= 0;
-			
+			byte flash			= 0;
 			byte context		= 0;
 			byte contextCount	= 1;
 	};

@@ -300,7 +300,7 @@ namespace psinc
 	}
 
 
-	void Camera::SetFlash(int power)
+	void Camera::SetFlash(byte power)
 	{
 		this->flash = power;
 	}
@@ -336,7 +336,7 @@ namespace psinc
 			case Mode::SlaveFalling:	this->send[5] = Commands::SlaveCaptureFalling;	break;
 		}
 		
-		this->send[6] = (byte)flash;
+		this->send[6] = flash;
 		this->send[7] = (byte)(size & 0xff);
 		this->send[8] = (byte)((size >> 8) & 0xff);
 		this->send[9] = (byte)((size >> 16) & 0xff);
