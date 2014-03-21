@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VERSION="$(cat version)"
-LIBRARY="emergent"
+LIBRARY="psinc"
 
 echo "Copying files ..."
 gzip -c9 debian/changelog > changelog.gz
@@ -18,7 +18,7 @@ sed -i "s/^Version.*/Version: $VERSION/" lib${LIBRARY}-dev/usr/lib/x86_64-linux-
 for root in "lib${LIBRARY}0" "lib${LIBRARY}-dev"; do
 
 	echo "Packaging $root"
-	
+
 	echo -n "  Modifying control file ... "
 		SIZE=$(du -s $root/usr | tr -cd '[[:digit:]]')
 		sed -i "s/^Installed-Size.*/Installed-Size: $SIZE/" $root/DEBIAN/control
