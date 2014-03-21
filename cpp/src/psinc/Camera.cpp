@@ -83,10 +83,17 @@ namespace psinc
 					{
 						stream = this->callback(this->Capture(this->handler, this->mode, this->flash));
 					}
-					else stream = this->callback(ACQUISITION_DISCONNECTED);
+					else 
+					{
+						stream = this->callback(ACQUISITION_DISCONNECTED);
+						
+						// Sleep the thread to avoid excessive connection attempts
+						// which will ramp up processor usage if in streaming mode.
+						this_thread::sleep_for(chrono::milliseconds(100));
+					}
 				}
 
-				if (!stream) this->handler = nullptr;
+				if (!stream) this->handler = nullptr;	
 			}
 			else
 			{

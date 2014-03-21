@@ -12,10 +12,6 @@ using namespace emergent;
 #define READ_PIPE	0x81
 
 
-//set<unsigned int> Transport::claimed;
-//mutex Transport::csClaim;
-
-
 Transport::Transport()
 {
 	libusb_init(&this->context);
@@ -196,7 +192,6 @@ bool Transport::Transfer(Buffer<byte> *buffer, bool write, bool check)
 
 		if (!err)
 		{
-			//cout << (write ? "w: " : "r: ") << transferred << " - " << *buffer << endl;
 			result = (write || check) ? transferred == buffer->Size() : true;
 
 			if (!result) FLOG(error, "USB device %d: Incomplete transfer when %s", this->id, write ? "writing" : "reading");

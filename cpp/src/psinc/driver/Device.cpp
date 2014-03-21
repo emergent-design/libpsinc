@@ -14,10 +14,6 @@ namespace psinc
 {
 	Device::Device()
 	{
-		// Need a default constructor because the device map will automatically create a new instance
-		// of device if accessed with an unknown key. Should probably respond to that here somehow! Throw
-		// an exception perhaps?
-		LOG(error, "A device was created without configuration, probably due to accessing an invalid key in the device map!");
 	}
 
 
