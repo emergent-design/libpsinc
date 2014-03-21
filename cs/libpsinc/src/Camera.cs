@@ -184,9 +184,9 @@ namespace libpsinc
 		
 		
 		/// <summary>
-		/// True if the camera has a monochrome imaging chip, otherwise false.
+		/// True if the camera has a bayer encoding imaging chip, otherwise false.
 		/// </summary>
-		protected bool monochrome = false;
+		protected bool bayer = false;
 		
 		
 		/// <summary>
@@ -382,9 +382,6 @@ namespace libpsinc
 		/// chip type and colour depth on the specified bus with a given camera serial number.
 		/// 
 		/// </summary>
-		/// <param name="type">string describing the imaging chip present in the connected hardware</param>
-		/// <param name="monochrome">If set to <c>true</c> the imaging chip in the hardware is monochrome, otherwise it is a bayer-colour chip.</param>
-		/// <param name="supplementary">Supplementary XML defining any connected Devices.</param>
 		/// <param name="serial">Serial number of the camera to connect to as a regular expression.
 	 	/// If empty the Camera will connect to the first available camera on the specified bus.</param>
 		/// <param name="bus">Bus ID to find the device on. If set to zero, the acquirer will look for the first device with a 
@@ -418,7 +415,7 @@ namespace libpsinc
 
 					if (this.transport.Connected)
 					{
-						var colour	= this.monochrome ? ColourMode.Monochrome : this.Colour ? ColourMode.BayerColour : ColourMode.BayerGrey;
+						var colour	= this.bayer ? (this.Colour ? ColourMode.BayerColour : ColourMode.BayerGrey) : ColourMode.Monochrome;
 						image		= this.Capture(this.Mode, colour, this.Flash);
 					}
 					else this.transport.Initialise();
@@ -505,7 +502,7 @@ namespace libpsinc
 							default:	cameraType = Camera.defaultType;	break;
 						}
 
-						this.monochrome = (description[2] & 0x01) > 0;
+						this.bayer = (description[2] & 0x01) == 0;
 					}
 
 					int count	= description[header + 1];
