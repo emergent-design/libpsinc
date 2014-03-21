@@ -1,0 +1,12 @@
+Package: libpsinc0
+Version: 0.0.0
+Section: libs
+Priority: optional
+Architecture: amd64
+Maintainer: Dan Parnham <dan@emergent-design.co.uk>
+Installed-Size: 2120
+Pre-Depends: multiarch-support
+Depends: libc6, libemergent0, libusb-1.0-0
+Description: Native driver for the PSI camera range
+ A C++ driver for the PSI camera range that uses libusb 1.0
+ for the communications.

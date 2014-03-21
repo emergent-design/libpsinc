@@ -1,0 +1,9 @@
+#!/bin/bash
+
+IFS='.';
+read -ra VERSION <<< "$(cat version)"
+VERSION[2]=`expr ${VERSION[2]} + 1`
+
+echo "${VERSION[*]}" > version
+
+dch -v "${VERSION[*]}" --distribution=unstable

@@ -1,0 +1,12 @@
+Package: libpsinc-dev
+Version: 0.0.0
+Section: libdevel
+Priority: optional
+Architecture: amd64
+Maintainer: Dan Parnham <dan@emergent-design.co.uk>
+Installed-Size: 84
+Depends: libpsinc0
+Suggests: pkg-config
+Description: Development headers for libpsinc
+ A C++ driver for the PSI camera range that uses libusb 1.0
+ for the communications.

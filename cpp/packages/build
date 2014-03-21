@@ -1,0 +1,50 @@
+#!/bin/bash
+
+VERSION="$(cat version)"
+LIBRARY="emergent"
+
+echo "Copying files ..."
+gzip -c9 debian/changelog > changelog.gz
+mkdir -p lib${LIBRARY}0/usr/lib/x86_64-linux-gnu
+mkdir -p lib${LIBRARY}-dev/usr/include
+cp changelog.gz lib${LIBRARY}0/usr/share/doc/lib${LIBRARY}0/
+cp changelog.gz lib${LIBRARY}-dev/usr/share/doc/lib${LIBRARY}-dev/
+cp ../lib/lib${LIBRARY}.so lib${LIBRARY}0/usr/lib/x86_64-linux-gnu/lib${LIBRARY}.so.${VERSION}
+ln -s lib${LIBRARY}.so.${VERSION} lib${LIBRARY}0/usr/lib/x86_64-linux-gnu/lib${LIBRARY}.so.0
+cp -r ../include/${LIBRARY} lib${LIBRARY}-dev/usr/include/
+
+sed -i "s/^Version.*/Version: $VERSION/" lib${LIBRARY}-dev/usr/lib/x86_64-linux-gnu/pkgconfig/${LIBRARY}.pc
+
+for root in "lib${LIBRARY}0" "lib${LIBRARY}-dev"; do
+
+	echo "Packaging $root"
+	
+	echo -n "  Modifying control file ... "
+		SIZE=$(du -s $root/usr | tr -cd '[[:digit:]]')
+		sed -i "s/^Installed-Size.*/Installed-Size: $SIZE/" $root/DEBIAN/control
+		sed -i "s/^Version.*/Version: $VERSION/" $root/DEBIAN/control
+	echo "done"
+
+	echo -n "  Removing temporary files and setting permissions ... "
+		find $root -name '*~' -type f -exec rm {} \;
+		find $root/usr -type d -exec chmod 0755 {} \;
+		find $root/usr -type f -exec chmod 0644 {} \;
+		[ -e $root/DEBIAN/postinst ] && chmod 0755 $root/DEBIAN/postinst
+		[ -e $root/DEBIAN/postrm ] && chmod 0755 $root/DEBIAN/postrm
+		[ -e $root/DEBIAN/shlibs ] && chmod 0644 $root/DEBIAN/shlibs
+	echo "done"
+
+	echo -n "  Building deb ... "
+		fakeroot dpkg-deb --build $root
+	echo "done"
+
+	mv ${root}.deb ${root}_${VERSION}_amd64.deb
+done
+
+
+echo "Cleaning up ..."
+rm lib${LIBRARY}0/usr/lib/x86_64-linux-gnu/lib${LIBRARY}.so.*
+rm -r lib${LIBRARY}-dev/usr/include/${LIBRARY}
+rm lib${LIBRARY}0/usr/share/doc/lib${LIBRARY}0/changelog.gz
+rm lib${LIBRARY}-dev/usr/share/doc/lib${LIBRARY}-dev/changelog.gz
+rm changelog.gz

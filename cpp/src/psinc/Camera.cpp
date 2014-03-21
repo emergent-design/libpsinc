@@ -173,7 +173,7 @@ namespace psinc
 					default: break;
 				}
 
-				this->monochrome = (description[2] & 0x01) > 0;
+				this->monochrome = (description[2] & 0x01) == 0;
 			}
 
 			byte *desc	= description + header + 1;

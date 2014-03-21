@@ -135,7 +135,7 @@ namespace psinc
 
 			Mode mode			= Mode::Normal;
 			volatile bool exit	= false;
-			bool monochrome		= false;
+			bool monochrome		= true;
 			bool initialised	= false;
 			byte flash			= 0;
 			byte context		= 0;

@@ -33,6 +33,9 @@ namespace psinc
 			bool Write(byte value);
 			
 			emg::Buffer<byte> Read();
+			
+			// Can this be removed since Buffer<byte> can be implicitly cast
+			// to a string?
 			std::string ReadString();
 			
 		protected:

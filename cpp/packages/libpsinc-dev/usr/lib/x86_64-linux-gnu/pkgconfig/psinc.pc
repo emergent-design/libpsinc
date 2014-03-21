@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libpsinc
+Description: Native driver for the PSI camera range
+Version: 0.0.0
+Requires:
+Libs: -L${libdir} -lpsinc
+Cflags: -I${includedir}/psinc

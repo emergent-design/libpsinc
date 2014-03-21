@@ -1,0 +1,39 @@
+{
+	"folders":
+	[
+		{
+			"path": "/",
+			"follow_symlinks": true,
+			"file_exclude_patterns": [ "*~", ".*", "*.make", "Makefile" ],
+			"folder_exclude_patterns": [ ".*", "bin", "lib", "obj" ]
+		},
+	],
+
+	"build_systems":
+	[
+		{
+			"name": "Build",
+			"shell": true,
+			"file_regex": "^(.+):([0-9]+):([0-9]+): (.*)$",
+			"working_dir": "${project_path}",
+			"cmd": [ "premake4 gmake && make -j8" ],
+		}
+	],
+
+	"settings":
+	{
+		"trim_trailing_white_space_on_save": true,
+    	"ensure_newline_at_eof_on_save": true,
+
+    	"sublimeclang_show_output_panel": false,
+		"sublimeclang_options":
+		[
+			"-isystem", "/usr/include",
+			"-isystem", "/usr/include/c++/*",
+
+			"-I${project_path}/include",
+			"-Wall",
+			"-Wno-overloaded-virtual"
+		]
+	}
+}
