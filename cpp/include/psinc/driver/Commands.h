@@ -3,6 +3,7 @@
 
 namespace psinc
 {
+	/// Camera commands
 	enum Commands
 	{
 		Capture				= 0x00,
@@ -11,7 +12,7 @@ namespace psinc
 		Flush				= 0x03,
 		MasterCapture		= 0x04,
 		SlaveCaptureFalling	= 0x05,
-		
+
 		WriteRegister		= 0x10,
 		WriteBit			= 0x11,
 		QueueRegister		= 0x12,

@@ -9,42 +9,66 @@
 
 namespace psinc
 {
+	/// Represents a device that is either a capability of the camera or
+	/// hardware that can be controlled by the camera.
 	class Device
 	{
 		public:
+
+			/// Indicates the direction of communication with this device
 			enum class Direction
 			{
-				Input,
-				Output,
-				Both
+				Input,	///< Values can be read from this device
+				Output,	///< Values can be written to this device
+				Both	///< Values can be both written to and read from this device
 			};
-			
+
+
+			/// Constructors
 			Device();
 			Device(Transport *transport, std::string name, byte index, Direction direction = Direction::Both);
-			
-			Direction GetDirection(std::string direction);
-			
+
+
+			/// Returns the name of this device
 			std::string Name();
-			
-			
+
+
+			/// Send an initialisation byte to the device
 			bool Initialise(byte configuration);
+
+
+			/// Write a string to the device
 			bool Write(std::string text);
+
+
+			/// Write the binary data to the device
 			bool Write(emg::Buffer<byte> &buffer);
+
+
+			/// Write a single byte to the device
 			bool Write(byte value);
-			
+
+
+			/// Read binary data from the device
 			emg::Buffer<byte> Read();
-			
+
+
 			// Can this be removed since Buffer<byte> can be implicitly cast
 			// to a string?
 			std::string ReadString();
-			
-		protected:
-			std::string name;
-			byte index				= 0;
-			Direction direction		= Direction::Both;
-			Transport *transport	= nullptr;
-	};
 
-	/// Definition for the map of features owned by the camera
-	//typedef std::map<std::string, std::unique_ptr<Device>> DeviceMap;
+		protected:
+
+			/// The name of this device
+			std::string name;
+
+			/// The device index
+			byte index = 0;
+
+			/// The device direction
+			Direction direction	= Direction::Both;
+
+			/// Reference to the transport layer (owned by the camera)
+			Transport *transport = nullptr;
+	};
 }

@@ -5,7 +5,7 @@
 
 namespace psinc
 {
-	/// An no-op data handler to allow frames to be captured but not processed in
+	/// A no-op data handler to allow frames to be captured but not processed in
 	/// any way. Useful when throwing a frame away after context switching.
 	class NoopHandler : public DataHandler
 	{

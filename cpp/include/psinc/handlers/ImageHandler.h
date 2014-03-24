@@ -18,7 +18,9 @@ namespace psinc
 			/// @param[in] image Reference to an image buffer that will be populated with the converted data.
 			ImageHandler(emg::ImageBase<byte> &image);
 
+
 			void Initialise(emg::ImageBase<byte> &image);
+
 
 			// Refer to parent documentation
 			virtual bool Process(bool monochrome, emg::Buffer<byte> &data, int width, int height);
