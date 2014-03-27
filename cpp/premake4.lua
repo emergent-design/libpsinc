@@ -25,4 +25,4 @@ solution "psinc"
 		postbuildcommands	"./strip bin/iconograph"
 		links				{ "libpsinc", "emergent", "freeimageplus" }
 		files				{ "include/iconograph/**h", "src/iconograph/**.cpp" }
-		
+
