@@ -92,6 +92,7 @@ namespace psinc
 		{
 			bool waiting = false;
 			Buffer<byte> receive(READ_BUFFER);
+			receive = 0;
 			Buffer<byte> command = {
 				0x00, 0x00, 0x00, 0x00, 0x00,							// Header
 				0x03, 0x00, 0x00, 0x00, 0x00, 							// Flush command
