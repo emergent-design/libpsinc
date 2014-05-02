@@ -1,3 +1,9 @@
+libpsinc0 (0.0.1) unstable; urgency=medium
+
+  * Added Instrument implementation based on a prototype hotplug transport.
+
+ -- Dan <dan@queeg>  Fri, 02 May 2014 17:11:28 +0100
+
 libpsinc0 (0.0.0) unstable; urgency=low
 
   * First release
