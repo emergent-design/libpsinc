@@ -1,3 +1,9 @@
+libpsinc0 (0.0.2) unstable; urgency=medium
+
+  * Added new counter device to the camera type.
+
+ -- Dan <dan@queeg>  Thu, 08 May 2014 15:12:50 +0100
+
 libpsinc0 (0.0.1) unstable; urgency=medium
 
   * Added Instrument implementation based on a prototype hotplug transport.

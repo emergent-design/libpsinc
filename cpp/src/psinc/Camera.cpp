@@ -30,11 +30,12 @@ namespace psinc
 			{ 0x08, { &this->transport, "Storage1", 	0x08 }},							// Storage block 1 (free for use - 127 bytes)
 			{ 0x09, { &this->transport, "Defaults", 	0x09 }},							// Default settings for this device. Modify with care.
 			{ 0x0e, { &this->transport, "LEDPair",		0x0e, Device::Direction::Output }},	// Simple LED pair
+			{ 0x13, { &this->transport, "Count",		0x13, Device::Direction::Input }},	// 64-bit counter
 			{ 0xff, { &this->transport, "Query", 		0xff, Device::Direction::Input }}	// Query the camera for a list of available devices and chip type
 		};
-		
-		this->send = Buffer<byte>({ 
-			0x00, 0x00, 0x00, 0x00, 0x00, 	// Header 
+
+		this->send = Buffer<byte>({
+			0x00, 0x00, 0x00, 0x00, 0x00, 	// Header
 			0x00, 0x00, 0x00, 0x00, 0x00,	// Command here
 			0xff							// Terminator
 		});
@@ -53,11 +54,11 @@ namespace psinc
 		}
 	}
 
-	
+
 	void Camera::Initialise(string serial, int bus)
 	{
 		this->transport.Initialise(serial, bus);
-		
+
 		if (!this->initialised)
 		{
 			this->_thread		= thread(&Camera::Entry, this);
@@ -83,17 +84,17 @@ namespace psinc
 					{
 						stream = this->callback(this->Capture(this->handler, this->mode, this->flash));
 					}
-					else 
+					else
 					{
 						stream = this->callback(ACQUISITION_DISCONNECTED);
-						
+
 						// Sleep the thread to avoid excessive connection attempts
 						// which will ramp up processor usage if in streaming mode.
 						this_thread::sleep_for(chrono::milliseconds(100));
 					}
 				}
 
-				if (!stream) this->handler = nullptr;	
+				if (!stream) this->handler = nullptr;
 			}
 			else
 			{
@@ -136,7 +137,7 @@ namespace psinc
 		{
 			// Ensure the registers match those in the camera that has just connected.
 			result = this->Configure() && this->RefreshRegisters();
-			
+
 			if (result)	this->callback(ACQUISITION_CONNECTED);
 			else		this->transport.Disconnect();
 		}
@@ -149,19 +150,19 @@ namespace psinc
 	{
 		return this->transport.Connected();
 	}
-	
-	
+
+
 	bool Camera::Configure()
 	{
 		this->aliases.clear();
 		this->features.clear();
 		this->devices.clear();
 		this->registers.clear();
-		
+
 		vector<byte> devices	= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		string xml				= chip::v024;
 		auto description		= this->devicePool[0xff].Read();
-		
+
 		if (description.Size())
 		{
 			int header = description[0];
@@ -178,34 +179,34 @@ namespace psinc
 
 			byte *desc	= description + header + 1;
 			int count	= *desc++;
-			
+
 			devices.assign(desc, desc + count);
 		}
-		
-		for (auto d : devices) 
+
+		for (auto d : devices)
 		{
 			this->devices[this->devicePool[d].Name()] = this->devicePool[d];
 		}
-		
+
 		xml_document doc;
 
 		if (doc.load_buffer(xml.data(), xml.size()))
 		{
 			return this->Configure(doc.child("camera"));
 		}
-		
+
 		return false;
 	}
-	
-	
+
+
 	bool Camera::Configure(xml_node xml)
 	{
 		this->contextCount = xml.attribute("contexts").as_int(1);
-		
+
 		for (auto &child : xml.children("register"))
 		{
 			int address = strtol(child.attribute("address").as_string("0x00"), nullptr, 0);
-			
+
 			this->registers[address] = { child, &this->transport };
 		}
 
@@ -215,7 +216,7 @@ namespace psinc
 		for (auto &child : xml.children("register"))
 		{
 			int address = strtol(child.attribute("address").as_string("0x00"), nullptr, 0);
-			
+
 			for (auto &feature : child.children("feature"))
 			{
 				this->features[feature.attribute("name").as_string()] = { feature, &this->registers[address] };
@@ -233,7 +234,7 @@ namespace psinc
 				if (context < 0)
 				{
 					// If context hasn't been assigned then it should be copied across all contexts
-					for (int i=0; i<this->contextCount; i++) 
+					for (int i=0; i<this->contextCount; i++)
 					{
 						this->aliases[i][key] = &this->features[feature];
 					}
@@ -244,11 +245,11 @@ namespace psinc
 				}
 			}
 		}
-			
+
 		return this->features.size();
 	}
-		
-	
+
+
 	bool Camera::RefreshRegisters()
 	{
 		byte maxPage = 0;
@@ -281,7 +282,7 @@ namespace psinc
 				else FLOG(error, "Failed to refresh registers for page %d", page);
 			}
 		}
-		
+
 		this->context = this->aliases[0]["Context"]->Get();
 
 		return true;
@@ -325,9 +326,9 @@ namespace psinc
 		int width	= this->aliases[this->context]["Width"]->Get();
 		int height	= this->aliases[this->context]["Height"]->Get();
 		int size	= width * height;
-		
+
 		this->receive.Resize(size);
-		
+
 		switch (mode)
 		{
 			case Mode::Normal:			this->send[5] = Commands::Capture;				break;
@@ -335,19 +336,19 @@ namespace psinc
 			case Mode::SlaveRising:		this->send[5] = Commands::SlaveCaptureRising;	break;
 			case Mode::SlaveFalling:	this->send[5] = Commands::SlaveCaptureFalling;	break;
 		}
-		
+
 		this->send[6] = flash;
 		this->send[7] = (byte)(size & 0xff);
 		this->send[8] = (byte)((size >> 8) & 0xff);
 		this->send[9] = (byte)((size >> 16) & 0xff);
-		
+
 		if (this->transport.Transfer(&this->send, &this->receive, image->waiting))
 		{
-			return image->Process(this->monochrome, this->receive, width, height) 
-				? ACQUISITION_SUCCESSFUL 
+			return image->Process(this->monochrome, this->receive, width, height)
+				? ACQUISITION_SUCCESSFUL
 				: ACQUISITION_ERROR_IMAGE_CONVERSION_FAILED;
 		}
-		
+
 		return ACQUISITION_ERROR_TRANSFER_FAILED;
 	}
 }

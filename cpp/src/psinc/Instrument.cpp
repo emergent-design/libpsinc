@@ -20,6 +20,7 @@ namespace psinc
 			{ 0x03, { &this->transport, "SecureLock",	0x03 }},							// Encrypted lock control
 			{ 0x09, { &this->transport, "Defaults", 	0x09 }},							// Default settings for this device. Modify with care.
 			{ 0x0e, { &this->transport, "LEDPair",		0x0e, Device::Direction::Output }},	// Simple LED pair
+			{ 0x13, { &this->transport, "Count",		0x13, Device::Direction::Input }},	// 64-bit counter
 			{ 0xff, { &this->transport, "Query", 		0xff, Device::Direction::Input }}	// Query the camera for a list of available devices and chip type
 		};
 
