@@ -59,6 +59,7 @@ namespace psinc
 
 
 			libusb_hotplug_callback_handle hotplug;
+			bool registered = false;
 
 			std::function<void(bool)> onConnection;
 	};

@@ -38,19 +38,11 @@ namespace psinc
 		this->serial		= serial;
 		this->product		= product;
 		this->onConnection	= onConnection;
-		auto events			= (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
-		auto callback		= [](libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data) {
-			((TransportHotplug *)data)->OnHotplug(device, event);
-			return 0;
-		};
+
 
 		libusb_hotplug_deregister_callback(this->context, this->hotplug);
 
-		if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, VENDOR, this->product, LIBUSB_HOTPLUG_MATCH_ANY, callback, this, &this->hotplug))
-		{
-			LOG(error, "Unable to register USB hotplug callback");
-			return false;
-		}
+		this->registered = false;
 
 		return true;
 	}
@@ -58,6 +50,23 @@ namespace psinc
 
 	void TransportHotplug::Poll(int time)
 	{
+		if (!this->registered)
+		{
+			auto events			= (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
+			auto callback		= [](libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data) {
+				((TransportHotplug *)data)->OnHotplug(device, event);
+				return 0;
+			};
+
+			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, VENDOR, this->product, LIBUSB_HOTPLUG_MATCH_ANY, callback, this, &this->hotplug))
+			{
+				LOG(error, "Unable to register USB hotplug callback");
+				return;
+			}
+
+			this->registered = true;
+		}
+
 		struct timeval tv = { 0, time * 1000 };
 		libusb_handle_events_timeout_completed(this->context, &tv, nullptr);
 	}
