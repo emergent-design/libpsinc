@@ -1,3 +1,9 @@
+libpsinc0 (0.0.4) unstable; urgency=medium
+
+  * Patched the hotplug transport destructor.
+
+ -- Dan <dan@queeg>  Sat, 10 May 2014 12:09:10 +0100
+
 libpsinc0 (0.0.3) unstable; urgency=medium
 
   * Moved the hotplug registration to the polling function so that any immediate

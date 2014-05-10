@@ -12,18 +12,9 @@ using namespace emergent;
 
 namespace psinc
 {
-	TransportHotplug::TransportHotplug()
-	{
-		libusb_init(&this->context);
-	}
-
-
 	TransportHotplug::~TransportHotplug()
 	{
-		this->Release();
-
 		libusb_hotplug_deregister_callback(this->context, this->hotplug);
-		libusb_exit(this->context);
 	}
 
 

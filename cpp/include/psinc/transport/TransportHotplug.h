@@ -22,7 +22,6 @@ namespace psinc
 	{
 		public:
 
-			TransportHotplug();
 			virtual ~TransportHotplug();
 
 			/// Initialises the transport with the product ID and
