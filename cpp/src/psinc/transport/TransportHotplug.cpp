@@ -59,7 +59,26 @@ namespace psinc
 		}
 
 		struct timeval tv = { 0, time * 1000 };
-		libusb_handle_events_timeout_completed(this->context, &tv, nullptr);
+
+		if (libusb_try_lock_events(this->context) == 0)
+		{
+			if (libusb_event_handling_ok(this->context))
+			{
+				libusb_handle_events_timeout_completed(this->context, &tv, nullptr);
+			}
+
+			libusb_unlock_events(this->context);
+		}
+		/*else
+		{
+			libusb_lock_event_waiters(this->context);
+
+			if (libusb_event_handler_active(this->context))
+			{
+				libusb_wait_for_event(this->context, nullptr);
+			}
+			libusb_unlock_event_waiters(this->context);
+		}*/
 	}
 
 
