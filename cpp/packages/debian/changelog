@@ -1,3 +1,10 @@
+libpsinc0 (0.0.6) unstable; urgency=medium
+
+  * Disabled the critical section in the hotplug transport since I'm not 
+    sure it's required but it is causing a deadlock 
+
+ -- Dan <dan@queeg>  Wed, 21 May 2014 17:26:21 +0100
+
 libpsinc0 (0.0.5) unstable; urgency=medium
 
   * Updated the hotplug transport to use libusb event locking. 

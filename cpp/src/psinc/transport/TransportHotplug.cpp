@@ -86,7 +86,7 @@ namespace psinc
 	{
 		bool trigger = false;
 		//lock_guard<mutex> lock(this->cs);
-		this->cs.lock();
+		//this->cs.lock();
 
 		if (this->handle)
 		{
@@ -111,7 +111,7 @@ namespace psinc
 			}
 		}
 
-		this->cs.unlock();
+		//this->cs.unlock();
 
 		if (trigger && this->onConnection) this->onConnection(this->handle);
 	}
