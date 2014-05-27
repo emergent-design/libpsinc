@@ -7,6 +7,7 @@
 #include <emergent/struct/Buffer.h>
 #include <libusb-1.0/libusb.h>
 #include <mutex>
+#include <queue>
 
 
 namespace psinc
@@ -61,5 +62,13 @@ namespace psinc
 			bool registered = false;
 
 			std::function<void(bool)> onConnection;
+
+			struct Pending
+			{
+				libusb_device *device;
+				libusb_hotplug_event event;
+			};
+
+			std::queue<Pending> pending;
 	};
 }

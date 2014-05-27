@@ -69,51 +69,52 @@ namespace psinc
 
 			libusb_unlock_events(this->context);
 		}
-		/*else
-		{
-			libusb_lock_event_waiters(this->context);
 
-			if (libusb_event_handler_active(this->context))
+		Pending pending = { nullptr };
+
+		this->cs.lock();
+
+			if (!this->pending.empty())
 			{
-				libusb_wait_for_event(this->context, nullptr);
+				pending = this->pending.front();
+				this->pending.pop();
 			}
-			libusb_unlock_event_waiters(this->context);
-		}*/
+
+		this->cs.unlock();
+
+		if (pending.device)
+		{
+			if (this->handle)
+			{
+				if (pending.event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT)
+				{
+					if (pending.device == libusb_get_device(this->handle))
+					{
+						this->Release();
+
+						if (this->onConnection) this->onConnection(false);
+					}
+				}
+			}
+			else
+			{
+				if (pending.event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED)
+				{
+					if (this->Claim(pending.device) && this->onConnection)
+					{
+						this->onConnection(true);
+					}
+				}
+			}
+		}
 	}
 
 
 	void TransportHotplug::OnHotplug(libusb_device *device, libusb_hotplug_event event)
 	{
-		bool trigger = false;
-		//lock_guard<mutex> lock(this->cs);
-		//this->cs.lock();
+		lock_guard<mutex> lock(this->cs);
 
-		if (this->handle)
-		{
-			if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT)
-			{
-				if (device == libusb_get_device(this->handle))
-				{
-					this->Release();
-					trigger = true;
-				}
-			}
-		}
-		else
-		{
-			if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED)
-			{
-				if (this->Claim(device) && this->onConnection)
-				{
-					trigger = true;
-					//this->onConnection(true);
-				}
-			}
-		}
-
-		//this->cs.unlock();
-
-		if (trigger && this->onConnection) this->onConnection(this->handle);
+		this->pending.push({ device, event });
 	}
 
 

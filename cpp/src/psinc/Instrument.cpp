@@ -70,8 +70,7 @@ namespace psinc
 	{
 		while (!this->exit)
 		{
-			this->transport.Poll(0);
-			this_thread::sleep_for(chrono::milliseconds(10));
+			this->transport.Poll(10);
 		}
 	}
 
