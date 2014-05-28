@@ -1,3 +1,9 @@
+libpsinc0 (0.0.8) unstable; urgency=medium
+
+  * Separate critical section required for hotplugging. 
+
+ -- Dan <dan@queeg>  Wed, 28 May 2014 15:02:03 +0100
+
 libpsinc0 (0.0.7) unstable; urgency=medium
 
   * Disabling the critical section was a bad idea. Refactored to avoid
