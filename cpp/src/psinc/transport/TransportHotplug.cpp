@@ -12,18 +12,9 @@ using namespace emergent;
 
 namespace psinc
 {
-	TransportHotplug::TransportHotplug()
-	{
-		libusb_init(&this->context);
-	}
-
-
 	TransportHotplug::~TransportHotplug()
 	{
-		this->Release();
-
 		libusb_hotplug_deregister_callback(this->context, this->hotplug);
-		libusb_exit(this->context);
 	}
 
 
@@ -39,7 +30,6 @@ namespace psinc
 		this->product		= product;
 		this->onConnection	= onConnection;
 
-
 		libusb_hotplug_deregister_callback(this->context, this->hotplug);
 
 		this->registered = false;
@@ -48,14 +38,23 @@ namespace psinc
 	}
 
 
+	int TransportHotplug::Push(libusb_device *device, libusb_hotplug_event event)
+	{
+		lock_guard<mutex> lock(this->csHotplug);
+
+		this->pending.push({ device, event });
+
+		return 0;
+	}
+
+
 	void TransportHotplug::Poll(int time)
 	{
 		if (!this->registered)
 		{
-			auto events			= (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
-			auto callback		= [](libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data) {
-				((TransportHotplug *)data)->OnHotplug(device, event);
-				return 0;
+			auto events		= (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
+			auto callback	= [](libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data) {
+				return ((TransportHotplug *)data)->Push(device, event);
 			};
 
 			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, VENDOR, this->product, LIBUSB_HOTPLUG_MATCH_ANY, callback, this, &this->hotplug))
@@ -67,43 +66,41 @@ namespace psinc
 			this->registered = true;
 		}
 
-		struct timeval tv = { 0, time * 1000 };
+		Pending item		= { nullptr };
+		struct timeval tv	= { 0, time * 1000 };
+
 		libusb_handle_events_timeout_completed(this->context, &tv, nullptr);
-	}
 
+		this->csHotplug.lock();
 
-	void TransportHotplug::OnHotplug(libusb_device *device, libusb_hotplug_event event)
-	{
-		bool trigger = false;
-		//lock_guard<mutex> lock(this->cs);
-		this->cs.lock();
-
-		if (this->handle)
-		{
-			if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT)
+			if (!this->pending.empty())
 			{
-				if (device == libusb_get_device(this->handle))
+				item = this->pending.front();
+				this->pending.pop();
+			}
+
+		this->csHotplug.unlock();
+
+		if (item.device)
+		{
+			if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT && this->handle)
+			{
+				if (item.device == libusb_get_device(this->handle))
 				{
 					this->Release();
-					trigger = true;
+
+					if (this->onConnection) this->onConnection(false);
 				}
 			}
-		}
-		else
-		{
-			if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED)
+
+			if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED && !this->handle)
 			{
-				if (this->Claim(device) && this->onConnection)
+				if (this->Claim(item.device) && this->onConnection)
 				{
-					trigger = true;
-					//this->onConnection(true);
+					this->onConnection(true);
 				}
 			}
 		}
-
-		this->cs.unlock();
-
-		if (trigger && this->onConnection) this->onConnection(this->handle);
 	}
 
 
@@ -124,6 +121,8 @@ namespace psinc
 
 	bool TransportHotplug::Claim(libusb_device *device)
 	{
+		lock_guard<mutex> lock(this->cs);
+
 		libusb_device_descriptor descriptor;
 
 		if (libusb_get_device_descriptor(device, &descriptor) == 0)
@@ -163,6 +162,8 @@ namespace psinc
 
 	void TransportHotplug::Release()
 	{
+		lock_guard<mutex> lock(this->cs);
+
 		if (this->handle)
 		{
 			// Release the device and close the handle
@@ -175,6 +176,5 @@ namespace psinc
 			this->id		= "";
 		}
 	}
-
 }
 

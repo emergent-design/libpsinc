@@ -1,7 +1,12 @@
 #!/bin/bash
 
 VERSION="$(cat version)"
+FULLVERSION=$VERSION
 LIBRARY="psinc"
+
+if (($# == 1)); then
+	FULLVERSION=$VERSION-$1
+fi
 
 echo "Copying files ..."
 gzip -c9 debian/changelog > changelog.gz
@@ -13,7 +18,7 @@ cp ../lib/lib${LIBRARY}.so lib${LIBRARY}0/usr/lib/x86_64-linux-gnu/lib${LIBRARY}
 ln -s lib${LIBRARY}.so.${VERSION} lib${LIBRARY}0/usr/lib/x86_64-linux-gnu/lib${LIBRARY}.so.0
 cp -r ../include/${LIBRARY} lib${LIBRARY}-dev/usr/include/
 
-sed -i "s/^Version.*/Version: $VERSION/" lib${LIBRARY}-dev/usr/lib/x86_64-linux-gnu/pkgconfig/${LIBRARY}.pc
+sed -i "s/^Version.*/Version: $FULLVERSION/" lib${LIBRARY}-dev/usr/lib/x86_64-linux-gnu/pkgconfig/${LIBRARY}.pc
 
 for root in "lib${LIBRARY}0" "lib${LIBRARY}-dev"; do
 

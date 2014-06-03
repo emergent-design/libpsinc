@@ -1,3 +1,36 @@
+libpsinc0 (0.0.8) unstable; urgency=medium
+
+  * Separate critical section required for hotplugging. 
+
+ -- Dan <dan@queeg>  Wed, 28 May 2014 15:02:03 +0100
+
+libpsinc0 (0.0.7) unstable; urgency=medium
+
+  * Disabling the critical section was a bad idea. Refactored to avoid
+    a deadlock by queueing the hotplugged devices and then handling
+    them on the transport thread. 
+
+ -- Dan <dan@queeg>  Tue, 27 May 2014 15:38:21 +0100
+
+libpsinc0 (0.0.6) unstable; urgency=medium
+
+  * Disabled the critical section in the hotplug transport since I'm not 
+    sure it's required but it is causing a deadlock 
+
+ -- Dan <dan@queeg>  Wed, 21 May 2014 17:26:21 +0100
+
+libpsinc0 (0.0.5) unstable; urgency=medium
+
+  * Updated the hotplug transport to use libusb event locking. 
+
+ -- Dan <dan@queeg>  Wed, 21 May 2014 16:57:36 +0100
+
+libpsinc0 (0.0.4) unstable; urgency=medium
+
+  * Patched the hotplug transport destructor.
+
+ -- Dan <dan@queeg>  Sat, 10 May 2014 12:09:10 +0100
+
 libpsinc0 (0.0.3) unstable; urgency=medium
 
   * Moved the hotplug registration to the polling function so that any immediate
