@@ -417,10 +417,9 @@ namespace libpsinc
 					{
 						var colour	= this.bayer ? (this.Colour ? ColourMode.BayerColour : ColourMode.BayerGrey) : ColourMode.Monochrome;
 						image		= this.Capture(this.Mode, colour, this.Flash);
+						this.Acquired(image);
 					}
 					else this.transport.Initialise();
-
-					this.Acquired(image);
 				}
 
 				Thread.Sleep(this.Sleep);
