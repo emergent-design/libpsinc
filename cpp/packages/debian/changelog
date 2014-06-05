@@ -1,3 +1,10 @@
+libpsinc0 (0.0.9) unstable; urgency=medium
+
+  * Patches for compiling under Windows. Change to how hotplug handles
+    the callback (since lambdas don't convert to __stdcall under mingw).
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Thu, 05 Jun 2014 12:17:16 +0100
+
 libpsinc0 (0.0.8) unstable; urgency=medium
 
   * Separate critical section required for hotplugging. 
