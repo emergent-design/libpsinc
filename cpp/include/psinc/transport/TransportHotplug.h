@@ -38,20 +38,12 @@ namespace psinc
 
 
 			bool Match(libusb_device_handle *device, int index);
-
-			/// Push onto the pending queue
-			int Push(libusb_device *device, libusb_hotplug_event event);
-
-
+			
 			/// Attempt to claim the given device.
 			bool Claim(libusb_device *device);
 
 			/// Releases the device.
 			virtual void Release();
-
-
-			//void OnHotplug(libusb_device *device, libusb_hotplug_event event);
-
 
 			/// Product ID that we are interested in
 			int product;
@@ -74,5 +66,8 @@ namespace psinc
 
 			std::queue<Pending> pending;
 			std::mutex csHotplug;
+			
+			/// Push onto the pending queue
+			friend int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data);
 	};
 }

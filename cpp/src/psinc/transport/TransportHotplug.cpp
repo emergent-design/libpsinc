@@ -37,27 +37,26 @@ namespace psinc
 		return true;
 	}
 
-
-	int TransportHotplug::Push(libusb_device *device, libusb_hotplug_event event)
+	
+	int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data)
 	{
-		lock_guard<mutex> lock(this->csHotplug);
-
-		this->pending.push({ device, event });
-
+		lock_guard<mutex> lock(((TransportHotplug *)data)->csHotplug);
+		
+		((TransportHotplug *)data)->pending.push({ device, event });
+		
 		return 0;
 	}
 
 
 	void TransportHotplug::Poll(int time)
 	{
+		using namespace std::placeholders;
+		
 		if (!this->registered)
 		{
-			auto events		= (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
-			auto callback	= [](libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data) {
-				return ((TransportHotplug *)data)->Push(device, event);
-			};
+			auto events = (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
 
-			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, VENDOR, this->product, LIBUSB_HOTPLUG_MATCH_ANY, callback, this, &this->hotplug))
+			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, VENDOR, this->product, LIBUSB_HOTPLUG_MATCH_ANY, &OnHotplug, this, &this->hotplug))
 			{
 				LOG(error, "Unable to register USB hotplug callback");
 				return;
