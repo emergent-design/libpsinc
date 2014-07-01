@@ -45,8 +45,8 @@ namespace psinc
 	{
 		bool waiting	= false;
 		this->value 	= (this->value & ~mask) | ((value << offset) & mask);
-		
-		Buffer<byte> data = { 
+
+		Buffer<byte> data = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 			// Header
 			Commands::WriteRegister, 				// Command
 			(byte)(this->address & 0xff),
@@ -59,15 +59,15 @@ namespace psinc
 		this->transport->Transfer(&data, nullptr, waiting);
 	}
 
-	
+
 	void Register::SetBit(int offset, bool value)
 	{
 		bool waiting = false;
 		if (value) 	this->value |= 1 << offset;
 		else 		this->value &= ~(1 << offset);
-		
-		Buffer<byte> data = { 
-			0x00, 0x00, 0x00, 0x00, 0x00, 
+
+		Buffer<byte> data = {
+			0x00, 0x00, 0x00, 0x00, 0x00,
 			Commands::WriteBit, (byte)(this->address & 0xff), (byte)((this->address >> 8) & 0xff), (byte)offset, (byte)((value ? 1 : 0)),
 			0xff
 		};
@@ -75,14 +75,14 @@ namespace psinc
 
 		this->transport->Transfer(&data, nullptr, waiting);
 	}
-	
-	
+
+
 	bool Register::Refresh()
 	{
 		bool waiting = false;
 		Buffer<byte> receive(5);
 		Buffer<byte> command = {
-			0x00, 0x00, 0x00, 0x00, 0x00,																				// Header 
+			0x00, 0x00, 0x00, 0x00, 0x00,																				// Header
 			0x03, 0x00, 0x00, 0x00, 0x00, 																				// Flush command
 			Commands::QueueRegister, (byte)(this->address & 0xff), (byte)((this->address >> 8) & 0xff), 0x00, 0x00, 	// Command
 			0xff 																										// Terminator
@@ -90,11 +90,11 @@ namespace psinc
 
 		if (this->transport->Transfer(&command, &receive, waiting))
 		{
-			this->value = (receive[3] << 8) + receive[4];
-			
+			this->value = (receive[4] << 8) + receive[3];
+
 			return true;
 		}
-		
+
 		return false;
 	}
 
