@@ -15,6 +15,11 @@ solution "psinc"
 	buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++11", "-O3", "-fPIC", "-D_FORTIFY_SOURCE=2" }
 	excludes		{ "**.bak", "**~" }
 	
+	newoption {
+	   trigger     = "iconograph",
+	   description = "Enable the iconograph project, you must have pkgconfig and gtk+ 3.0 set up"
+	}
+	
 	configuration "linux"
 		flags	"Symbols"
 
@@ -26,8 +31,9 @@ solution "psinc"
 		files				{ "include/psinc/**h", "src/psinc/**.cpp" }
 		configuration "linux"
 			postbuildcommands	"./strip lib/libpsinc.so"
-
-	project "iconograph"
+	
+	if _OPTIONS.iconograph then
+		project				"iconograph"
 		kind				"WindowedApp"
 		targetdir			"bin"
 		buildoptions		{ pkgconfig("cflags", "gtk+-3.0") }
@@ -36,4 +42,5 @@ solution "psinc"
 		files				{ "include/iconograph/**h", "src/iconograph/**.cpp" }
 		configuration "linux"
 			postbuildcommands	"./strip bin/iconograph"
+	end
 
