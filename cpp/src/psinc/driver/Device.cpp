@@ -41,7 +41,7 @@ namespace psinc
 			0xff																// Terminator
 		};
 
-		return this->transport->Transfer(&data, nullptr, waiting);
+		return this->transport ? this->transport->Transfer(&data, nullptr, waiting) : false;
 	}
 
 
@@ -69,7 +69,7 @@ namespace psinc
 		memcpy(data.Data() + 10, buffer.Data(), size);
 		data[size+10] = 0xff;					// Terminator
 
-		return this->transport->Transfer(&data, nullptr, waiting);
+		return this->transport ? this->transport->Transfer(&data, nullptr, waiting) : false;
 	}
 
 
@@ -82,7 +82,7 @@ namespace psinc
 			0xff													// Terminator
 		};
 
-		return this->transport->Transfer(&data, nullptr, waiting);
+		return this->transport ? this->transport->Transfer(&data, nullptr, waiting) : false;
 	}
 
 
@@ -100,7 +100,7 @@ namespace psinc
 				0xff 													// Terminator
 			};
 
-			if (this->transport->Transfer(&command, &receive, waiting, false))
+			if (this->transport && this->transport->Transfer(&command, &receive, waiting, false))
 			{
 				int length = (receive[3] << 8) + receive[2];
 
