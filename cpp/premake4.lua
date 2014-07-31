@@ -12,7 +12,6 @@ solution "psinc"
 	platforms		"native"
 	includedirs		"include"
 	libdirs			"lib"
-	buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++11", "-O3", "-fPIC", "-D_FORTIFY_SOURCE=2" }
 	excludes		{ "**.bak", "**~" }
 	
 	newoption {
@@ -20,17 +19,21 @@ solution "psinc"
 	   description = "Enable the iconograph project, you must have pkgconfig and gtk+ 3.0 set up"
 	}
 	
-	configuration "linux"
-		flags	"Symbols"
+	configuration "not vs*"
+		flags			"Symbols"
+		buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++11", "-O3", "-D_FORTIFY_SOURCE=2" }
 
 	project "libpsinc"
 		kind				"SharedLib"
 		targetname			"psinc"
 		links				{ "emergent", "usb-1.0" }
-		linkoptions 		{ "-Wl,-soname,libpsinc.so.0" }
 		files				{ "include/psinc/**h", "src/psinc/**.cpp" }
 		configuration "linux"
 			postbuildcommands	"./strip lib/libpsinc.so"
+		configuration "not vs*"
+			linkoptions 		{ "-Wl,-soname,libpsinc.so.0" }
+		configuration "vs*"
+			kind "StaticLib"
 	
 	if _OPTIONS.iconograph then
 		project				"iconograph"

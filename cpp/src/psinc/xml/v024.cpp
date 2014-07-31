@@ -1,4 +1,4 @@
-namespace psinc { namespace chip { const char *v024 = u8R"xml(
+namespace psinc { namespace chip { const char *v024 = R"xml(
 <?xml version="1.0" encoding="utf-8"?>
 <camera chip="v024" bits="16" manufacturer="PSI" author="dan" contexts="2">
 	<alias context="0" name="Width" feature="A: Window Width" />
@@ -284,7 +284,8 @@ namespace psinc { namespace chip { const char *v024 = u8R"xml(
 		<feature name="A: Tile Gain X2 Y4" bits="4" min="1" max="15" default="4" />
 		<feature name="Sample Weight X2 Y4" bits="4" offset="4" min="1" max="15" default="15" />
 		<feature name="B: Tile Gain X2 Y4" bits="4" offset="8" min="1" max="15" default="4" />
-	</register>	
+	</register>
+	)xml" R"xml(
 	<register address="0x97">	
 		<feature name="A: Tile Gain X3 Y4" bits="4" min="1" max="15" default="4" />
 		<feature name="Sample Weight X3 Y4" bits="4" offset="4" min="1" max="15" default="15" />

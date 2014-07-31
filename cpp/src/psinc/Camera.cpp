@@ -18,7 +18,7 @@ namespace psinc
 	{
 		// Notes:
 		// The "Name" also appears as part of the serial in the USB descriptor for this device.
-		this->devicePool = {
+		this->devicePool = map<byte, Device> {
 			{ 0x00, { &this->transport, "Prox", 		0x00, Device::Direction::Input }},	// Prox reader device
 			{ 0x01, { &this->transport, "Lock",			0x01, Device::Direction::Output }},	// Electronic lock control
 			{ 0x02, { &this->transport, "LEDArray",		0x02, Device::Direction::Output }},	// LED array

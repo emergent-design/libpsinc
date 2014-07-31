@@ -13,7 +13,7 @@ namespace psinc
 
 	Instrument::Instrument()
 	{
-		this->deviceSets[Type::Camera] = {
+		this->deviceSets[Type::Camera] = map<byte, Device> {
 			{ 0x00, { &this->transport, "Prox", 		0x00, Device::Direction::Input }},	// Prox reader device
 			{ 0x01, { &this->transport, "Lock",			0x01, Device::Direction::Output }},	// Electronic lock control
 			{ 0x02, { &this->transport, "LEDArray",		0x02, Device::Direction::Output }},	// LED array
@@ -24,7 +24,7 @@ namespace psinc
 			{ 0xff, { &this->transport, "Query", 		0xff, Device::Direction::Input }}	// Query the camera for a list of available devices and chip type
 		};
 
-		this->deviceSets[Type::Odometer] = {
+		this->deviceSets[Type::Odometer] = map<byte, Device> {
 			{ 0x00, { &this->transport, "Count", 		0x00, Device::Direction::Input }},	// The odometer count value
 		};
 
