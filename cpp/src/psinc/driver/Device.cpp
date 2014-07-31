@@ -113,12 +113,4 @@ namespace psinc
 
 		return {};
 	}
-
-
-	string Device::ReadString()
-	{
-		auto receive = this->Read();
-
-		return receive.Size() ? string((char *)receive.Data(), receive.Size()) : "";
-	}
 }
