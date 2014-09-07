@@ -6,15 +6,17 @@ using namespace emergent;
 
 namespace psinc
 {
-	ImageHandler::ImageHandler(ImageBase<byte> &image)
+	ImageHandler::ImageHandler(ImageBase<byte> &image, bool forceBayer)
 	{
-		this->image = &image;
+		this->image			= &image;
+		this->forceBayer	= forceBayer;
 	}
 
 
-	void ImageHandler::Initialise(ImageBase<byte> &image)
+	void ImageHandler::Initialise(ImageBase<byte> &image, bool forceBayer)
 	{
-		this->image = &image;
+		this->image			= &image;
+		this->forceBayer	= forceBayer;
 	}
 
 

@@ -16,10 +16,10 @@ namespace psinc
 
 			/// Constructor
 			/// @param[in] image Reference to an image buffer that will be populated with the converted data.
-			ImageHandler(emg::ImageBase<byte> &image);
+			ImageHandler(emg::ImageBase<byte> &image, bool forceBayer = false);
 
 
-			void Initialise(emg::ImageBase<byte> &image);
+			void Initialise(emg::ImageBase<byte> &image, bool forceBayer = false);
 
 
 			// Refer to parent documentation
