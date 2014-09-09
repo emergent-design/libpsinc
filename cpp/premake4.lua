@@ -1,10 +1,3 @@
-local function pkgconfig(opt, lib)
-    local cmdStream = assert(io.popen("pkg-config --" .. opt .. " " .. lib))
-    local cmdOutput = assert(cmdStream:read("*l"))
-    cmdStream:close()
-    return cmdOutput;
-end
-
 solution "psinc"
 	language		"C++"
 	targetdir		"lib"
@@ -20,8 +13,7 @@ solution "psinc"
 	}
 	
 	configuration "not vs*"
-		flags			"Symbols"
-		buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++11", "-O3", "-D_FORTIFY_SOURCE=2" }
+		
 
 	project "libpsinc"
 		kind				"SharedLib"
@@ -31,19 +23,10 @@ solution "psinc"
 		configuration "linux"
 			postbuildcommands	"./strip lib/libpsinc.so"
 		configuration "not vs*"
-			linkoptions 		{ "-Wl,-soname,libpsinc.so.0" }
+			flags			"Symbols"
+			buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++11", "-O3", "-D_FORTIFY_SOURCE=2" }
+			linkoptions 	{ "-Wl,-soname,libpsinc.so.0" }
 		configuration "vs*"
 			kind "StaticLib"
-	
-	if _OPTIONS.iconograph then
-		project				"iconograph"
-		kind				"WindowedApp"
-		targetdir			"bin"
-		buildoptions		{ pkgconfig("cflags", "gtk+-3.0") }
-		linkoptions			{ pkgconfig("libs", "gtk+-3.0") }
-		links				{ "libpsinc", "emergent", "freeimage" }
-		files				{ "include/iconograph/**h", "src/iconograph/**.cpp" }
-		configuration "linux"
-			postbuildcommands	"./strip bin/iconograph"
-	end
+
 

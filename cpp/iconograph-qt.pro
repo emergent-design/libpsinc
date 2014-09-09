@@ -6,11 +6,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = iconograph-qt
 TEMPLATE = app
 
-INCLUDEPATH += include/iconograph-qt
+INCLUDEPATH += include/iconograph-qt include
 SOURCES += src/iconograph-qt/*.cpp
 HEADERS += include/iconograph-qt/*.h
 FORMS   += ui/*.ui
-LIBS    += -lemergent -lpsinc
+LIBS    += -Llib -lemergent -lpsinc
 
 DESTDIR = bin
 OBJECTS_DIR = bin/.obj
