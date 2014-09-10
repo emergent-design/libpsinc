@@ -199,7 +199,7 @@ namespace psinc
 
 				if (!result) FLOG(error, "USB device %d: Incomplete transfer when %s", this->id, write ? "writing" : "reading");
 			}
-			else if (err == LIBUSB_ERROR_NO_DEVICE)
+			else if (err == LIBUSB_ERROR_NO_DEVICE || err == LIBUSB_ERROR_IO)
 			{
 				FLOG(error, "USB device %d: Device has been disconnected", this->id);
 				this->Release();
