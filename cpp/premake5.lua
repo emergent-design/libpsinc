@@ -27,11 +27,11 @@ solution "psinc"
 			linkoptions 	{ "-Wl,-soname,libpsinc.so.0" }
 			
 		configuration "vs*"
-			configurations { "debug", "release" }
-			kind "StaticLib"
+			kind		"StaticLib"
+			defines		"NOMINMAX"
+			targetname	"psinc_%{cfg.buildcfg}_%{cfg.platform}"
+			
 			configuration "debug"
 				flags		"Symbols"
-				targetname	"psincd"
 			configuration "release"
 				optimize	"Full"
-
