@@ -147,6 +147,13 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="3">
+         <widget class="QCheckBox" name="flashCheck">
+          <property name="text">
+           <string>Enable</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="1">
          <widget class="QSlider" name="flashSlider">
           <property name="enabled">
@@ -188,10 +195,10 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QCheckBox" name="flashCheck">
+        <item row="1" column="3">
+         <widget class="QCheckBox" name="exposureCheck">
           <property name="text">
-           <string>Enable</string>
+           <string>Auto</string>
           </property>
          </widget>
         </item>
@@ -220,10 +227,25 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="3">
-         <widget class="QCheckBox" name="exposureCheck">
-          <property name="text">
-           <string>Auto</string>
+        <item row="6" column="1">
+         <widget class="QSlider" name="adcSlider">
+          <property name="maximum">
+           <number>7</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="invertedAppearance">
+           <bool>false</bool>
+          </property>
+          <property name="invertedControls">
+           <bool>false</bool>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::TicksBelow</enum>
+          </property>
+          <property name="tickInterval">
+           <number>1</number>
           </property>
          </widget>
         </item>
@@ -259,25 +281,10 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
-         <widget class="QSlider" name="adcSlider">
+        <item row="6" column="2">
+         <widget class="QSpinBox" name="adcSpin">
           <property name="maximum">
            <number>7</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="invertedAppearance">
-           <bool>false</bool>
-          </property>
-          <property name="invertedControls">
-           <bool>false</bool>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::TicksBelow</enum>
-          </property>
-          <property name="tickInterval">
-           <number>1</number>
           </property>
          </widget>
         </item>
@@ -294,24 +301,10 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="2">
-         <widget class="QSpinBox" name="adcSpin">
-          <property name="maximum">
-           <number>7</number>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="3">
          <widget class="QCheckBox" name="gainCheck">
           <property name="text">
            <string>Auto</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="3">
-         <widget class="QPushButton" name="adcReset">
-          <property name="text">
-           <string>Reset</string>
           </property>
          </widget>
         </item>
@@ -322,7 +315,7 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
+        <item row="8" column="1">
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -334,6 +327,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="6" column="3">
+         <widget class="QPushButton" name="adcReset">
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
