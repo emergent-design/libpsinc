@@ -25,9 +25,9 @@ namespace psinc
 		this->maximum		= configuration.attribute("max").as_int(1);
 		this->flag			= this->bits == 1;
 		this->mask			= 0;
-		
+
 		for (int i=0; i<this->bits; i++) this->mask |= 1 << (this->offset + i);
-		
+
 		this->Invalidate(configuration.attribute("invalid").as_string());
 	}
 
@@ -38,21 +38,21 @@ namespace psinc
 		{
 			char *check;
 			auto ranges = explode(values, ",");
-			
+
 			for (string &range : ranges)
 			{
 				if (range.size())
 				{
 					auto limits	= explode(range, "-");
 					int start	= strtol(limits[0].c_str(), &check, 0);
-					
+
 					if (check > limits[0].c_str())
 					{
 						if (limits.size() > 1)
 						{
 							int end	= strtol(limits[1].c_str(), &check, 0);
-							
-							if (check < limits[1].c_str()) 
+
+							if (check < limits[1].c_str())
 							{
 								for (int i=start; i<=end; i++) this->invalid.insert(i);
 							}
@@ -72,7 +72,7 @@ namespace psinc
 			if (this->flag)	this->parent->SetBit(this->offset, value);
 			else			this->parent->Set(this->offset, this->mask, value);
 		}
-		
+
 		return false;
 	}
 
@@ -81,7 +81,7 @@ namespace psinc
 	{
 		return this->parent ? (this->parent->Get() & this->mask) >> this->offset : 0;
 	}
-			
+
 
 	int Feature::Size()
 	{
@@ -111,5 +111,11 @@ namespace psinc
 	int Feature::Maximum()
 	{
 		return this->maximum;
+	}
+
+
+	bool Feature::ReadOnly()
+	{
+		return this->readonly;
 	}
 }

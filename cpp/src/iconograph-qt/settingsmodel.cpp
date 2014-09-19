@@ -74,7 +74,9 @@ bool SettingsModel::setData(const QModelIndex &index, const QVariant &value, int
 
 Qt::ItemFlags SettingsModel::flags(const QModelIndex &index) const
 {
-	return index.column() == 1 ? Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled : Qt::ItemIsEnabled;
+	bool editable = index.column() == 1 && !this->camera->features[this->index[index.row()]].ReadOnly();
+
+	return editable ? Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled : Qt::ItemIsEnabled;
 }
 
 

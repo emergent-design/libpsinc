@@ -57,6 +57,10 @@ namespace psinc
 			int Maximum();
 
 
+			/// Returns true if this feature is read-only
+			bool ReadOnly();
+
+
 		private:
 
 			/// Determine the invalid values from the given list
