@@ -31,17 +31,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	this->handler.Initialise(this->image);
 	this->camera.Initialise();
 
-	this->camera.GrabImage(Camera::Mode::Master, this->handler, [&](int status) {
-		switch (status)
-		{
-			case ACQUISITION_SUCCESSFUL: 			emit imageGrabbed(this->Convert());	break;
-			case ACQUISITION_CONNECTED:				emit connectionChanged(true);		break;
-			case ACQUISITION_DISCONNECTED:			emit connectionChanged(false);		break;
-		}
-
-		return this->stream;
-	});
+	this->Grab();
 }
+
 
 
 MainWindow::~MainWindow()
@@ -69,6 +61,21 @@ QImage *MainWindow::Convert()
 	}
 
 	return result;
+}
+
+
+void MainWindow::Grab()
+{
+	this->camera.GrabImage(Camera::Mode::Master, this->handler, [&](int status) {
+		switch (status)
+		{
+			case ACQUISITION_SUCCESSFUL: 			emit imageGrabbed(this->Convert());	break;
+			case ACQUISITION_CONNECTED:				emit connectionChanged(true);		break;
+			case ACQUISITION_DISCONNECTED:			emit connectionChanged(false);		break;
+		}
+
+		return this->stream;
+	});
 }
 
 
@@ -138,3 +145,13 @@ void MainWindow::on_compandingCheck_toggled(bool checked)	{ this->camera.aliases
 void MainWindow::on_adcReset_clicked()						{ this->ui->adcSlider->setValue(this->camera.aliases[0]["ADCReference"]->Reset()); }
 void MainWindow::on_colourCheck_toggled(bool checked)		{ this->handler.Initialise(this->image, checked); }
 void MainWindow::on_portraitCheck_toggled(bool checked)		{ this->portrait = checked; }
+void MainWindow::on_grabFrame_clicked()						{ if (!this->stream) this->Grab(); }
+
+void MainWindow::on_streamCheck_toggled(bool checked)
+{
+	this->stream = checked;
+
+	if (checked) this->Grab();
+}
+
+

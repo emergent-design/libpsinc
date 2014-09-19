@@ -335,6 +335,26 @@
           </property>
          </widget>
         </item>
+        <item row="7" column="0" colspan="6">
+         <widget class="QPushButton" name="grabFrame">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Grab Frame</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QCheckBox" name="streamCheck">
+          <property name="text">
+           <string>Stream</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="advancedTab">
@@ -634,6 +654,22 @@
     <hint type="destinationlabel">
      <x>579</x>
      <y>594</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>streamCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>grabFrame</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>695</x>
+     <y>360</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>373</x>
+     <y>468</y>
     </hint>
    </hints>
   </connection>
