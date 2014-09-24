@@ -66,7 +66,7 @@ QImage *MainWindow::Convert()
 
 void MainWindow::Grab()
 {
-	this->camera.GrabImage(Camera::Mode::Master, this->handler, [&](int status) {
+	this->camera.GrabImage(this->mode, this->handler, [&](int status) {
 		switch (status)
 		{
 			case ACQUISITION_SUCCESSFUL: 			emit imageGrabbed(this->Convert());	break;
@@ -155,3 +155,9 @@ void MainWindow::on_streamCheck_toggled(bool checked)
 }
 
 
+void MainWindow::on_modeBox_currentIndexChanged(int index)
+{
+	this->mode = (Camera::Mode)index;
+
+	if (this->stream) this->ui->streamCheck->toggle();
+}

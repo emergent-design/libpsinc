@@ -37,6 +37,7 @@ class MainWindow : public QMainWindow
 		void on_compandingCheck_toggled(bool checked);
 		void on_streamCheck_toggled(bool checked);
 		void on_grabFrame_clicked();
+		void on_modeBox_currentIndexChanged(int index);
 
 	signals:
 
@@ -56,11 +57,13 @@ class MainWindow : public QMainWindow
 		psinc::Camera camera;
 		psinc::ImageHandler handler;
 		emg::Image<byte, emg::rgb> image;
+		psinc::Camera::Mode mode = psinc::Camera::Mode::Normal;
 
 		int frameCount	= 0;
 		bool stream		= true;
 		bool connected	= false;
 		bool portrait	= false;
+		bool switchMode	= false;
 
 		std::chrono::time_point<std::chrono::steady_clock> last = std::chrono::steady_clock::now();
 };

@@ -137,6 +137,13 @@
           </property>
          </spacer>
         </item>
+        <item row="0" column="3">
+         <widget class="QCheckBox" name="flashCheck">
+          <property name="text">
+           <string>Enable</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="flashLabel">
           <property name="text">
@@ -147,10 +154,10 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QCheckBox" name="flashCheck">
+        <item row="1" column="3">
+         <widget class="QCheckBox" name="exposureCheck">
           <property name="text">
-           <string>Enable</string>
+           <string>Auto</string>
           </property>
          </widget>
         </item>
@@ -185,6 +192,16 @@
           </property>
          </widget>
         </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="adcLabel">
+          <property name="text">
+           <string>ADC Reference</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="2">
          <widget class="QSpinBox" name="flashSpin">
           <property name="enabled">
@@ -192,13 +209,6 @@
           </property>
           <property name="maximum">
            <number>255</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QCheckBox" name="exposureCheck">
-          <property name="text">
-           <string>Auto</string>
           </property>
          </widget>
         </item>
@@ -227,38 +237,6 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
-         <widget class="QSlider" name="adcSlider">
-          <property name="maximum">
-           <number>7</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="invertedAppearance">
-           <bool>false</bool>
-          </property>
-          <property name="invertedControls">
-           <bool>false</bool>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::TicksBelow</enum>
-          </property>
-          <property name="tickInterval">
-           <number>1</number>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="adcLabel">
-          <property name="text">
-           <string>ADC Reference</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1">
          <widget class="QSlider" name="gainSlider">
           <property name="minimum">
@@ -281,10 +259,25 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="2">
-         <widget class="QSpinBox" name="adcSpin">
+        <item row="6" column="1">
+         <widget class="QSlider" name="adcSlider">
           <property name="maximum">
            <number>7</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="invertedAppearance">
+           <bool>false</bool>
+          </property>
+          <property name="invertedControls">
+           <bool>false</bool>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::TicksBelow</enum>
+          </property>
+          <property name="tickInterval">
+           <number>1</number>
           </property>
          </widget>
         </item>
@@ -298,6 +291,13 @@
           </property>
           <property name="maximum">
            <number>64</number>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2">
+         <widget class="QSpinBox" name="adcSpin">
+          <property name="maximum">
+           <number>7</number>
           </property>
          </widget>
         </item>
@@ -315,7 +315,14 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="1">
+        <item row="6" column="3">
+         <widget class="QPushButton" name="adcReset">
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -328,14 +335,33 @@
           </property>
          </spacer>
         </item>
-        <item row="6" column="3">
-         <widget class="QPushButton" name="adcReset">
+        <item row="0" column="5">
+         <widget class="QCheckBox" name="streamCheck">
           <property name="text">
-           <string>Reset</string>
+           <string>Stream</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="7" column="0" colspan="6">
+        <item row="7" column="1">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="8" column="2" colspan="4">
          <widget class="QPushButton" name="grabFrame">
           <property name="enabled">
            <bool>false</bool>
@@ -345,13 +371,37 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="5">
-         <widget class="QCheckBox" name="streamCheck">
+        <item row="8" column="1">
+         <widget class="QComboBox" name="modeBox">
+          <item>
+           <property name="text">
+            <string>Normal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Master</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Slave Rising</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Slave Falling</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="8" column="0">
+         <widget class="QLabel" name="modeLabel">
           <property name="text">
-           <string>Stream</string>
+           <string>Capture Mode</string>
           </property>
-          <property name="checked">
-           <bool>true</bool>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
