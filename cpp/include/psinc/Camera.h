@@ -58,7 +58,9 @@ namespace psinc
 			/// Start an asynchronous image grab. The data handler would usually have access
 			/// to an image and will be used to automatically convert the raw data from the
 			/// camera. The callback event is invoked regardless of what happened and reports
-			/// the AcquisitionStatus.
+			/// the AcquisitionStatus. If the callback function returns "true" then this Camera
+			/// will go ahead and capture another frame (streaming mode), and if "false" is
+			/// returned then it will stop and await the next call to GrabImage.
 			/// @return False if grabbing could not be started (already grabbing)
 			bool GrabImage(Mode mode, DataHandler &handler, emg::event callback);
 

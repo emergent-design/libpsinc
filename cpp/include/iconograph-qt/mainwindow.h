@@ -35,9 +35,7 @@ class MainWindow : public QMainWindow
 		void on_colourCheck_toggled(bool checked);
 		void on_portraitCheck_toggled(bool checked);
 		void on_compandingCheck_toggled(bool checked);
-
 		void on_streamCheck_toggled(bool checked);
-
 		void on_grabFrame_clicked();
 
 	signals:
