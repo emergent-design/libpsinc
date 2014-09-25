@@ -51,6 +51,18 @@ namespace psinc
 	}
 
 
+	Device Instrument::CustomDevice(byte index)
+	{
+		return { &this->transport, "", index };
+	}
+
+
+	vector<string> Instrument::List(Type product)
+	{
+		return TransportHotplug::List((int)product);
+	}
+
+
 	void Instrument::Initialise(Type product, string serial, std::function<void(bool)> onConnection)
 	{
 		this->transport.Initialise((int)product, serial, onConnection);

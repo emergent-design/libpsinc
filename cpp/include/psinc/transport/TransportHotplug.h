@@ -28,17 +28,20 @@ namespace psinc
 			/// Initialises the transport with the product ID and
 			/// serial of interest.
 			/// The serial string will be treated as a regex expression.
-			bool Initialise(int product, std::string serial, std::function<void(bool)> onConnection);
+			bool Initialise(int product, std::string serial, std::function<void(bool)> onConnection, int timeout = 500);
 
 
 			void Poll(int time);
 
 
-		private:
+			static std::vector<std::string> List(int product);
+
+
+		protected:
 
 
 			bool Match(libusb_device_handle *device, int index);
-			
+
 			/// Attempt to claim the given device.
 			bool Claim(libusb_device *device);
 
@@ -66,7 +69,7 @@ namespace psinc
 
 			std::queue<Pending> pending;
 			std::mutex csHotplug;
-			
+
 			/// Push onto the pending queue
 			friend int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data);
 	};

@@ -5,7 +5,7 @@
 using namespace std;
 using namespace emergent;
 
-#define USB_TIMEOUT 500
+// #define USB_TIMEOUT 500
 #define VENDOR		0x0525
 #define PRODUCT		0xaaca
 #define WRITE_PIPE	0x03
@@ -191,7 +191,7 @@ namespace psinc
 		{
 			int transferred;
 			bool result	= false;
-			int err		= libusb_bulk_transfer(this->handle, write ? WRITE_PIPE : READ_PIPE, *buffer, buffer->Size(), &transferred, USB_TIMEOUT);
+			int err		= libusb_bulk_transfer(this->handle, write ? WRITE_PIPE : READ_PIPE, *buffer, buffer->Size(), &transferred, this->timeout);
 
 			if (!err)
 			{

@@ -15,7 +15,7 @@ namespace psinc
 			enum class Type : int
 			{
 				Camera		= 0xaaca,
-				Odometer	= 0xaac0
+				Odometer	= 0xaac0,
 			};
 
 
@@ -40,8 +40,13 @@ namespace psinc
 			bool Connected();
 
 
+			Device CustomDevice(byte index);
+
+			/// Retrieve list of all serial numbers for any connected instruments of the given type
+			static std::vector<std::string> List(Type product);
+
 			/// A map of available devices that can be controlled by (or are part of)
-			/// the connected camera.
+			/// the connected instrument.
 			std::map<std::string, Device> devices;
 
 

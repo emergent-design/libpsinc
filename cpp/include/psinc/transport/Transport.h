@@ -86,5 +86,7 @@ namespace psinc
 
 			/// A thread specific context for dealing with libusb
 			libusb_context *context = nullptr;
+
+			int timeout = 500;
 	};
 }

@@ -18,7 +18,7 @@ namespace psinc
 	}
 
 
-	bool TransportHotplug::Initialise(int product, string serial, std::function<void(bool)> onConnection)
+	bool TransportHotplug::Initialise(int product, string serial, std::function<void(bool)> onConnection, int timeout)
 	{
 		if (!libusb_has_capability (LIBUSB_CAP_HAS_HOTPLUG))
 		{
@@ -29,6 +29,7 @@ namespace psinc
 		this->serial		= serial;
 		this->product		= product;
 		this->onConnection	= onConnection;
+		this->timeout		= timeout;
 
 		libusb_hotplug_deregister_callback(this->context, this->hotplug);
 
@@ -37,13 +38,13 @@ namespace psinc
 		return true;
 	}
 
-	
+
 	int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data)
 	{
 		lock_guard<mutex> lock(((TransportHotplug *)data)->csHotplug);
-		
+
 		((TransportHotplug *)data)->pending.push({ device, event });
-		
+
 		return 0;
 	}
 
@@ -51,7 +52,7 @@ namespace psinc
 	void TransportHotplug::Poll(int time)
 	{
 		using namespace std::placeholders;
-		
+
 		if (!this->registered)
 		{
 			auto events = (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
@@ -86,7 +87,9 @@ namespace psinc
 			{
 				if (item.device == libusb_get_device(this->handle))
 				{
-					this->Release();
+					this->cs.lock();
+						this->Release();
+					this->cs.unlock();
 
 					if (this->onConnection) this->onConnection(false);
 				}
@@ -158,10 +161,76 @@ namespace psinc
 	}
 
 
+	vector<string> TransportHotplug::List(int product)
+	{
+		vector<string> result;
+
+		libusb_context *context = nullptr;
+		libusb_init(&context);
+
+
+		unsigned char data[64];
+		libusb_device **list;
+		libusb_device_descriptor descriptor;
+		libusb_device_handle *handle;
+
+		libusb_get_device_list(context, &list);
+
+		for (libusb_device **device = list; *device; device++)
+		{
+			if (libusb_get_device_descriptor(*device, &descriptor) == 0)
+			{
+				if (descriptor.idVendor == VENDOR && descriptor.idProduct == product)
+				{
+					if (libusb_open(*device, &handle) == 0)
+					{
+						libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 64);
+
+						result.push_back(reinterpret_cast<char *>(data));
+					}
+				}
+			}
+		}
+
+		libusb_exit(context);
+
+		return result;
+	}
+
+	/*	bool Transport::Connect()
+	{
+		lock_guard<mutex> lock(this->cs);
+
+		if (!this->handle)
+		{
+			libusb_device **list;
+			libusb_device_descriptor descriptor;
+
+			libusb_get_device_list(this->context, &list);
+
+			// Loop through the list of connected USB devices
+			for (libusb_device **device = list; *device; device++)
+			{
+				if (libusb_get_device_descriptor(*device, &descriptor) == 0)
+				{
+					if (descriptor.idVendor == VENDOR && descriptor.idProduct == PRODUCT)
+					{
+						// If a particular device matches the known vendor, product ID then attempt to claim it.
+						if (this->Claim(*device, descriptor.iSerialNumber, this->serial)) break;
+					}
+				}
+			}
+
+			libusb_free_device_list(list, 1);
+		}
+
+		return this->handle;
+	}*/
+
 
 	void TransportHotplug::Release()
 	{
-		lock_guard<mutex> lock(this->cs);
+		//lock_guard<mutex> lock(this->cs);
 
 		if (this->handle)
 		{
