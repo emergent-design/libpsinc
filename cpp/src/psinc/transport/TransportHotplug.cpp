@@ -197,36 +197,6 @@ namespace psinc
 		return result;
 	}
 
-	/*	bool Transport::Connect()
-	{
-		lock_guard<mutex> lock(this->cs);
-
-		if (!this->handle)
-		{
-			libusb_device **list;
-			libusb_device_descriptor descriptor;
-
-			libusb_get_device_list(this->context, &list);
-
-			// Loop through the list of connected USB devices
-			for (libusb_device **device = list; *device; device++)
-			{
-				if (libusb_get_device_descriptor(*device, &descriptor) == 0)
-				{
-					if (descriptor.idVendor == VENDOR && descriptor.idProduct == PRODUCT)
-					{
-						// If a particular device matches the known vendor, product ID then attempt to claim it.
-						if (this->Claim(*device, descriptor.iSerialNumber, this->serial)) break;
-					}
-				}
-			}
-
-			libusb_free_device_list(list, 1);
-		}
-
-		return this->handle;
-	}*/
-
 
 	void TransportHotplug::Release()
 	{
