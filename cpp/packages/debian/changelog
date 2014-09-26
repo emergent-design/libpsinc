@@ -1,3 +1,11 @@
+libpsinc0 (0.0.12) unstable; urgency=medium
+
+  * Fixed a deadlock issue in TransportHotplug.
+  * Added a CustomDevice function for accessing unmapped devices.
+  * Added a static List function that will list all connected PSI hardware of the given type.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 26 Sep 2014 10:31:41 +0100
+
 libpsinc0 (0.0.11) unstable; urgency=medium
 
   * Added safety checks to Device.cpp to avoid issues with a default device
