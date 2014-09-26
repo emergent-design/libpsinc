@@ -187,6 +187,8 @@ namespace psinc
 						libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 64);
 
 						result.push_back(reinterpret_cast<char *>(data));
+
+						libusb_close(handle);
 					}
 				}
 			}
