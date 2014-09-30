@@ -173,7 +173,7 @@ namespace psinc
 			Mode mode = Mode::Normal;
 
 			/// Control flag for the capture thread
-			std::atomic_flag run = ATOMIC_FLAG_INIT;
+			std::atomic<bool> run;
 
 			/// The PSI camera range can contain either bayer or monochrome chips. Monochrome
 			/// is the default but this is set to false if the chip is determined to be bayer

@@ -46,7 +46,7 @@ namespace psinc
 	{
 		if (this->initialised)
 		{
-			this->run.clear(memory_order_release);
+			this->run = false;
 
 			// Notify the thread to wake so that it can then exit
 			this->condition.notify_one();
@@ -61,7 +61,7 @@ namespace psinc
 
 		if (!this->initialised)
 		{
-			this->run.test_and_set(memory_order_acquire);
+			this->run			= true;
 			this->_thread		= thread(&Camera::Entry, this);
 			this->initialised	= true;
 		}
@@ -73,7 +73,7 @@ namespace psinc
 		unique_lock<mutex> lock(this->cs);
 		bool stream = false;
 
-		while (this->run.test_and_set(memory_order_acquire))
+		while (this->run)
 		{
 			FLOG(debug, "Capture thread %s is active", this_thread::get_id());
 

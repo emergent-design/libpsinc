@@ -78,7 +78,7 @@ namespace psinc
 			std::thread _thread;
 
 			/// Control flag for the capture thread
-			std::atomic_flag run = ATOMIC_FLAG_INIT;
+			std::atomic<bool> run;
 
 			/// Set to true once initialised so that the thread is only created once
 			/// even though the Initialise function can be called multiple times if the serial
