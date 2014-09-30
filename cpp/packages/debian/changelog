@@ -1,3 +1,9 @@
+libpsinc0 (0.0.13) unstable; urgency=medium
+
+  * Patched to use atomic_flag and atomic<bool> instead of volatile.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 30 Sep 2014 12:28:50 +0100
+
 libpsinc0 (0.0.12) unstable; urgency=medium
 
   * Fixed a deadlock issue in TransportHotplug.
