@@ -2,7 +2,9 @@
 
 #include <emergent/Emergent.h>
 #include <emergent/image/Image.h>
+#include <atomic>
 #include <map>
+
 
 namespace psinc
 {
@@ -19,7 +21,7 @@ namespace psinc
 			// This should only be written to by the acquisition system, but can be read
 			// from outside to know when the USB transport has prepped the camera for
 			// an image grab - only really useful when the camera is acting as a slave.
-			volatile bool waiting = false;
+			std::atomic<bool> waiting;
 
 		protected:
 

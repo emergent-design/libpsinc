@@ -45,7 +45,7 @@ namespace psinc
 	{
 		if (this->initialised)
 		{
-			this->exit = true;
+			this->run.clear(memory_order_release);
 			this->_thread.join();
 		}
 	}
@@ -72,6 +72,7 @@ namespace psinc
 
 		if (!this->initialised)
 		{
+			this->run.test_and_set(memory_order_acquire);
 			this->_thread		= thread(&Instrument::Entry, this);
 			this->initialised	= true;
 		}
@@ -80,7 +81,7 @@ namespace psinc
 
 	void Instrument::Entry()
 	{
-		while (!this->exit)
+		while (this->run.test_and_set(memory_order_acquire))
 		{
 			this->transport.Poll(0);
 			this_thread::sleep_for(chrono::milliseconds(10));

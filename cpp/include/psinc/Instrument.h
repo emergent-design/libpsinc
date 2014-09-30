@@ -3,6 +3,7 @@
 #include <psinc/transport/TransportHotplug.h>
 #include <psinc/driver/Device.h>
 #include <condition_variable>
+#include <atomic>
 #include <thread>
 
 
@@ -77,7 +78,7 @@ namespace psinc
 			std::thread _thread;
 
 			/// Control flag for the capture thread
-			volatile bool exit = false;
+			std::atomic_flag run = ATOMIC_FLAG_INIT;
 
 			/// Set to true once initialised so that the thread is only created once
 			/// even though the Initialise function can be called multiple times if the serial

@@ -3,6 +3,7 @@
 #include <emergent/Emergent.h>
 #include <emergent/struct/Buffer.h>
 #include <libusb-1.0/libusb.h>
+#include <atomic>
 #include <mutex>
 
 
@@ -34,7 +35,7 @@ namespace psinc
 
 
 			/// Transfer packets to and from the actual device
-			bool Transfer(emg::Buffer<byte> *send, emg::Buffer<byte> *receive, volatile bool &waiting, bool check = true);
+			bool Transfer(emg::Buffer<byte> *send, emg::Buffer<byte> *receive, std::atomic<bool> &waiting, bool check = true);
 
 
 			/// Reset the connection to the actual device

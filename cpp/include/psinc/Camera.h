@@ -6,6 +6,7 @@
 #include <psinc/driver/Device.h>
 
 #include <thread>
+#include <atomic>
 #include <condition_variable>
 
 
@@ -172,7 +173,7 @@ namespace psinc
 			Mode mode = Mode::Normal;
 
 			/// Control flag for the capture thread
-			volatile bool exit = false;
+			std::atomic_flag run = ATOMIC_FLAG_INIT;
 
 			/// The PSI camera range can contain either bayer or monochrome chips. Monochrome
 			/// is the default but this is set to false if the chip is determined to be bayer

@@ -1,6 +1,8 @@
 #include "psinc/driver/Register.h"
 #include "psinc/driver/Commands.h"
+#include <atomic>
 
+using namespace std;
 using namespace pugi;
 using namespace emergent;
 
@@ -43,8 +45,8 @@ namespace psinc
 
 	void Register::Set(int offset, int mask, int value)
 	{
-		bool waiting	= false;
-		this->value 	= (this->value & ~mask) | ((value << offset) & mask);
+		atomic<bool> waiting(false);
+		this->value = (this->value & ~mask) | ((value << offset) & mask);
 
 		Buffer<byte> data = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 			// Header
@@ -62,7 +64,7 @@ namespace psinc
 
 	void Register::SetBit(int offset, bool value)
 	{
-		bool waiting = false;
+		atomic<bool> waiting(false);
 		if (value) 	this->value |= 1 << offset;
 		else 		this->value &= ~(1 << offset);
 
@@ -79,7 +81,7 @@ namespace psinc
 
 	bool Register::Refresh()
 	{
-		bool waiting = false;
+		atomic<bool> waiting(false);
 		Buffer<byte> receive(5);
 		Buffer<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,																				// Header

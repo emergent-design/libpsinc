@@ -177,7 +177,7 @@ namespace psinc
 	}
 
 
-	bool Transport::Transfer(Buffer<byte> *send, Buffer<byte> *receive, volatile bool &waiting, bool check)
+	bool Transport::Transfer(Buffer<byte> *send, Buffer<byte> *receive, atomic<bool> &waiting, bool check)
 	{
 		lock_guard<mutex> lock(this->cs);
 

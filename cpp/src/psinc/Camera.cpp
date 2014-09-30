@@ -46,7 +46,7 @@ namespace psinc
 	{
 		if (this->initialised)
 		{
-			this->exit = true;
+			this->run.clear(memory_order_release);
 
 			// Notify the thread to wake so that it can then exit
 			this->condition.notify_one();
@@ -61,6 +61,7 @@ namespace psinc
 
 		if (!this->initialised)
 		{
+			this->run.test_and_set(memory_order_acquire);
 			this->_thread		= thread(&Camera::Entry, this);
 			this->initialised	= true;
 		}
@@ -72,7 +73,7 @@ namespace psinc
 		unique_lock<mutex> lock(this->cs);
 		bool stream = false;
 
-		while (!this->exit)
+		while (this->run.test_and_set(memory_order_acquire))
 		{
 			FLOG(debug, "Capture thread %s is active", this_thread::get_id());
 
@@ -252,8 +253,9 @@ namespace psinc
 
 	bool Camera::RefreshRegisters()
 	{
+		atomic<bool> waiting(false);
+
 		byte maxPage = 0;
-		bool waiting = false;
 		Buffer<byte> data(512);
 		Buffer<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,							// Header

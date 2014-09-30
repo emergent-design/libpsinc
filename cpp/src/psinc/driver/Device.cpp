@@ -34,7 +34,7 @@ namespace psinc
 
 	bool Device::Initialise(byte configuration)
 	{
-		bool waiting = false;
+		atomic<bool> waiting(false);
 		Buffer<byte> data = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 										// Header
 			Commands::InitialiseDevice, this->index, configuration, 0x00, 0x00,	// Command
@@ -53,8 +53,8 @@ namespace psinc
 
 	bool Device::Write(Buffer<byte> &buffer)
 	{
+		atomic<bool> waiting(false);
 		int size		= buffer.Size();
-		bool waiting	= false;
 		byte command[]	= {
 			0x00, 0x00, 0x00, 0x00, 0x00, 		// Header
 			Commands::WriteBlock, this->index, 	// Command
@@ -75,7 +75,7 @@ namespace psinc
 
 	bool Device::Write(byte value)
 	{
-		bool waiting = false;
+		atomic<bool> waiting(false);
 		Buffer<byte> data = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 							// Header
 			Commands::WriteDevice, this->index, value, 0x00, 0x00,	// Command
@@ -90,7 +90,7 @@ namespace psinc
 	{
 		if (this->direction != Direction::Output)
 		{
-			bool waiting = false;
+			atomic<bool> waiting(false);
 			Buffer<byte> receive(READ_BUFFER);
 			receive = 0;
 			Buffer<byte> command = {
