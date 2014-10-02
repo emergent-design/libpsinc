@@ -1,3 +1,9 @@
+libpsinc0 (0.0.14) unstable; urgency=medium
+
+  * Added a timeout parameter to instrument initialisation (USB transfer timeout).
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Thu, 02 Oct 2014 16:18:18 +0100
+
 libpsinc0 (0.0.13) unstable; urgency=medium
 
   * Patched to use atomic_flag and atomic<bool> instead of volatile.

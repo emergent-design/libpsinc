@@ -63,9 +63,9 @@ namespace psinc
 	}
 
 
-	void Instrument::Initialise(Type product, string serial, std::function<void(bool)> onConnection)
+	void Instrument::Initialise(Type product, string serial, std::function<void(bool)> onConnection, int timeout)
 	{
-		this->transport.Initialise((int)product, serial, onConnection);
+		this->transport.Initialise((int)product, serial, onConnection, timeout);
 
 		this->devices.clear();
 		for (auto &d : this->deviceSets[product]) this->devices[d.second.Name()] = d.second;

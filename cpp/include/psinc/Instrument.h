@@ -33,7 +33,7 @@ namespace psinc
 			/// treated as a regex and, combined with the cameras ability to append the camera
 			/// name to the end of the serial number in the USB descriptor, provides a powerful
 			/// way to reliably connect to a specific camera.
-			void Initialise(Type product, std::string serial = "", std::function<void(bool)> onConnection = nullptr);
+			void Initialise(Type product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500);
 
 
 			/// Checks if this instance is currently connected to a physical device
