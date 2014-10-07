@@ -38,6 +38,7 @@ class MainWindow : public QMainWindow
 		void on_streamCheck_toggled(bool checked);
 		void on_grabFrame_clicked();
 		void on_modeBox_currentIndexChanged(int index);
+		void on_contextSpin_valueChanged(int value);
 
 	signals:
 
@@ -48,6 +49,7 @@ class MainWindow : public QMainWindow
 
 
 		void Grab();
+		void UpdateUi();
 		QImage *Convert();
 
 		Ui::MainWindow *ui;
@@ -60,6 +62,7 @@ class MainWindow : public QMainWindow
 		psinc::Camera::Mode mode = psinc::Camera::Mode::Normal;
 
 		int frameCount	= 0;
+		byte context	= 0;
 		bool stream		= true;
 		bool connected	= false;
 		bool portrait	= false;

@@ -118,12 +118,7 @@ void MainWindow::onConnection(bool connected)
 
 		if (connected)
 		{
-			this->ui->exposureSlider->setValue(this->camera.aliases[0]["Exposure"]->Get());
-			this->ui->exposureCheck->setChecked(this->camera.aliases[0]["AutoExposure"]->Get());
-			this->ui->gainSlider->setValue(this->camera.aliases[0]["Gain"]->Get());
-			this->ui->gainCheck->setChecked(this->camera.aliases[0]["AutoGain"]->Get());
-			this->ui->adcSlider->setValue(this->camera.aliases[0]["ADCReference"]->Get());
-			this->ui->compandingCheck->setChecked(this->camera.aliases[0]["Companding"]->Get() == 3);
+			this->UpdateUi();
 
 			this->ui->status->showMessage("Camera connected");
 		}
@@ -134,15 +129,32 @@ void MainWindow::onConnection(bool connected)
 }
 
 
+void MainWindow::UpdateUi()
+{
+	if (this->connected)
+	{
+		this->context = this->camera.aliases[0]["Context"]->Get();
+
+		this->ui->contextSpin->setValue(this->context);
+		this->ui->exposureSlider->setValue(this->camera.aliases[this->context]["Exposure"]->Get());
+		this->ui->exposureCheck->setChecked(this->camera.aliases[this->context]["AutoExposure"]->Get());
+		this->ui->gainSlider->setValue(this->camera.aliases[this->context]["Gain"]->Get());
+		this->ui->gainCheck->setChecked(this->camera.aliases[this->context]["AutoGain"]->Get());
+		this->ui->adcSlider->setValue(this->camera.aliases[this->context]["ADCReference"]->Get());
+		this->ui->compandingCheck->setChecked(this->camera.aliases[this->context]["Companding"]->Get() == 3);
+	}
+}
+
+
 void MainWindow::on_flashSlider_valueChanged(int value)		{ this->camera.SetFlash(value);}
 void MainWindow::on_flashCheck_toggled(bool checked)		{ this->camera.SetFlash(checked ? this->ui->flashSlider->value() : 0); }
-void MainWindow::on_exposureSlider_valueChanged(int value)	{ this->camera.aliases[0]["Exposure"]->Set(value); }
-void MainWindow::on_exposureCheck_toggled(bool checked)		{ this->camera.aliases[0]["AutoExposure"]->Set(checked ? 1 : 0); }
-void MainWindow::on_gainSlider_valueChanged(int value)		{ this->camera.aliases[0]["Gain"]->Set(value); }
-void MainWindow::on_gainCheck_toggled(bool checked)			{ this->camera.aliases[0]["AutoGain"]->Set(checked ? 1 : 0); }
-void MainWindow::on_adcSlider_valueChanged(int value)		{ this->camera.aliases[0]["ADCReference"]->Set(value); }
-void MainWindow::on_compandingCheck_toggled(bool checked)	{ this->camera.aliases[0]["Companding"]->Set(checked ? 3 : 2); }
-void MainWindow::on_adcReset_clicked()						{ this->ui->adcSlider->setValue(this->camera.aliases[0]["ADCReference"]->Reset()); }
+void MainWindow::on_exposureSlider_valueChanged(int value)	{ this->camera.aliases[this->context]["Exposure"]->Set(value); }
+void MainWindow::on_exposureCheck_toggled(bool checked)		{ this->camera.aliases[this->context]["AutoExposure"]->Set(checked ? 1 : 0); }
+void MainWindow::on_gainSlider_valueChanged(int value)		{ this->camera.aliases[this->context]["Gain"]->Set(value); }
+void MainWindow::on_gainCheck_toggled(bool checked)			{ this->camera.aliases[this->context]["AutoGain"]->Set(checked ? 1 : 0); }
+void MainWindow::on_adcSlider_valueChanged(int value)		{ this->camera.aliases[this->context]["ADCReference"]->Set(value); }
+void MainWindow::on_compandingCheck_toggled(bool checked)	{ this->camera.aliases[this->context]["Companding"]->Set(checked ? 3 : 2); }
+void MainWindow::on_adcReset_clicked()						{ this->ui->adcSlider->setValue(this->camera.aliases[this->context]["ADCReference"]->Reset()); }
 void MainWindow::on_colourCheck_toggled(bool checked)		{ this->handler.Initialise(this->image, checked); }
 void MainWindow::on_portraitCheck_toggled(bool checked)		{ this->portrait = checked; }
 void MainWindow::on_grabFrame_clicked()						{ if (!this->stream) this->Grab(); }
@@ -160,4 +172,11 @@ void MainWindow::on_modeBox_currentIndexChanged(int index)
 	this->mode = (Camera::Mode)index;
 
 	if (this->stream) this->ui->streamCheck->toggle();
+}
+
+
+void MainWindow::on_contextSpin_valueChanged(int value)
+{
+	this->camera.SetContext(value);
+	this->UpdateUi();
 }
