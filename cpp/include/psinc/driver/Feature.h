@@ -1,7 +1,7 @@
 #pragma once
 
 #include <emergent/Emergent.h>
-#include <emergent/struct/Bounds.h>
+#include <emergent/struct/Bounds.hpp>
 #include <psinc/driver/Register.h>
 #include <memory>
 #include <map>

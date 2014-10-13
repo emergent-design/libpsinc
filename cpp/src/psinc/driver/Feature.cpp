@@ -37,13 +37,13 @@ namespace psinc
 		if (values.size())
 		{
 			char *check;
-			auto ranges = explode(values, ",");
+			auto ranges = String::explode(values, ",");
 
 			for (string &range : ranges)
 			{
 				if (range.size())
 				{
-					auto limits	= explode(range, "-");
+					auto limits	= String::explode(range, "-");
 					int start	= strtol(limits[0].c_str(), &check, 0);
 
 					if (check > limits[0].c_str())

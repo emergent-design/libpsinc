@@ -4,7 +4,6 @@
 
 #include <emergent/Emergent.h>
 #include <psinc/transport/Transport.h>
-#include <emergent/struct/Buffer.h>
 #include <libusb-1.0/libusb.h>
 #include <mutex>
 #include <queue>

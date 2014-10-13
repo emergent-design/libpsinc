@@ -1,7 +1,7 @@
 #pragma once
 
 #include <emergent/Emergent.h>
-#include <emergent/struct/Buffer.h>
+#include <emergent/struct/Buffer.hpp>
 #include <libusb-1.0/libusb.h>
 #include <atomic>
 #include <mutex>

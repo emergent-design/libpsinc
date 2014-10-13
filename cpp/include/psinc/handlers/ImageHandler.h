@@ -1,6 +1,7 @@
 #pragma once
 
 #include <psinc/handlers/DataHandler.h>
+#include <emergent/image/Image.hpp>
 
 
 namespace psinc
