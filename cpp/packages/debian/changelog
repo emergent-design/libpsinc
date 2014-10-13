@@ -1,3 +1,9 @@
+libpsinc0 (0.0.15) unstable; urgency=medium
+
+  * Updated for compatibility with libemergent v0.0.7
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Mon, 13 Oct 2014 14:57:23 +0100
+
 libpsinc0 (0.0.14) unstable; urgency=medium
 
   * Added a timeout parameter to instrument initialisation (USB transfer timeout).
