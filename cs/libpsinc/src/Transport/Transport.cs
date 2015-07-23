@@ -45,6 +45,7 @@ namespace libpsinc
 		const int MAX_TRANSFER_ATTEMPTS = 4;
 		const int TIMEOUT				= 200;
 
+		IntPtr context					= IntPtr.Zero;
 		IntPtr handle					= IntPtr.Zero;
 		bool connected					= false;
 		bool raiseError					= false;
@@ -68,7 +69,7 @@ namespace libpsinc
 				}
 			}
 
-			unsafe { Usb.Init(null); }
+			Usb.Init(ref this.context);
 		}
 
 
@@ -82,6 +83,7 @@ namespace libpsinc
 		public void Dispose()
 		{
 			this.Release();
+			Usb.Exit(this.context);
 		}
 
 
@@ -120,7 +122,7 @@ namespace libpsinc
 			lock(this)
 			{
 				IntPtr list;
-				int size = Usb.GetDeviceList(IntPtr.Zero, out list);
+				int size = Usb.GetDeviceList(this.context, out list);
 
 				if (size > 0)
 				{

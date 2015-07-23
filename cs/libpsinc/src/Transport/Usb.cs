@@ -51,9 +51,8 @@ namespace libpsinc
 	internal static class Usb
 	{
 		const string LIB = "libusb-1.0.dll";
-		
-		// Using unsafe void** so real null can be sent thereby using the default context and avoiding session management
-		[DllImport(LIB, EntryPoint = "libusb_init")]						unsafe internal static extern int Init(void **context);		
+
+		[DllImport(LIB, EntryPoint = "libusb_init")]						internal static extern int Init(ref IntPtr context);		
 		[DllImport(LIB, EntryPoint = "libusb_exit")]						internal static extern void Exit(IntPtr context);
 		[DllImport(LIB, EntryPoint = "libusb_get_device_list")]				internal static extern int GetDeviceList(IntPtr context, out IntPtr list);
 		[DllImport(LIB, EntryPoint = "libusb_free_device_list")]			internal static extern void FreeDeviceList(IntPtr list, int unrefDevices);
