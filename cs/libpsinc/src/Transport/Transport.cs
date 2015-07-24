@@ -271,7 +271,7 @@ namespace libpsinc
 		/// </summary>
 		/// <param name="camera">Camera to query.</param>
 		/// <param name="index">Descriptor index to query.</param>
-		string RetrieveSerial(IntPtr camera, int index)
+		string RetrieveSerial(IntPtr camera, byte index)
 		{	
 			Usb.GetStringDescriptorASCII(camera, index, this.buffer, 64);
 			return System.Text.Encoding.ASCII.GetString(this.buffer);
@@ -284,19 +284,18 @@ namespace libpsinc
 		/// </summary>
 		/// <param name="device">Device (camera) to claim.</param>
 		/// <param name="index">Index of the serial descriptor on the device.</param>
-		bool Claim(IntPtr device, int index)
+		bool Claim(IntPtr device, byte index)
 		{
 			uint bus = (uint)Usb.GetBusNumber(device);
 			if (this.Bus == 0 || this.Bus == bus)
 			{
-			
-				if ((this.Serial == string.Empty || Regex.IsMatch(this.RetrieveSerial(this.handle, index), (this.Serial)))
-					&& (Usb.Open(device, ref this.handle) == 0))
+				if (Usb.Open(device, ref this.handle) == 0)
 				{
-					// Disabled this while solving an issue on Windows with 
-					// the camera that causes it to get stuck in a strange state.
-					//if (Usb.SetConfiguration(this.handle, 1) == 0)
+					if (this.Serial == string.Empty || Regex.IsMatch(this.RetrieveSerial(this.handle, index), this.Serial))
 					{
+						// Disabled this while solving an issue on Windows with 
+						// the camera that causes it to get stuck in a strange state.
+						//if (Usb.SetConfiguration(this.handle, 1) == 0)
 						if (Usb.ClaimInterface(this.handle, 0) == 0)
 						{
 							return true;

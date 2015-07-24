@@ -66,8 +66,8 @@ namespace libpsinc
 		[DllImport(LIB, EntryPoint = "libusb_release_interface")]			internal static extern int ReleaseInterface(IntPtr handle, int interfaceNumber);
 		[DllImport(LIB, EntryPoint = "libusb_reset_device")]				internal static extern int ResetDevice(IntPtr handle);
 		[DllImport(LIB, EntryPoint = "libusb_bulk_transfer")]				internal static extern int BulkTransfer(IntPtr handle, byte endpoint, [In][Out]byte [] data, int length, out int transferred, int timeout);
-		[DllImport(LIB, EntryPoint = "libusb_get_string_descriptor_ascii")] internal static extern int GetStringDescriptorASCII(IntPtr handle, int index, [Out]byte[] data, int length);
-		
+		[DllImport(LIB, EntryPoint = "libusb_get_string_descriptor_ascii")] internal static extern int GetStringDescriptorASCII(IntPtr handle, byte index, [Out]byte[] data, int length);
+
 		public enum Error
 		{
 			Success = 0, Io = -1, InvalidParameter = -2, Access = -3, NoDevice = -4, NotFound = -5, Busy = -6,		
@@ -97,4 +97,4 @@ namespace libpsinc
 		}
 	}
 }
-
+	
