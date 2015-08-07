@@ -1,0 +1,24 @@
+#!/bin/bash
+
+dst="psinc-w64"
+
+mkdir $dst
+mkdir $dst/platforms
+
+cp /usr/lib/gcc/x86_64-w64-mingw32/4.9-posix/libgcc_s_seh-1.dll $dst/
+cp /usr/lib/gcc/x86_64-w64-mingw32/4.9-posix/libstdc++-6.dll $dst/
+cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $dst/
+cp /usr/x86_64-w64-mingw32/lib/freeimage.dll $dst/
+cp /usr/x86_64-w64-mingw32/lib/libusb-1.0.dll $dst/
+cp ../lib/psinc.dll $dst/
+cp ../lib/psinc.lib $dst/
+
+cp /opt/qt5-win/lib/Qt5Core.dll $dst/
+cp /opt/qt5-win/lib/Qt5Gui.dll $dst/
+cp /opt/qt5-win/lib/Qt5Widgets.dll $dst/
+cp /opt/qt5-win/plugins/platforms/qwindows.dll $dst/platforms/
+cp ../bin/iconograph-qt.exe $dst/
+
+7z a $dst-`cat version`.7z $dst
+
+rm -r $dst
