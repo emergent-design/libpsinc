@@ -1,8 +1,6 @@
 #pragma once
 
-#pragma once
-
-#include <emergent/Emergent.h>
+#include <emergent/Emergent.hpp>
 #include <psinc/transport/Transport.h>
 #include <libusb-1.0/libusb.h>
 #include <mutex>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <emergent/Emergent.h>
+#include <emergent/Emergent.hpp>
 #include <emergent/xml/pugixml.hpp>
 #include "psinc/transport/Transport.h"
 

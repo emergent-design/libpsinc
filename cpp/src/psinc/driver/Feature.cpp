@@ -1,6 +1,6 @@
 #include "psinc/driver/Feature.h"
 
-#include <emergent/Logger.h>
+#include <emergent/logger/Logger.hpp>
 
 using namespace std;
 using namespace pugi;

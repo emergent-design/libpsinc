@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <emergent/Logger.h>
+#include <emergent/logger/Logger.hpp>
 #include <iostream>
 
 

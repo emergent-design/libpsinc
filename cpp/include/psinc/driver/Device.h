@@ -1,7 +1,7 @@
 #pragma once
 
 #define PUGIXML_NO_XPATH
-#include <emergent/Emergent.h>
+#include <emergent/Emergent.hpp>
 #include <emergent/xml/pugixml.hpp>
 #include <psinc/transport/Transport.h>
 #include <map>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <emergent/Emergent.h>
+#include <emergent/Emergent.hpp>
 #include <emergent/struct/Bounds.hpp>
 #include <psinc/driver/Register.h>
 #include <memory>

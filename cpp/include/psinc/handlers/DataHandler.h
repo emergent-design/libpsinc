@@ -1,6 +1,6 @@
 #pragma once
 
-#include <emergent/Emergent.h>
+#include <emergent/Emergent.hpp>
 #include <emergent/struct/Buffer.hpp>
 #include <atomic>
 #include <map>

@@ -1,7 +1,7 @@
 #include "psinc/driver/Device.h"
 #include "psinc/driver/Commands.h"
 
-#include <emergent/Logger.h>
+#include <emergent/logger/Logger.hpp>
 
 using namespace std;
 using namespace pugi;

@@ -1,6 +1,6 @@
 #include "psinc/handlers/DataHandler.h"
 
-#include <emergent/Maths.h>
+#include <emergent/Maths.hpp>
 
 using namespace std;
 using namespace emergent;

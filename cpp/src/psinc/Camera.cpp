@@ -2,7 +2,7 @@
 #include "psinc/xml/Devices.h"
 #include "psinc/driver/Commands.h"
 
-#include <emergent/Logger.h>
+#include <emergent/logger/Logger.hpp>
 
 #define REFRESH_ATTEMPTS 3
 
