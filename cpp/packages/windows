@@ -13,10 +13,10 @@ cp /usr/x86_64-w64-mingw32/lib/libusb-1.0.dll $dst/
 cp ../lib/psinc.dll $dst/
 cp ../lib/psinc.lib $dst/
 
-cp /opt/qt5-win/lib/Qt5Core.dll $dst/
-cp /opt/qt5-win/lib/Qt5Gui.dll $dst/
-cp /opt/qt5-win/lib/Qt5Widgets.dll $dst/
-cp /opt/qt5-win/plugins/platforms/qwindows.dll $dst/platforms/
+cp /opt/qt5-win-x64/bin/Qt5Core.dll $dst/
+cp /opt/qt5-win-x64/bin/Qt5Gui.dll $dst/
+cp /opt/qt5-win-x64/bin/Qt5Widgets.dll $dst/
+cp /opt/qt5-win-x64/plugins/platforms/qwindows.dll $dst/platforms/
 cp ../bin/iconograph-qt.exe $dst/
 
 7z a $dst-`cat version`.7z $dst
