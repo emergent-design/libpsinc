@@ -13,8 +13,8 @@ using namespace emergent;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-	logger::instance().add(new sink::console());
-	logger::instance().set_verbosity("info");
+	Log::Initialise({ make_unique<logger::Console>() });
+	Log::Verbosity(Severity::Info);
 
 	connect(this, SIGNAL(connectionChanged(bool)), this, SLOT(onConnection(bool)));
 	connect(this, SIGNAL(imageGrabbed(QImage*)), this, SLOT(onGrab(QImage*)));
@@ -100,7 +100,7 @@ void MainWindow::onGrab(QImage *image)
 
 	if (duration_cast<milliseconds>(steady_clock::now() - this->last).count() >= 5000)
 	{
-		this->ui->status->showMessage(QString::fromStdString(tfm::format("Camera connected (%.1f fps)", 0.2 * this->frameCount)));
+		this->ui->status->showMessage(QString::fromStdString(String::format("Camera connected (%.1f fps)", 0.2 * this->frameCount)));
 		this->frameCount	= 0;
 		this->last			= steady_clock::now();
 	}
