@@ -1,7 +1,6 @@
 #include "psinc/Camera.h"
 #include "psinc/xml/Devices.h"
 #include "psinc/driver/Commands.h"
-
 #include <emergent/logger/Logger.hpp>
 
 #define REFRESH_ATTEMPTS 3
@@ -75,7 +74,7 @@ namespace psinc
 
 		while (this->run)
 		{
-			FLOG(debug, "Capture thread %s is active", this_thread::get_id());
+			Log::Debug("Capture thread %s is active", this_thread::get_id());
 
 			if (this->handler)
 			{
@@ -99,12 +98,12 @@ namespace psinc
 			}
 			else
 			{
-				FLOG(debug, "Capture thread %s is going to sleep", this_thread::get_id());
+				Log::Debug("Capture thread %s is going to sleep", this_thread::get_id());
 				this->condition.wait(lock);	// Thread is paused until notified
 			}
 		}
 
-		FLOG(debug, "Capture thread %s is exiting", this_thread::get_id());
+		Log::Debug("Capture thread %s is exiting", this_thread::get_id());
 	}
 
 
@@ -278,10 +277,10 @@ namespace psinc
 						if (r.second.Page() == page) r.second.Refresh(data);
 					}
 
-					FLOG(info, "Successfully refreshed registers for page %d", page);
+					Log::Info("Successfully refreshed registers for page %d", page);
 					break;
 				}
-				else FLOG(error, "Failed to refresh registers for page %d", page);
+				else Log::Error("Failed to refresh registers for page %d", page);
 			}
 		}
 

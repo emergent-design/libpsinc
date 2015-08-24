@@ -115,7 +115,7 @@ namespace psinc
 							{
 								// If the device was claimed successfully then added it
 								// to the list and return triumphant.
-								FLOG(info, "USB device claimed: %d", this->id);
+								Log::Info("USB device claimed: %d", this->id);
 								//claimed.insert(this->id);
 								return true;
 							}
@@ -151,7 +151,7 @@ namespace psinc
 
 			this->handle = nullptr;
 
-			FLOG(info, "USB deviced released: %d", this->id);
+			Log::Info("USB deviced released: %d", this->id);
 		}
 	}
 
@@ -169,7 +169,7 @@ namespace psinc
 				// and must be cleaned up.
 				this->Release();
 
-				LOG(error, "Problem resetting USB device, handle has been released");
+				Log::Error("Problem resetting USB device, handle has been released");
 			}
 		}
 
@@ -197,14 +197,14 @@ namespace psinc
 			{
 				result = (write || check) ? transferred == buffer->Size() : true;
 
-				if (!result) FLOG(error, "USB device %d: Incomplete transfer when %s", this->id, write ? "writing" : "reading");
+				if (!result) Log::Error("USB device %d: Incomplete transfer when %s", this->id, write ? "writing" : "reading");
 			}
 			else if (err == LIBUSB_ERROR_NO_DEVICE || err == LIBUSB_ERROR_IO)
 			{
-				FLOG(error, "USB device %d: Device has been disconnected", this->id);
+				Log::Error("USB device %d: Device has been disconnected", this->id);
 				this->Release();
 			}
-			else FLOG(error, "USB device %d: Transfer error %s when %s", this->id, err, write ? "writing" : "reading");
+			else Log::Error("USB device %d: Transfer error %s when %s", this->id, err, write ? "writing" : "reading");
 
 			return result;
 		}

@@ -22,7 +22,7 @@ namespace psinc
 	{
 		if (!libusb_has_capability (LIBUSB_CAP_HAS_HOTPLUG))
 		{
-			LOG(error, "USB Hotplug capabilites are not supported on this platform");
+			Log::Error("USB Hotplug capabilites are not supported on this platform");
 			return false;
 		}
 
@@ -59,7 +59,7 @@ namespace psinc
 
 			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, VENDOR, this->product, LIBUSB_HOTPLUG_MATCH_ANY, &OnHotplug, this, &this->hotplug))
 			{
-				LOG(error, "Unable to register USB hotplug callback");
+				Log::Error("Unable to register USB hotplug callback");
 				return;
 			}
 
@@ -141,9 +141,9 @@ namespace psinc
 					{
 						if (libusb_claim_interface(this->handle, 0) == 0)
 						{
-							this->id = tfm::format("%03d-%03d", libusb_get_bus_number(device), libusb_get_device_address(device));
+							this->id = String::format("%03d-%03d", libusb_get_bus_number(device), libusb_get_device_address(device));
 
-							FLOG(info, "USB device claimed: %s", this->id);
+							Log::Info("USB device claimed: %s", this->id);
 
 							return true;
 						}
@@ -210,7 +210,7 @@ namespace psinc
 			libusb_release_interface(this->handle, 0);
 			libusb_close(this->handle);
 
-			FLOG(info, "USB deviced released: %s", this->id);
+			Log::Info("USB deviced released: %s", this->id);
 
 			this->handle	= nullptr;
 			this->id		= "";
