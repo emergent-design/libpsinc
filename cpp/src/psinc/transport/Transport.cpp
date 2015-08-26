@@ -204,7 +204,7 @@ namespace psinc
 				Log::Error("USB device %d: Device has been disconnected", this->id);
 				this->Release();
 			}
-			else Log::Error("USB device %d: Transfer error %s when %s", this->id, err, write ? "writing" : "reading");
+			else Log::Error("USB device %d: Transfer error %d when %s", this->id, err, write ? "writing" : "reading");
 
 			return result;
 		}
