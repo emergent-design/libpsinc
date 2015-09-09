@@ -1,3 +1,9 @@
+libpsinc0 (0.0.17) unstable; urgency=medium
+
+  * Now using the new logger and string format from libemergent.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Wed, 09 Sep 2015 11:17:03 +0100
+
 libpsinc0 (0.0.16) unstable; urgency=medium
 
   * Updated for compatibility with new header-only libemergent.
