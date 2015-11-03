@@ -1,3 +1,9 @@
+libpsinc0 (0.0.18) unstable; urgency=medium
+
+  * Updated for compatibility with Image<> changes in libemergent.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 03 Nov 2015 16:44:31 +0000
+
 libpsinc0 (0.0.17) unstable; urgency=medium
 
   * Now using the new logger and string format from libemergent.

@@ -10,7 +10,7 @@ INCLUDEPATH += include/iconograph-qt include
 SOURCES += src/iconograph-qt/*.cpp
 HEADERS += include/iconograph-qt/*.h
 FORMS   += ui/*.ui
-LIBS    += -Llib -lpsinc
+LIBS    += -Llib -lpsinc -lfreeimage
 CONFIG  += rtti
 
 DESTDIR = bin
