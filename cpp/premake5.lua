@@ -26,7 +26,7 @@ solution "psinc"
 
 		configuration "not vs*"
 
-			buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++11", "-O3", "-D_FORTIFY_SOURCE=2" }
+			buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++14", "-O3", "-D_FORTIFY_SOURCE=2" }
 			linkoptions 	{ "-Wl,-soname,libpsinc.so.0" }
 
 		configuration "vs*"
