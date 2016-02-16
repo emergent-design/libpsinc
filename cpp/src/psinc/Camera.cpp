@@ -18,19 +18,22 @@ namespace psinc
 		// Notes:
 		// The "Name" also appears as part of the serial in the USB descriptor for this device.
 		this->devicePool = map<byte, Device> {
-			{ 0x00, { &this->transport, "Prox", 		0x00, Device::Direction::Input }},	// Prox reader device
-			{ 0x01, { &this->transport, "Lock",			0x01, Device::Direction::Output }},	// Electronic lock control
-			{ 0x02, { &this->transport, "LEDArray",		0x02, Device::Direction::Output }},	// LED array
-			{ 0x03, { &this->transport, "SecureLock",	0x03 }},							// Encrypted lock control
-			{ 0x04, { &this->transport, "Error", 		0x04, Device::Direction::Input }},	// Error reporting
-			{ 0x05, { &this->transport, "Serial", 		0x05 }},							// Serial number of the camera (16 bytes)
-			{ 0x06, { &this->transport, "Storage0", 	0x06 }},							// Storage block 0 (free for use - 502 bytes)
-			{ 0x07, { &this->transport, "Name", 		0x07, Device::Direction::Both }},	// User-settable name of the camera.
-			{ 0x08, { &this->transport, "Storage1", 	0x08 }},							// Storage block 1 (free for use - 127 bytes)
-			{ 0x09, { &this->transport, "Defaults", 	0x09 }},							// Default settings for this device. Modify with care.
-			{ 0x0e, { &this->transport, "LEDPair",		0x0e, Device::Direction::Output }},	// Simple LED pair
-			{ 0x13, { &this->transport, "Count",		0x13, Device::Direction::Input }},	// 64-bit counter
-			{ 0xff, { &this->transport, "Query", 		0xff, Device::Direction::Input }}	// Query the camera for a list of available devices and chip type
+			{ 0x00, { &this->transport, "Prox", 			0x00, Device::Direction::Input }},	// Prox reader device
+			{ 0x01, { &this->transport, "Lock",				0x01, Device::Direction::Output }},	// Electronic lock control
+			{ 0x02, { &this->transport, "LEDArray",			0x02, Device::Direction::Output }},	// LED array
+			{ 0x03, { &this->transport, "SecureLock",		0x03 }},							// Encrypted lock control
+			{ 0x04, { &this->transport, "Error", 			0x04, Device::Direction::Input }},	// Error reporting
+			{ 0x05, { &this->transport, "Serial", 			0x05 }},							// Serial number of the camera (16 bytes)
+			{ 0x06, { &this->transport, "Storage0", 		0x06 }},							// Storage block 0 (free for use - 502 bytes)
+			{ 0x07, { &this->transport, "Name", 			0x07, Device::Direction::Both }},	// User-settable name of the camera.
+			{ 0x08, { &this->transport, "Storage1", 		0x08 }},							// Storage block 1 (free for use - 127 bytes)
+			{ 0x09, { &this->transport, "Defaults", 		0x09 }},							// Default settings for this device. Modify with care.
+			{ 0x0b,	{ &this->transport, "HardwareVersion",	0x0b, Device::Direction::Input }},
+			{ 0x0d, { &this->transport, "Watchdog",			0x0d, Device::Direction::Both }},
+			{ 0x0e, { &this->transport, "LEDPair",			0x0e, Device::Direction::Output }},	// Simple LED pair
+			{ 0x0f, { &this->transport, "FirmwareVersion",	0x0e, Device::Direction::Input }},
+			{ 0x13, { &this->transport, "Count",			0x13, Device::Direction::Input }},	// 64-bit counter
+			{ 0xff, { &this->transport, "Query", 			0xff, Device::Direction::Input }}	// Query the camera for a list of available devices and chip type
 		};
 
 		this->send = Buffer<byte>({
@@ -40,6 +43,8 @@ namespace psinc
 		});
 	}
 
+// result["Hardware"]	= (string)instrument.CustomDevice(0x0b).Read();		//this_thread::sleep_for(milliseconds(10));
+// 				result["Firmware"] 	= (string)instrument.CustomDevice(0x0f).Read();		//this_thread::sleep_for(milliseconds(10));
 
 	Camera::~Camera()
 	{
@@ -159,7 +164,7 @@ namespace psinc
 		this->devices.clear();
 		this->registers.clear();
 
-		vector<byte> devices	= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		vector<byte> devices	= { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0b, 0x0d, 0x0f };
 		string xml				= chip::v024;
 		auto description		= this->devicePool[0xff].Read();
 
