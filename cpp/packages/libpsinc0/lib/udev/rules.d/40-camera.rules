@@ -1,1 +1,0 @@
-SUBSYSTEM=="usb", ATTR{idVendor}=="0525", ATTR{idProduct}=="aaca", SYMLINK+="camera%n", MODE="0666", GROUP="plugdev"

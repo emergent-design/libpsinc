@@ -1,0 +1,116 @@
+libpsinc0 (0.0.17) unstable; urgency=medium
+
+  * Now using the new logger and string format from libemergent.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Wed, 09 Sep 2015 11:17:03 +0100
+
+libpsinc0 (0.0.16) unstable; urgency=medium
+
+  * Updated for compatibility with new header-only libemergent.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 07 Aug 2015 12:41:59 +0100
+
+libpsinc0 (0.0.15) unstable; urgency=medium
+
+  * Updated for compatibility with libemergent v0.0.7
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Mon, 13 Oct 2014 14:57:23 +0100
+
+libpsinc0 (0.0.14) unstable; urgency=medium
+
+  * Added a timeout parameter to instrument initialisation (USB transfer timeout).
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Thu, 02 Oct 2014 16:18:18 +0100
+
+libpsinc0 (0.0.13) unstable; urgency=medium
+
+  * Patched to use atomic_flag and atomic<bool> instead of volatile.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 30 Sep 2014 12:28:50 +0100
+
+libpsinc0 (0.0.12) unstable; urgency=medium
+
+  * Fixed a deadlock issue in TransportHotplug.
+  * Added a CustomDevice function for accessing unmapped devices.
+  * Added a static List function that will list all connected PSI hardware of the given type.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 26 Sep 2014 10:31:41 +0100
+
+libpsinc0 (0.0.11) unstable; urgency=medium
+
+  * Added safety checks to Device.cpp to avoid issues with a default device
+    instance being accessed.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Wed, 23 Jul 2014 00:11:30 +0100
+
+libpsinc0 (0.0.10) unstable; urgency=medium
+
+  * Patched the Register::Refresh function with the correct byte order.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 01 Jul 2014 14:41:48 +0100
+
+libpsinc0 (0.0.9) unstable; urgency=medium
+
+  * Patches for compiling under Windows. Change to how hotplug handles
+    the callback (since lambdas don't convert to __stdcall under mingw).
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Thu, 05 Jun 2014 12:17:16 +0100
+
+libpsinc0 (0.0.8) unstable; urgency=medium
+
+  * Separate critical section required for hotplugging. 
+
+ -- Dan <dan@queeg>  Wed, 28 May 2014 15:02:03 +0100
+
+libpsinc0 (0.0.7) unstable; urgency=medium
+
+  * Disabling the critical section was a bad idea. Refactored to avoid
+    a deadlock by queueing the hotplugged devices and then handling
+    them on the transport thread. 
+
+ -- Dan <dan@queeg>  Tue, 27 May 2014 15:38:21 +0100
+
+libpsinc0 (0.0.6) unstable; urgency=medium
+
+  * Disabled the critical section in the hotplug transport since I'm not 
+    sure it's required but it is causing a deadlock 
+
+ -- Dan <dan@queeg>  Wed, 21 May 2014 17:26:21 +0100
+
+libpsinc0 (0.0.5) unstable; urgency=medium
+
+  * Updated the hotplug transport to use libusb event locking. 
+
+ -- Dan <dan@queeg>  Wed, 21 May 2014 16:57:36 +0100
+
+libpsinc0 (0.0.4) unstable; urgency=medium
+
+  * Patched the hotplug transport destructor.
+
+ -- Dan <dan@queeg>  Sat, 10 May 2014 12:09:10 +0100
+
+libpsinc0 (0.0.3) unstable; urgency=medium
+
+  * Moved the hotplug registration to the polling function so that any immediate
+    connections will be handled on the polling thread as expected.
+
+ -- Dan <dan@queeg>  Fri, 09 May 2014 11:31:05 +0100
+
+libpsinc0 (0.0.2) unstable; urgency=medium
+
+  * Added new counter device to the camera type.
+
+ -- Dan <dan@queeg>  Thu, 08 May 2014 15:12:50 +0100
+
+libpsinc0 (0.0.1) unstable; urgency=medium
+
+  * Added Instrument implementation based on a prototype hotplug transport.
+
+ -- Dan <dan@queeg>  Fri, 02 May 2014 17:11:28 +0100
+
+libpsinc0 (0.0.0) unstable; urgency=low
+
+  * First release
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 23 Jul 2013 18:00:00 +0100
+
