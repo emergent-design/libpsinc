@@ -14,7 +14,8 @@ namespace libpsinc
 		CameraDisconnected	= -5,
 		CameraIOError		= -6,
 		UnknownFeature		= -7,
-		OutOfRange			= -8
+		OutOfRange			= -8,
+		UnknownDevice		= -9,
 	}
 
 
@@ -23,6 +24,7 @@ namespace libpsinc
 		const string LIB = "libpsinc.dll";
 
 		[DllImport(LIB, EntryPoint = "psinc_enable_logging")]		internal static extern void EnableLogging();
+
 		[DllImport(LIB, EntryPoint = "psinc_camera_create")]		internal static extern IntPtr Create();
 		[DllImport(LIB, EntryPoint = "psinc_camera_initialise")]	internal static extern int Initialise(IntPtr camera, string serial);
 		[DllImport(LIB, EntryPoint = "psinc_camera_delete")]		internal static extern int Delete(IntPtr camera);
@@ -33,7 +35,13 @@ namespace libpsinc
 		[DllImport(LIB, EntryPoint = "psinc_camera_set_flash")]		internal static extern int SetFlash(IntPtr camera, byte power);
 		[DllImport(LIB, EntryPoint = "psinc_camera_set_context")]	internal static extern int SetContext(IntPtr camera, byte context);
 		[DllImport(LIB, EntryPoint = "psinc_camera_connected")]		internal static extern bool Connected(IntPtr camera);
+
+		[DllImport(LIB, EntryPoint = "psinc_device_initialise")]	internal static extern int DeviceInitialise(IntPtr camera, string device, byte configuration);
+		[DllImport(LIB, EntryPoint = "psinc_device_write_byte")]	internal static extern int DeviceWriteByte(IntPtr camera, string device, byte value);
+		[DllImport(LIB, EntryPoint = "psinc_device_write")]			internal static extern int DeviceWrite(IntPtr camera, string device, IntPtr buffer, int size);
+		[DllImport(LIB, EntryPoint = "psinc_device_read")]			internal static extern int DeviceRead(IntPtr camera, string device, IntPtr Buffer, int size, out int used);
 	}
+
 		
 
 	/// <summary>
@@ -231,5 +239,73 @@ namespace libpsinc
 
 			return result;
 		}
+
+
+		/// <summary>
+		/// Send an initialisation value to a device
+		/// </summary>
+		/// <returns><c>true</c>, if successful, <c>false</c> otherwise.</returns>
+		/// <param name="device">Name of device.</param>
+		/// <param name="configuration">Configuration value.</param>
+		public bool DeviceInitialise(string device, byte configuration)
+		{
+			return Psinc.DeviceInitialise(this.camera, device, configuration) == (int)ReturnCodes.Ok;
+		}
+
+
+		/// <summary>
+		/// Write a single byte to a device.
+		/// </summary>
+		/// <returns><c>true</c>, if successful, <c>false</c> otherwise.</returns>
+		/// <param name="device">Name of device.</param>
+		/// <param name="value">Value to transmit.</param>
+		public bool DeviceWrite(string device, byte value)
+		{
+			return Psinc.DeviceWriteByte(this.camera, device, value) == (int)ReturnCodes.Ok;
+		}
+
+
+		/// <summary>
+		/// Write a block of data to a device.
+		/// </summary>
+		/// <returns><c>true</c>, if successful, <c>false</c> otherwise.</returns>
+		/// <param name="device">Name of device.</param>
+		/// <param name="buffer">Buffer to be written.</param>
+		public bool DeviceWrite(string device, byte [] buffer)
+		{
+			unsafe
+			{
+				fixed (byte *data = buffer)
+				{
+					return Psinc.DeviceWrite(this.camera, device, (IntPtr)data, buffer.Length) == (int)ReturnCodes.Ok;
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Read a block of data from a device
+		/// </summary>
+		/// <returns>The number of bytes read or 0 if unsuccessful.</returns>
+		/// <param name="device">Name of device.</param>
+		/// <param name="buffer">Buffer in which to write the data.</param>
+		public int DeviceRead(string device, byte [] buffer)
+		{
+			int used = 0;
+
+			unsafe
+			{
+				fixed (byte *data = buffer)
+				{
+					if (Psinc.DeviceRead(this.camera, device, (IntPtr)data, buffer.Length, out used) == (int)ReturnCodes.Ok)
+					{
+						return used;
+					}
+				}
+			}
+
+			return 0;
+		}
 	}
 }
+

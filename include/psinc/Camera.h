@@ -1,9 +1,10 @@
 #pragma once
 
-#include <psinc/Transport.h>
-#include <psinc/handlers/DataHandler.h>
+#include <psinc/Instrument.h>
+#include <psinc/handlers/DataHandler.hpp>
 #include <psinc/driver/Feature.h>
 #include <psinc/driver/Device.h>
+#include <psinc/Transport.h>
 
 #include <thread>
 #include <atomic>
@@ -12,20 +13,8 @@
 
 namespace psinc
 {
-	/// Capture status values passed to the event callback function
-	enum AcquisitionStatus
-	{
-		ACQUISITION_SUCCESSFUL,
-		ACQUISITION_CONNECTED,
-		ACQUISITION_DISCONNECTED,
-
-		ACQUISITION_ERROR_TRANSFER_FAILED			= -1,
-		ACQUISITION_ERROR_IMAGE_CONVERSION_FAILED	= -2,
-	};
-
-
 	/// The primary interface to the capture library
-	class Camera
+	class Camera : public Instrument
 	{
 		public:
 
@@ -45,7 +34,7 @@ namespace psinc
 
 
 			/// Destructor
-			virtual ~Camera();
+			virtual ~Camera() {}
 
 
 			/// Initialises the transport to look for specific descriptors or on a particular
@@ -53,7 +42,7 @@ namespace psinc
 			/// treated as a regex and, combined with the cameras ability to append the camera
 			/// name to the end of the serial number in the USB descriptor, provides a powerful
 			/// way to reliably connect to a specific camera.
-			void Initialise(std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500);
+			virtual void Initialise(std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500);
 
 
 			/// Start an asynchronous image grab. The data handler would usually have access
@@ -63,12 +52,12 @@ namespace psinc
 			/// will go ahead and capture another frame (streaming mode), and if "false" is
 			/// returned then it will stop and await the next call to GrabImage.
 			/// @return False if grabbing could not be started (already grabbing)
-			bool GrabImage(Mode mode, DataHandler &handler, emg::event callback);
+			bool GrabImage(Mode mode, DataHandler &handler, std::function<bool(bool)> callback);
 
 
 			/// Checks if this instance is currently connected to a physical device
 			/// @return True if a device appears to be connected.
-			bool Connected();
+			virtual bool Connected();
 
 
 			/// Checks if the camera is currently performing an asynchronous image grab.
@@ -81,13 +70,8 @@ namespace psinc
 			std::map<std::string, Feature> features;
 
 
-			/// Maps common features to simple names
+			/// Maps common features to simple names grouped by context.
 			std::map<byte, std::map<std::string, Feature*>> aliases;
-
-
-			/// A map of available devices that can be controlled by (or are part of)
-			/// the connected camera.
-			std::map<std::string, Device> devices;
 
 
 			/// Sets the flash power. Depending on the camera type this can be
@@ -116,23 +100,28 @@ namespace psinc
 			// will render the values stored in the feature maps above obsolete. Setting
 			// invalid values could leave the chip in an inoperative state.
 			bool SetRegister(int address, int value);
+
 			// Will return -1 if the value could not be retrieved.
 			int GetRegister(int address);
 
 
+		protected:
+
+			// Called from the thread main loop and returns true if the thread is safe to go to sleep.
+			virtual bool Main();
+
+
 		private:
+
+			// Disallow the use of the base class initialisation since we need to override
+			// some of the connection functionality - a camera is not considered fully
+			// connected until it has also been configured.
+			using Instrument::Initialise;
+
 
 			/// The internal image handler created for the specific type of image passed to
 			/// the grab function.
 			DataHandler *handler = nullptr;
-
-
-			/// Entry point for the asynchronous grabbing thread
-			virtual void Entry();
-
-			/// Informs the underlying transport to connect to a device and if successful
-			/// will invoke configuration and refreshing of the register values.
-			// bool Connect();
 
 
 			/// When a camera is connected, determine what type it is and then initialise
@@ -152,14 +141,8 @@ namespace psinc
 			/// Attempt to capture data from the device. The supplied handler should
 			/// be of the appropriate type to cope with the data that will be captured.
 			/// @return AcquisitionStatus
-			int Capture(DataHandler *image, Mode mode, int flash);
+			bool Capture(DataHandler *handler, Mode mode, int flash);
 
-
-			/// The communications layer, effectively a wrapper around libusb 1.0.
-			Transport transport;
-
-			/// A map of all known devices.
-			std::map<byte, Device> devicePool;
 
 			/// The chip registers for the connected camera. The map key is the register
 			/// address.
@@ -172,25 +155,15 @@ namespace psinc
 			/// Byte buffer used to receive data from the device during a capture.
 			emg::Buffer<byte> receive;
 
-			///Condition variable used to wake the thread when a grab request is made
-			std::condition_variable condition;
 
-			///Image capture complete callback
-			emg::event callback	= nullptr;
+			/// Image capture complete callback
+			std::function<bool(bool)> callback	= nullptr;
 
+			/// Invoked when the connection status changes
 			std::function<void(bool)> onConnection = nullptr;
-
-			///Critical section mutex
-			std::mutex cs;
-
-			///The capture thread
-			std::thread _thread;
 
 			/// Storage for the capture mode
 			Mode mode = Mode::Normal;
-
-			/// Control flag for the capture thread
-			std::atomic<bool> run;
 
 			/// The PSI camera range can contain either bayer or monochrome chips. Monochrome
 			/// is the default but this is set to false if the chip is determined to be bayer
@@ -201,7 +174,7 @@ namespace psinc
 			/// Set to true once initialised so that the capture thread is only created once
 			/// even though the Initialise function can be called multiple times if the serial
 			/// and bus parameters need to be modified.
-			bool initialised = false;
+			// bool initialised = false;
 
 			/// Set to true if the camera is fully configured and refreshed after connection.
 			bool configured = false;

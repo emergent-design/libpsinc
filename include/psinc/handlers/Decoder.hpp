@@ -49,7 +49,7 @@ namespace psinc
 			//		1: 0, 1
 			//		2: 1, 0
 			//		3: 1, 1
-			template <typename T, typename U> static void BayerGreyOld(T *src, U *dst, int width, int height, byte bayerMode, uint16_t shift)
+			/*template <typename T, typename U> static void BayerGreyOld(T *src, U *dst, int width, int height, byte bayerMode, uint16_t shift)
 			{
 				using emg::Maths;
 
@@ -97,7 +97,7 @@ namespace psinc
 
 					oddLine = !oddLine;
 				}
-			}
+			}*/
 
 
 			// Decode data from a bayer sensor to an RGB image
@@ -106,7 +106,7 @@ namespace psinc
 			//		1: 0, 1
 			//		2: 1, 0
 			//		3: 1, 1
-			template <typename T, typename U> static void BayerColourOld(T *src, U *dst, int width, int height, byte bayerMode, uint16_t)
+			/*template <typename T, typename U> static void BayerColourOld(T *src, U *dst, int width, int height, byte bayerMode, uint16_t)
 			{
 				using emg::Maths;
 
@@ -178,7 +178,7 @@ namespace psinc
 
 					oddLine = !oddLine;
 				}
-			}
+			}*/
 
 
 			//       -1

@@ -121,7 +121,6 @@ QImage *MainWindow::ConvertWindow()
 	int rw			= roi.width();
 	int rh			= roi.height();
 	int width		= this->hdrImage.Width();
-//	int height		= this->hdrImage.Height();
 	int size		= rw * rh * 3;
 	int jump		= (width - rw) * 3;
 	uint16_t *src	= this->hdrImage + roi.top() * width * 3 + roi.left() * 3;
@@ -154,10 +153,6 @@ QImage *MainWindow::ConvertWindow()
 		sum += this->histogram[high];
 	}
 
-//	cout << roi.left() << ", " << roi.top() << ", " << roi.width() << ", " << roi.height() << endl;
-//	cout << "Low: " << low << ", High: " << high << endl;
-
-
 	return this->ConvertRange(low, std::max(256, high - low));
 }
 
@@ -165,19 +160,11 @@ QImage *MainWindow::ConvertWindow()
 
 void MainWindow::Grab()
 {
-	// While testing
-//	auto *handler = &this->handler;
 	auto *handler = this->hdrMode == Hdr::Simple ? (DataHandler *)&this->handler : (DataHandler *)&this->hdrHandler;
 
-	this->camera.GrabImage(this->mode, *handler, [&](int status) {
-//		switch (status)
-//		{
-//			case ACQUISITION_SUCCESSFUL: 			emit imageGrabbed(this->Convert());	break;
-//			//case ACQUISITION_CONNECTED:				emit connectionChanged(true);		break;
-//			//case ACQUISITION_DISCONNECTED:			emit connectionChanged(false);		break;
-//		}
+	this->camera.GrabImage(this->mode, *handler, [&](bool status) {
 
-		if (status == ACQUISITION_SUCCESSFUL)
+		if (status)
 		{
 			emit imageGrabbed(this->Convert());
 		}

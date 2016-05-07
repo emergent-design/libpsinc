@@ -135,4 +135,6 @@ extern "C"
 	int emg_hdrimage_get(emg_hdrimage *image, unsigned char *data, int stride, bool bgr)									{ return _emg_get(reinterpret_cast<ImageBase<uint16_t> *>(image), data, stride, bgr); }
 	int emg_image_set(emg_image *image, unsigned char *data, int width, int height, int depth, int stride, bool bgr)		{ return _emg_set(reinterpret_cast<ImageBase<byte> *>(image), data, width, height, depth, stride, bgr); }
 	int emg_hdrimage_set(emg_hdrimage *image, unsigned char *data, int width, int height, int depth, int stride, bool bgr)	{ return _emg_set(reinterpret_cast<ImageBase<uint16_t> *>(image), data, width, height, depth, stride, bgr); }
+	unsigned char *emg_image_data(emg_image *image)																			{ return reinterpret_cast<ImageBase<byte> *>(image)->Data(); }
+	uint16_t *emg_hdrimage_data(emg_hdrimage *image)																		{ return reinterpret_cast<ImageBase<uint16_t> *>(image)->Data(); }
 }

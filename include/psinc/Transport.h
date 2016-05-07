@@ -16,9 +16,7 @@ namespace psinc
 	/// Uses libusb to connect to and communicate with the physical
 	/// devices. This supports connecting to specific hardware based
 	/// on the bus or a serial number regex.
-	/// This is a test of the new libusb hotplug features and should
-	/// be migrated into the main Transport if successful.
-	class Transport //: public Transport
+	class Transport
 	{
 		public:
 
@@ -28,7 +26,7 @@ namespace psinc
 			/// Initialises the transport with the product ID and
 			/// serial of interest.
 			/// The serial string will be treated as a regex expression.
-			bool Initialise(int product, std::string serial, std::function<void(bool)> onConnection, int timeout = 500);
+			bool Initialise(uint16_t product, std::string serial, std::function<void(bool)> onConnection, int timeout = 500);
 
 
 			/// Poll to allow hotplug detection to work.
@@ -54,7 +52,7 @@ namespace psinc
 
 			/// Return a list of serial numbers for all connected devices
 			/// that match the given product ID.
-			static std::vector<std::string> List(int product);
+			static std::vector<std::string> List(uint16_t product);
 
 
 		private:
@@ -84,6 +82,10 @@ namespace psinc
 			bool Claim(libusb_device *device);
 
 
+			/// Check that the device matches an expected vendor and product ID.
+			static bool Valid(libusb_device *device, uint16_t product);
+
+
 			/// Tranfer the given data to the device (write) or from the device (!write)
 			bool Transfer(emg::Buffer<byte> *buffer, bool write, bool check, bool truncate);
 
@@ -93,7 +95,7 @@ namespace psinc
 
 
 			/// Product ID that we are interested in
-			int product;
+			uint16_t product;
 
 			/// Full serial of the device connected to by this transport instance.
 			std::string id;

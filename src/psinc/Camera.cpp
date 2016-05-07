@@ -13,30 +13,8 @@ using namespace emergent;
 
 namespace psinc
 {
-
-	Camera::Camera()
+	Camera::Camera() : Instrument()
 	{
-		// Notes:
-		// The "Name" also appears as part of the serial in the USB descriptor for this device.
-		this->devicePool = map<byte, Device> {
-			{ 0x00, { &this->transport, "Prox", 			0x00, Device::Direction::Input }},	// Prox reader device
-			{ 0x01, { &this->transport, "Lock",				0x01, Device::Direction::Output }},	// Electronic lock control
-			{ 0x02, { &this->transport, "LEDArray",			0x02, Device::Direction::Output }},	// LED array
-			{ 0x03, { &this->transport, "SecureLock",		0x03 }},							// Encrypted lock control
-			{ 0x04, { &this->transport, "Error", 			0x04, Device::Direction::Input }},	// Error reporting
-			{ 0x05, { &this->transport, "Serial", 			0x05 }},							// Serial number of the camera (16 bytes)
-			{ 0x06, { &this->transport, "Storage0", 		0x06 }},							// Storage block 0 (free for use - 502 bytes)
-			{ 0x07, { &this->transport, "Name", 			0x07, Device::Direction::Both }},	// User-settable name of the camera.
-			{ 0x08, { &this->transport, "Storage1", 		0x08 }},							// Storage block 1 (free for use - 127 bytes)
-			{ 0x09, { &this->transport, "Defaults", 		0x09 }},							// Default settings for this device. Modify with care.
-			{ 0x0b,	{ &this->transport, "HardwareVersion",	0x0b, Device::Direction::Input }},
-			{ 0x0d, { &this->transport, "Watchdog",			0x0d, Device::Direction::Both }},
-			{ 0x0e, { &this->transport, "LEDPair",			0x0e, Device::Direction::Output }},	// Simple LED pair
-			{ 0x0f, { &this->transport, "FirmwareVersion",	0x0e, Device::Direction::Input }},
-			{ 0x13, { &this->transport, "Count",			0x13, Device::Direction::Input }},	// 64-bit counter
-			{ 0xff, { &this->transport, "Query", 			0xff, Device::Direction::Input }}	// Query the camera for a list of available devices and chip type
-		};
-
 		this->send = Buffer<byte>({
 			0x00, 0x00, 0x00, 0x00, 0x00, 	// Header
 			0x00, 0x00, 0x00, 0x00, 0x00,	// Command here
@@ -45,24 +23,11 @@ namespace psinc
 	}
 
 
-	Camera::~Camera()
-	{
-		if (this->initialised)
-		{
-			this->run = false;
-
-			// Notify the thread to wake so that it can then exit
-			this->condition.notify_one();
-			this->_thread.join();
-		}
-	}
-
-
 	void Camera::Initialise(string serial, std::function<void(bool)> onConnection, int timeout)
 	{
 		this->onConnection = onConnection;
 
-		this->transport.Initialise(0xaaca, serial, [&](bool connected) {
+		Instrument::Initialise(Type::Camera, serial, [&](bool connected) {
 			this->configured = false;
 
 			if (!connected && this->onConnection)
@@ -70,65 +35,48 @@ namespace psinc
 				this->onConnection(false);
 			}
 		}, timeout);
-
-
-		if (!this->initialised)
-		{
-			this->run			= true;
-			this->_thread		= thread(&Camera::Entry, this);
-			this->initialised	= true;
-		}
 	}
 
 
-	void Camera::Entry()
+	bool Camera::Main()
 	{
-		unique_lock<mutex> lock(this->cs);
-		bool stream = false;
-
-		while (this->run)
+		if (this->transport.Connected() && !this->configured)
 		{
-			this->transport.Poll(0);
+			this->configured = this->Configure() && this->RefreshRegisters();
 
-			if (this->transport.Connected() && !this->configured)
+			if (this->onConnection && this->configured)
 			{
-				this->configured = this->Configure() && this->RefreshRegisters();
-
-				if (this->onConnection && this->configured)
-				{
-					this->onConnection(true);
-				}
-			}
-
-			if (this->handler)
-			{
-				if (this->callback)
-				{
-					if (this->Connected())
-					{
-						stream = this->callback(this->Capture(this->handler, this->mode, this->flash));
-					}
-					else
-					{
-						stream = this->callback(ACQUISITION_DISCONNECTED);
-
-						// Sleep the thread to avoid ramping up processor usage if in streaming mode.
-						this_thread::sleep_for(chrono::milliseconds(100));
-					}
-				}
-
-				if (!stream) this->handler = nullptr;
-			}
-			else
-			{
-				// Thread is paused until notified, wakes after timeout to poll the hotplugging system.
-				this->condition.wait_for(lock, 50ms);
+				this->onConnection(true);
 			}
 		}
+
+		if (this->handler)
+		{
+			bool stream = false;
+
+			if (this->callback)
+			{
+				if (this->Connected())
+				{
+					stream = this->callback(this->Capture(this->handler, this->mode, this->flash));
+				}
+				else
+				{
+					stream = this->callback(false);
+
+					// Sleep the thread to avoid ramping up processor usage if in streaming mode.
+					this_thread::sleep_for(chrono::milliseconds(100));
+				}
+			}
+
+			if (!stream) this->handler = nullptr;
+		}
+
+		return this->handler == nullptr;
 	}
 
 
-	bool Camera::GrabImage(Mode mode, DataHandler &handler, event callback)
+	bool Camera::GrabImage(Mode mode, DataHandler &handler, std::function<bool(bool)> callback)
 	{
 		bool result = false;
 
@@ -160,12 +108,11 @@ namespace psinc
 	{
 		this->aliases.clear();
 		this->features.clear();
-		this->devices.clear();
 		this->registers.clear();
 
-		vector<byte> devices	= { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0b, 0x0d, 0x0f };
-		auto xml				= chip::v024;
-		auto description		= this->devicePool[0xff].Read();
+		xml_document doc;
+		auto xml			= chip::v024;
+		auto description	= this->CustomDevice(0xff).Read(); //this->devicePool[0xff].Read();
 
 		if (description.Size())
 		{
@@ -182,26 +129,9 @@ namespace psinc
 
 				this->monochrome = (description[2] & 0x01) == 0;
 			}
-
-			byte *desc	= description + header + 1;
-			int count	= *desc++;
-
-			devices.assign(desc, desc + count);
 		}
 
-		for (auto d : devices)
-		{
-			this->devices[this->devicePool[d].Name()] = this->devicePool[d];
-		}
-
-		xml_document doc;
-
-		if (doc.load(xml))
-		{
-			return this->Configure(doc.child("camera"));
-		}
-
-		return false;
+		return doc.load(xml) && this->Configure(doc.child("camera"));
 	}
 
 
@@ -349,12 +279,6 @@ namespace psinc
 	}
 
 
-	bool Camera::Reset()
-	{
-		return this->transport.Reset();
-	}
-
-
 	void Camera::SetFlash(byte power)
 	{
 		this->flash = power;
@@ -407,7 +331,7 @@ namespace psinc
 	}
 
 
-	int Camera::Capture(DataHandler *image, Mode mode, int flash)
+	bool Camera::Capture(DataHandler *handler, Mode mode, int flash)
 	{
 		int width, height;
 
@@ -439,15 +363,7 @@ namespace psinc
 		this->send[8] = (byte)((size >> 8) & 0xff);
 		this->send[9] = (byte)((size >> 16) & 0xff);
 
-		if (this->transport.Transfer(&this->send, &this->receive, image->waiting))
-		{
-			return image->Process(this->monochrome, this->hdr, this->receive, width, height, this->bayerMode)
-				? ACQUISITION_SUCCESSFUL
-				: ACQUISITION_ERROR_IMAGE_CONVERSION_FAILED;
-		}
-
-		return ACQUISITION_ERROR_TRANSFER_FAILED;
+		return this->transport.Transfer(&this->send, &this->receive, handler->waiting)
+			&& handler->Process(this->monochrome, this->hdr, this->receive, width, height, this->bayerMode);
 	}
 }
-
-

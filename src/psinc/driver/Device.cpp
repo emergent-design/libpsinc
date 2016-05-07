@@ -47,14 +47,21 @@ namespace psinc
 
 	bool Device::Write(const std::string &text)
 	{
-		return this->Write(Buffer<byte>(text));
+		return this->Write(reinterpret_cast<const byte *>(text.data()), text.size());
 	}
 
 
 	bool Device::Write(const Buffer<byte> &buffer)
 	{
+		return this->Write(buffer.Data(), buffer.Size());
+	}
+
+
+	bool Device::Write(const byte *buffer, int size)
+	{
+		if (size <= 0) return false;
+
 		atomic<bool> waiting(false);
-		int size		= buffer.Size();
 		byte command[]	= {
 			0x00, 0x00, 0x00, 0x00, 0x00, 		// Header
 			Commands::WriteBlock, this->index, 	// Command
@@ -66,7 +73,7 @@ namespace psinc
 		Buffer<byte> data(11 + size);
 
 		memcpy(data.Data(), command, 10);
-		memcpy(data.Data() + 10, buffer.Data(), size);
+		memcpy(data.Data() + 10, data, size);
 		data[size+10] = 0xff;					// Terminator
 
 		return this->transport ? this->transport->Transfer(&data, nullptr, waiting) : false;

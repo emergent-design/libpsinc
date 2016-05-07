@@ -1,6 +1,6 @@
 #include "psinc.h"
 #include "psinc/Camera.h"
-#include "psinc/handlers/ImageHandler.h"
+#include "psinc/handlers/ImageHandler.hpp"
 #include <emergent/logger/Logger.hpp>
 #include <thread>
 
@@ -17,13 +17,8 @@ template <typename T> int _psinc_grab(Camera *camera, ImageBase<T> *image)
 	int result = PSINC_OK;
 	ImageHandler<T> handler(*image);
 
-	camera->GrabImage(Camera::Mode::Normal, handler, [&](int status) {
-		switch (status)
-		{
-			case ACQUISITION_CONNECTED:				result = PSINC_CAMERA_CONNECTED;	break;
-			case ACQUISITION_DISCONNECTED:			result = PSINC_CAMERA_DISCONNECTED;	break;
-			case ACQUISITION_ERROR_TRANSFER_FAILED:	result = PSINC_CAMERA_IO_ERROR;		break;
-		}
+	camera->GrabImage(Camera::Mode::Normal, handler, [&](bool status) {
+		result = status ? PSINC_OK : PSINC_CAMERA_IO_ERROR;
 		return false;
 	});
 

@@ -61,6 +61,10 @@ namespace psinc
 			bool Write(const emg::Buffer<byte> &buffer);
 
 
+			/// Write the binary data to the device
+			bool Write(const byte *buffer, int size);
+
+
 			/// Write a single byte to the device
 			bool Write(byte value);
 

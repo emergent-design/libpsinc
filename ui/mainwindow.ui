@@ -519,16 +519,6 @@
             <string>Window</string>
            </property>
           </item>
-          <item>
-           <property name="text">
-            <string>Algorithm A</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Algorithm B</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="2" column="9">

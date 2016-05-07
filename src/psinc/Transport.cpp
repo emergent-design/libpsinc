@@ -1,11 +1,11 @@
 #include "psinc/Transport.h"
 #include <emergent/logger/Logger.hpp>
 #include <regex>
+#include <set>
 
 using namespace std;
 using namespace emergent;
 
-#define VENDOR		0x0525	// PSI
 #define WRITE_PIPE	0x03
 #define READ_PIPE	0x81
 
@@ -33,7 +33,7 @@ namespace psinc
 	}
 
 
-	bool Transport::Initialise(int product, string serial, std::function<void(bool)> onConnection, int timeout)
+	bool Transport::Initialise(uint16_t product, string serial, std::function<void(bool)> onConnection, int timeout)
 	{
 		this->serial		= serial;
 		this->product		= product;
@@ -76,7 +76,7 @@ namespace psinc
 		{
 			auto events = (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
 
-			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, VENDOR, this->product, LIBUSB_HOTPLUG_MATCH_ANY, &OnHotplug, this, &this->hotplug))
+			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, LIBUSB_HOTPLUG_MATCH_ANY, this->product, LIBUSB_HOTPLUG_MATCH_ANY, &OnHotplug, this, &this->hotplug))
 			{
 				Log::Error("Unable to register USB hotplug callback");
 				return;
@@ -91,23 +91,26 @@ namespace psinc
 		Pending item;
 		if (this->pending.try_dequeue(item))
 		{
-			if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT && this->handle)
+			if (Valid(item.device, this->product))
 			{
-				if (item.device == libusb_get_device(this->handle))
+				if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT && this->handle)
 				{
-					this->cs.lock();
-						this->Release();
-					this->cs.unlock();
+					if (item.device == libusb_get_device(this->handle))
+					{
+						this->cs.lock();
+							this->Release();
+						this->cs.unlock();
 
-					if (this->onConnection) this->onConnection(false);
+						if (this->onConnection) this->onConnection(false);
+					}
 				}
-			}
 
-			if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED && !this->handle)
-			{
-				if (this->Claim(item.device) && this->onConnection)
+				if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED && !this->handle)
 				{
-					this->onConnection(true);
+					if (this->Claim(item.device) && this->onConnection)
+					{
+						this->onConnection(true);
+					}
 				}
 			}
 		}
@@ -126,26 +129,32 @@ namespace psinc
 	}
 
 
+	bool Transport::Valid(libusb_device *device, uint16_t product)
+	{
+		static const set<uint16_t> VENDORS = { 0x0525 };
+		libusb_device_descriptor descriptor;
+
+		return libusb_get_device_descriptor(device, &descriptor) == 0
+			&& VENDORS.count(descriptor.idVendor)
+			&& descriptor.idProduct == product;
+	}
+
+
 	void Transport::LegacyConnect()
 	{
 		libusb_device **list;
-		libusb_device_descriptor descriptor;
-
 		libusb_get_device_list(this->context, &list);
 
 		// Loop through the list of connected USB devices
 		for (libusb_device **device = list; *device; device++)
 		{
-			if (libusb_get_device_descriptor(*device, &descriptor) == 0)
+			if (Valid(*device, this->product))
 			{
-				if (descriptor.idVendor == VENDOR && descriptor.idProduct == this->product)
+				// If a particular device matches the known vendor, product ID then attempt to claim it.
+				if (this->Claim(*device))
 				{
-					// If a particular device matches the known vendor, product ID then attempt to claim it.
-					if (this->Claim(*device))
-					{
-						if (this->onConnection) this->onConnection(true);
-						break;
-					}
+					if (this->onConnection) this->onConnection(true);
+					break;
 				}
 			}
 		}
@@ -191,7 +200,7 @@ namespace psinc
 	}
 
 
-	vector<string> Transport::List(int product)
+	vector<string> Transport::List(uint16_t product)
 	{
 		vector<string> result;
 
@@ -206,18 +215,15 @@ namespace psinc
 
 		for (libusb_device **device = list; *device; device++)
 		{
-			if (libusb_get_device_descriptor(*device, &descriptor) == 0)
+			if (Valid(*device, product) && libusb_get_device_descriptor(*device, &descriptor) == 0)
 			{
-				if (descriptor.idVendor == VENDOR && descriptor.idProduct == product)
+				if (libusb_open(*device, &handle) == 0)
 				{
-					if (libusb_open(*device, &handle) == 0)
-					{
-						libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 64);
+					libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 64);
 
-						result.push_back(reinterpret_cast<char *>(data));
+					result.push_back(reinterpret_cast<char *>(data));
 
-						libusb_close(handle);
-					}
+					libusb_close(handle);
 				}
 			}
 		}

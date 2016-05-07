@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 /*
 	A wrapper for libpsinc that provides a C API for easier interop with other languages.
 */
@@ -21,7 +23,10 @@ extern "C"
 		PSINC_CAMERA_DISCONNECTED	= -5,
 		PSINC_CAMERA_IO_ERROR		= -6,
 		PSINC_UNKNOWN_FEATURE		= -7,
-		PSINC_OUT_OF_RANGE			= -8
+		PSINC_OUT_OF_RANGE			= -8,
+
+		PSINC_UNKNOWN_DEVICE		= -9,
+
 	};
 
 
@@ -69,6 +74,21 @@ extern "C"
 
 
 
+	/* ------------------- Device ------------------- */
+
+	// Initialise a device by name
+	int psinc_device_initialise(psinc_camera *camera, const char *device, unsigned char configuration);
+
+	// Write a byte to a device by name
+	int psinc_device_write_byte(psinc_camera *camera, const char *device, unsigned char value);
+
+	// Write a block of data to a device by name
+	int psinc_device_write(psinc_camera *camera, const char *device, unsigned char *buffer, int size);
+
+	// Read a block of data from a device by name
+	int psinc_device_read(psinc_camera *camera, const char *device, unsigned char *buffer, int size, int &used);
+
+
 	/* ------------------- Image ------------------- */
 
 	// Allocate memory for an image instance.
@@ -100,6 +120,11 @@ extern "C"
 	// Stride indicates the number of bytes for a single row of pixels in the source data.
 	// The bgr flag indicates whether or not the source data is in a BGR byte-order.
 	int emg_image_set(emg_image *image, unsigned char *data, int width, int height, int depth, int stride, bool bgr);
+
+	// Retrieve a reference to the start of the pixel data. If this is a colour image then the
+	// internal channel order is RGB. This reference is invalid if the image is deleted or
+	// resized.
+	unsigned char *emg_image_data(emg_image *image);
 
 
 
@@ -135,4 +160,9 @@ extern "C"
 	// Stride indicates the number of bytes for a single row of pixels in the source data.
 	// The bgr flag indicates whether or not the source data is in a BGR byte-order.
 	int emg_hdrimage_set(emg_hdrimage *image, unsigned char *data, int width, int height, int depth, int stride, bool bgr);
+
+	// Retrieve a reference to the start of the pixel data. If this is a colour image then the
+	// internal channel order is RGB. This reference is invalid if the image is deleted or
+	// resized.
+	uint16_t *emg_hdrimage_data(emg_hdrimage *image);
 }

@@ -5,7 +5,7 @@
 #include <QtWidgets/QSpinBox>
 
 #include <psinc/Camera.h>
-#include <psinc/handlers/ImageHandler.h>
+#include <psinc/handlers/ImageHandler.hpp>
 #include <chrono>
 #include "settingsmodel.h"
 
@@ -61,7 +61,6 @@ class MainWindow : public QMainWindow
 		void on_regionButton_clicked();
 
 //		void on_lensCheck_toggled(bool checked);
-
 //		void on_lensBox_valueChanged(double);
 
 	signals:

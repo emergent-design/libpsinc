@@ -9,11 +9,14 @@
 
 namespace psinc
 {
+	/// The base class for a Camera but it can also be used directly when communicating
+	/// with hardware that is not a camera or should you wish to use devices connected
+	/// to a camera but not actually grab any images.
 	class Instrument
 	{
 		public:
 
-			enum class Type : int
+			enum class Type : uint16_t
 			{
 				Camera		= 0xaaca,
 				Odometer	= 0xaac0,
@@ -21,7 +24,7 @@ namespace psinc
 
 
 			/// Default Constructor
-			Instrument();
+			Instrument() {}
 
 
 			/// Destructor
@@ -33,56 +36,58 @@ namespace psinc
 			/// treated as a regex and, combined with the cameras ability to append the camera
 			/// name to the end of the serial number in the USB descriptor, provides a powerful
 			/// way to reliably connect to a specific camera.
-			void Initialise(Type product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500);
+			virtual void Initialise(Type product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500);
 
 
 			/// Checks if this instance is currently connected to a physical device
 			/// @return True if a device appears to be connected.
-			bool Connected();
+			virtual bool Connected();
 
-
+			/// Create a custom device instance if you know the index instead of
+			/// using the map of named devices below.
 			Device CustomDevice(byte index);
 
 			/// Retrieve list of all serial numbers for any connected instruments of the given type
-			static std::vector<std::string> List(Type product);
+			static std::vector<std::string> List(Type product = Type::Camera);
 
 			/// A map of available devices that can be controlled by (or are part of)
 			/// the connected instrument.
 			std::map<std::string, Device> devices;
 
-
 			/// Resets the instrument.
 			bool Reset();
+
+
+		protected:
+
+			/// Called from the thread main loop, it can be overridden to provide additional functionality
+			/// Returns true if the thread is safe to go to sleep.
+			virtual bool Main() { return true; }
+
+			/// The communications layer, effectively a wrapper around libusb 1.0.
+			Transport transport;
+
+			/// Condition variable used to wake the thread
+			std::condition_variable condition;
+
+			/// Critical section mutex
+			std::mutex cs;
 
 
 		private:
 
 			/// Entry point for the thread
-			virtual void Entry();
+			void Entry();
 
-
-
-			/// The communications layer, effectively a wrapper around libusb 1.0.
-			Transport transport;
-
-			/// A map of all known devices per instrument.
-			std::map<Type, std::map<byte, Device>> deviceSets;
-
-			///Condition variable used to wake the thread when a grab request is made
-			std::condition_variable condition;
-
-			///Critical section mutex
-			std::mutex cs;
-
-			///The thread
+			/// The thread
 			std::thread _thread;
 
-			/// Control flag for the capture thread
+			/// Control flag for the thread
 			std::atomic<bool> run;
 
 			/// Set to true once initialised so that the thread is only created once
 			/// even though the Initialise function can be called multiple times if the serial
-			/// and bus parameters need to be modified.
+			/// or instrument type needs to be modified.
 			bool initialised = false;
 
 	};
