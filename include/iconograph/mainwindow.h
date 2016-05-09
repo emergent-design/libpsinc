@@ -90,10 +90,6 @@ class MainWindow : public QMainWindow
 		QImage *ConvertRange(int start, int window);
 		QImage *ConvertWindow();
 
-		void Set(std::string alias, int value);
-		void Set(std::string alias, bool value);
-		int Reset(std::string alias);
-
 		Ui::MainWindow *ui;
 		SettingsModel *settings;
 		FeatureDelegate *delegate;

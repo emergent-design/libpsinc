@@ -26,10 +26,8 @@ namespace psinc
 			/// Default Constructor
 			Instrument() {}
 
-
 			/// Destructor
 			virtual ~Instrument();
-
 
 			/// Initialises the transport to look for specific descriptors or on a particular
 			/// bus. It also starts the internal thread running. The serial string is actually
@@ -37,7 +35,6 @@ namespace psinc
 			/// name to the end of the serial number in the USB descriptor, provides a powerful
 			/// way to reliably connect to a specific camera.
 			virtual void Initialise(Type product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500);
-
 
 			/// Checks if this instance is currently connected to a physical device
 			/// @return True if a device appears to be connected.
@@ -47,22 +44,28 @@ namespace psinc
 			/// using the map of named devices below.
 			Device CustomDevice(byte index);
 
+			/// Resets the instrument.
+			bool Reset();
+
 			/// Retrieve list of all serial numbers for any connected instruments of the given type
 			static std::vector<std::string> List(Type product = Type::Camera);
+
 
 			/// A map of available devices that can be controlled by (or are part of)
 			/// the connected instrument.
 			std::map<std::string, Device> devices;
 
-			/// Resets the instrument.
-			bool Reset();
-
 
 		protected:
+
+			/// Called when an instrument is connected. The instrument is not considered
+			/// fully connected until it is successfully configured.
+			virtual bool Configure() { return true; }
 
 			/// Called from the thread main loop, it can be overridden to provide additional functionality
 			/// Returns true if the thread is safe to go to sleep.
 			virtual bool Main() { return true; }
+
 
 			/// The communications layer, effectively a wrapper around libusb 1.0.
 			Transport transport;
@@ -73,11 +76,15 @@ namespace psinc
 			/// Critical section mutex
 			std::mutex cs;
 
+			/// Invoked when the connection status changes
+			std::function<void(bool)> onConnection = nullptr;
+
 
 		private:
 
 			/// Entry point for the thread
 			void Entry();
+
 
 			/// The thread
 			std::thread _thread;
@@ -90,5 +97,7 @@ namespace psinc
 			/// or instrument type needs to be modified.
 			bool initialised = false;
 
+			/// Set to true if the instrument is fully configured and refreshed after connection.
+			bool configured = false;
 	};
 }

@@ -229,7 +229,7 @@ void MainWindow::UpdateSlider(QSlider *slider, QSpinBox *spin, string alias)
 {
 	auto &aliases = this->camera.aliases[this->context];
 
-	if (aliases.count(alias))
+	if (aliases.Contains(alias))
 	{
 		slider->setEnabled(true);
 		spin->setEnabled(true);
@@ -249,7 +249,7 @@ void MainWindow::UpdateCheck(QCheckBox *check, string alias)
 {
 	auto &aliases = this->camera.aliases[this->context];
 
-	if (aliases.count(alias))
+	if (aliases.Contains(alias))
 	{
 		check->setEnabled(true);
 		check->setChecked(aliases[alias]->Get() == aliases[alias]->Maximum());
@@ -262,7 +262,7 @@ void MainWindow::UpdateUi()
 {
 	if (this->connected)
 	{
-		this->context = this->camera.aliases[0]["Context"]->Get();
+		this->context = this->camera.aliases[0].context->Get();
 
 		this->ui->contextSpin->setValue(this->context);
 
@@ -276,39 +276,17 @@ void MainWindow::UpdateUi()
 }
 
 
-void MainWindow::Set(string alias, int value)
-{
-	if (this->camera.aliases[this->context].count(alias))
-	{
-		this->camera.aliases[this->context][alias]->Set(value);
-	}
-}
-
-void MainWindow::Set(string alias, bool value)
-{
-	if (this->camera.aliases[this->context].count(alias))
-	{
-		this->camera.aliases[this->context][alias]->Set(value);
-	}
-}
-
-int MainWindow::Reset(string alias)
-{
-	return this->camera.aliases[this->context].count(alias) ? this->camera.aliases[this->context][alias]->Reset() : 0;
-}
-
-
-void MainWindow::on_flashSlider_valueChanged(int value)		{ this->camera.SetFlash(value);}
-void MainWindow::on_flashCheck_toggled(bool checked)		{ this->camera.SetFlash(checked ? this->ui->flashSlider->value() : 0); }
-void MainWindow::on_exposureSlider_valueChanged(int value)	{ this->Set("Exposure", value); }
-void MainWindow::on_exposureCheck_toggled(bool checked)		{ this->Set("AutoExposure", checked); }
-void MainWindow::on_gainSlider_valueChanged(int value)		{ this->Set("Gain", value); }
-void MainWindow::on_gainCheck_toggled(bool checked)			{ this->Set("AutoGain", checked); }
-void MainWindow::on_adcSlider_valueChanged(int value)		{ this->Set("ADCReference", value); }
-void MainWindow::on_compandingCheck_toggled(bool checked)	{ this->Set("Companding", checked); }
-void MainWindow::on_adcReset_clicked()						{ this->ui->adcSlider->setValue(this->Reset("ADCReference")); }
-void MainWindow::on_colourCheck_toggled(bool checked)		{ this->handler.Initialise(this->image, checked); }
-void MainWindow::on_portraitCheck_toggled(bool checked)		{ this->portrait = checked; }
+void MainWindow::on_flashSlider_valueChanged(int value)		{ camera.SetFlash(value);}
+void MainWindow::on_flashCheck_toggled(bool checked)		{ camera.SetFlash(checked ? ui->flashSlider->value() : 0); }
+void MainWindow::on_exposureSlider_valueChanged(int value)	{ camera.aliases[context].exposure->Set(value); }
+void MainWindow::on_exposureCheck_toggled(bool checked)		{ camera.aliases[context].autoExposure->Set(checked); }
+void MainWindow::on_gainSlider_valueChanged(int value)		{ camera.aliases[context].gain->Set(value); }
+void MainWindow::on_gainCheck_toggled(bool checked)			{ camera.aliases[context].autoGain->Set(checked); }
+void MainWindow::on_adcSlider_valueChanged(int value)		{ camera.aliases[context].adcReference->Set(value); }
+void MainWindow::on_compandingCheck_toggled(bool checked)	{ camera.aliases[context].companding->Set(checked); }
+void MainWindow::on_adcReset_clicked()						{ ui->adcSlider->setValue(camera.aliases[context].adcReference->Reset()); }
+void MainWindow::on_colourCheck_toggled(bool checked)		{ handler.Initialise(this->image, checked); }
+void MainWindow::on_portraitCheck_toggled(bool checked)		{ portrait = checked; }
 void MainWindow::on_grabFrame_clicked()						{ if (!this->stream) this->Grab(); }
 
 void MainWindow::on_streamCheck_toggled(bool checked)

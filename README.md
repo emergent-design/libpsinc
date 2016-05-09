@@ -1,11 +1,13 @@
 libpsinc
 ========
 
-libpsinc is a cross-platform acquisition driver for the [Perception-SI Ltd](http://www.psi-ltd.com) range of cameras. It provides a c++ implementation and a c# implementation, suitable for use on both .net and mono.We test libpsinc on Linux and Windows, but are unable to support Mac (it may work, we have no way of checking).
+libpsinc is a cross-platform acquisition driver for the [Perception-SI Ltd](http://www.psi-ltd.com) range of cameras. It provides a C++14 implementation that we test on Linux and Windows, but are unable to support Mac (it may work, but we have no way of checking). The core functionality is also wrapped by a C API allowing for easier interop with languages such as C#. An example
+C# wrapper library has also been included that should work with both .NET and mono.
 
 libpsinc relies upon [libusb](http://libusb.info/); see the libpsinc [installation instructions](https://github.com/emergent-design/libpsinc/wiki/Installation) for your platform.
 
-More detailed usage documentation can be found on the [wiki](https://github.com/emergent-design/libpsinc/wiki)
+More detailed usage documentation can be found on the [wiki](https://github.com/emergent-design/libpsinc/wiki).
+
 
 # License #
 
@@ -13,92 +15,115 @@ libpsinc is freely available under the terms of the [MIT License](http://opensou
 
 ```
 This software is based on libpsinc (https://github.com/emergent-design/libpsinc).
-Libpsinc is Copyright (C) 2014 Emergent Design
+Libpsinc is Copyright (C) 2014-2016 Emergent Design
 ```
 
 
 # Using libpsinc #
 
-The main C# interface is through the Camera class:
+The main C++ interface is through the Camera class:
 
-```csharp
-using libpsinc;
+```cpp
+#include <iostream>
+#include <psinc/Camera.h>
+#include <psinc/handlers/ImageHandler.hpp>
 
-public class Example
+using namespace std;
+using namespace emg;
+using namespace psinc;
+
+// A simple synchronous example that will capture a single image
+int main(int argc, char *argv[])
 {
-  Camera camera = new Camera();
+    Camera camera;
+    Image<byte> image;
+    ImageHandler<byte> handler(image);
 
-  public Example()
-  {
-    //First of all hook up all the event handlers...
+    // Default initialisation will attempt to connect to any appropriate
+    // camera and will register no callbacks.
+    camera.Initialise();
 
-    //This is going to handle incoming images
-    this.camera.Acquired += i => this.OnCapture(i as Bitmap);
-
-    //If you want to do something when the camera connection
-    //state changed hook into ConnectionChanged
-    this.camera.ConnectionChanged += this.OnConnection;
-
-    //Typically you'd just log transfer errors, which you can do
-    //(along with any other error reporting you need) from the
-    //TransferError event
-    this.camera.TransferError += this.OnError;
-
-    //Now initialise the camera. This will connect to the first
-    //camera it can find, but you can also pass in a bus index
-    //and serial number regex if you want to connect to a
-    //specific camera.
-    if (this.camera.Initialise()
+    // Wait for a camera to be connected
+    while (!camera.Connected())
     {
-        //The camera will now try to initialise itself, connect
-        //and refresh the local cache of features. You'll know
-        //when the camera is ready to use when the OnConnection
-        //event fires...
+        this_thread::sleep_for(1ms);
     }
-    else Console.WriteLine("Failed to initialise camera");
-  }
 
-  protected void OnConnection(bool connected)
-  {
-    if (connected)
+    // Grab an image - returns immediately
+    camera.GrabImage(Camera::Mode::Master, handler, [](bool) { return false; });
+
+    // Wait for the camera to finish grabbing
+    while (camera.Grabbing())
     {
-        //The camera just got connected.
-        //You can now check what features and
-        //devices are available through it and
-        //what their current values are.
-        //You're also now able to take control
-        //of the camera settings...
+        this_thread::sleep_for(1ms);
     }
-    else
-    {
-        //The camera just got unplugged.
-        //Do whatever is appropriate in
-        //your application whan that event
-        //occurs.
-    }
-  }
 
-  protected void OnCapture(Bitmap image)
-  {
-    //image contains the frame you just captured.
-    //Do with it what you will.
-  }
-
-  protected void OnError(string error)
-  {
-    //A transfer error occurred. If you're interested
-    //in seeing what it was, log or output the error.
-  }
-
+    // Save the image to disk
+    image.Save("grab.png");
 }
 ```
 
-Remember to dispose the Camera when you've finished with it. Camera runs a capture thread constantly once it's initialised. If you don't wish to stream data all the time, simply pause the Camera and resume it when you want to capture another frame.
+
+```cpp
+#include <iostream>
+#include <psinc/Camera.h>
+#include <psinc/handlers/ImageHandler.hpp>
+#include <emergent/logger/Logger.hpp>
+
+using namespace std;
+using namespace emg;
+using namespace psinc;
+
+// Another example taking advantage of the asynchronous
+// nature of the camera class to continuously capture images.
+int main(int argc, char *argv[])
+{
+    Log::Initialise({ unique_ptr<logger::Sink>(new logger::Console()) });
+
+    Camera camera;
+    Image<byte> image;
+    ImageHandler<byte> handler(image);
+
+    // Initialise the camera with a callback function for handling connection events.
+    camera.Initialise("", [&](bool connected) {
+
+        // The connected flag indicates the event type.
+        cout << "Camera has been " << (connected ? "connected" : "disconnected") << endl;
+
+        // Due to threading constraints on the callbacks it is not safe to
+        // call GrabImage from here.
+    });
+
+    // The supplied callback function will be invoked when an attempted image grab
+    // has completed. If successful then the Image<> controlled by the ImageHandler
+    // will contain the new data. If in streaming mode then you must either copy
+    // or process this image before returning true otherwise the next frame will
+    // overwrite it.
+    camera.GrabImage(Camera::Mode::Master, handler, [](bool status) {
+
+        // The status flag indicates whether or not image grabbing was successful.
+        cout << (status ? '.' : 'x') << flush;
+
+        // Returning true indicates that another frame is required (streaming mode).
+        return true;
+    });
+
+    while (true)
+    {
+        this_thread::sleep_for(100ms);
+    }
+}
+```
+
+Both of the above examples can be compiled using a suitable version of Clang/GCC with the options ```-std=c++14 -lpsinc -lfreeimage -lpthread```
+
 
 ## Features ##
 
-Features are properties of the camera that you can either read or control - A to D reference voltage, for example, or gain. These are exposed by libpsinc rather than giving direct access to the control registers of the camera as the registers can contain combined features in an array of interesting ways. Using the Features class instead means you don't have to worry about this.
+Features are properties of the camera that you can either read or control such as A/D reference voltage or gain. These are exposed by libpsinc rather than giving direct access to the control registers of the camera as the registers can contain combined features in an array of interesting ways. Using the Feature class instead means you don't have to worry about this.
+
 
 ## Devices ##
 
-...Or more correctly sub-devices. The PSI camera can control or receive data from further devices which have been connected to it such as LED arrays, prox card readers and electronic locks. These are represented in code using the Device class.
+...Or more correctly sub-devices. The PSI camera can control or receive data from further internal and external devices which have been connected to it such as LED arrays, prox card readers and electronic locks. The Device class provides raw access to them, but each device type may
+vary in communication protocol. Please refer to the [wiki](https://github.com/emergent-design/libpsinc/wiki) for more information.

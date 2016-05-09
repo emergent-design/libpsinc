@@ -2,7 +2,7 @@
 #include "psinc/driver/Commands.h"
 
 #include <emergent/logger/Logger.hpp>
-
+#include <future>
 
 using namespace std;
 using namespace emergent;
@@ -37,7 +37,7 @@ namespace psinc
 
 	void Instrument::Initialise(Type product, string serial, std::function<void(bool)> onConnection, int timeout)
 	{
-		this->transport.Initialise((uint16_t)product, serial, onConnection, timeout);
+		this->onConnection = onConnection;
 
 		// Common devices for all instrument types
 		this->devices = {
@@ -72,6 +72,16 @@ namespace psinc
 			});
 		}
 
+		this->transport.Initialise((uint16_t)product, serial, [&](bool connected) {
+			this->configured = false;
+
+			if (this->onConnection && !connected)
+			{
+				this->onConnection(false);
+			}
+
+		}, timeout);
+
 		if (!this->initialised)
 		{
 			this->run			= true;
@@ -89,6 +99,16 @@ namespace psinc
 		{
 			this->transport.Poll(0);
 
+			if (this->transport.Connected() && !this->configured)
+			{
+				this->configured = this->Configure();
+
+				if (this->onConnection && this->configured)
+				{
+					this->onConnection(true);
+				}
+			}
+
 			if (this->Main())
 			{
 				this->condition.wait_for(lock, 50ms);
@@ -99,7 +119,7 @@ namespace psinc
 
 	bool Instrument::Connected()
 	{
-		return this->transport.Connected();
+		return this->transport.Connected() && this->configured;
 	}
 
 

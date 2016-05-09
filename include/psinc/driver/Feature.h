@@ -77,33 +77,33 @@ namespace psinc
 
 			/// The bitmask for this feature, since multiple features
 			/// can exist within a single register.
-			int mask;
+			int mask = 0;
 
 			/// The minimum permitted value for this feature
-			int minimum;
+			int minimum = 0;
 
 			/// The maximum permitted value for this feature
-			int maximum;
+			int maximum = 0;
 
 			/// Default value for this feature
-			int defaultValue;
+			int defaultValue = 0;
 
 			/// Range(s) of valid values
 			std::set<int> invalid;
 
 			/// Number of bits this feature uses
-			int bits;
+			int bits = 0;
 
 			/// Indicates whether or not this feature is a flag
-			bool flag;
+			bool flag = false;
 
 			/// Offset of this feature within the register
-			int offset;
+			int offset = 0;
 
 			/// True if this feature cannot be written to
-			bool readonly;
+			bool readonly = false;
 
 			/// Parent register for this feature
-			Register *parent;
+			Register *parent = nullptr;
 	};
 }

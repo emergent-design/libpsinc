@@ -3,6 +3,7 @@
 #include "psinc/driver/Commands.h"
 #include <emergent/logger/Logger.hpp>
 #include <emergent/Timer.hpp>
+#include <future>
 
 #define REFRESH_ATTEMPTS 3
 
@@ -25,31 +26,12 @@ namespace psinc
 
 	void Camera::Initialise(string serial, std::function<void(bool)> onConnection, int timeout)
 	{
-		this->onConnection = onConnection;
-
-		Instrument::Initialise(Type::Camera, serial, [&](bool connected) {
-			this->configured = false;
-
-			if (!connected && this->onConnection)
-			{
-				this->onConnection(false);
-			}
-		}, timeout);
+		Instrument::Initialise(Type::Camera, serial, onConnection, timeout);
 	}
 
 
 	bool Camera::Main()
 	{
-		if (this->transport.Connected() && !this->configured)
-		{
-			this->configured = this->Configure() && this->RefreshRegisters();
-
-			if (this->onConnection && this->configured)
-			{
-				this->onConnection(true);
-			}
-		}
-
 		if (this->handler)
 		{
 			bool stream = false;
@@ -98,12 +80,6 @@ namespace psinc
 	}
 
 
-	bool Camera::Connected()
-	{
-		return this->transport.Connected() && this->configured;
-	}
-
-
 	bool Camera::Configure()
 	{
 		this->aliases.clear();
@@ -131,7 +107,7 @@ namespace psinc
 			}
 		}
 
-		return doc.load(xml) && this->Configure(doc.child("camera"));
+		return doc.load(xml) && this->Configure(doc.child("camera")) && this->RefreshRegisters();
 	}
 
 
@@ -176,12 +152,12 @@ namespace psinc
 					// If context hasn't been assigned then it should be copied across all contexts
 					for (int i=0; i<this->contextCount; i++)
 					{
-						this->aliases[i][key] = &this->features[feature];
+						this->aliases[i].Set(key, this->features[feature]);
 					}
 				}
 				else if (context < this->contextCount)
 				{
-					this->aliases[context][key] = &this->features[feature];
+					this->aliases[context].Set(key, this->features[feature]);
 				}
 			}
 		}
@@ -229,7 +205,10 @@ namespace psinc
 			}
 		}
 
-		this->context = this->aliases[0]["Context"]->Get();
+		if (this->aliases[0].context)
+		{
+			this->context = this->aliases[0].context->Get();
+		}
 
 		return true;
 	}
@@ -287,10 +266,10 @@ namespace psinc
 
 	bool Camera::SetContext(byte context)
 	{
-		if (context < this->contextCount && this->aliases[0].count("Context"))
+		if (context < this->contextCount && this->aliases[0].context)
 		{
 			this->context = context;
-			this->aliases[0]["Context"]->Set(context);
+			this->aliases[0].context->Set(context);
 
 			return true;
 		}
@@ -301,30 +280,28 @@ namespace psinc
 
 	bool Camera::SetWindow(byte context, int x, int y, int width, int height)
 	{
-		if (!this->aliases[context].count("ColumnStart"))	return false;
-		if (!this->aliases[context].count("RowStart"))		return false;
+		auto &alias	= this->aliases[context];
+		int mx		= alias.columnStart->Minimum();
+		int my		= alias.rowStart->Minimum();
 
-		int mx = this->aliases[context]["ColumnStart"]->Minimum();
-		int my = this->aliases[context]["RowStart"]->Minimum();
-
-		this->aliases[context]["ColumnStart"]->Set(mx + x);
-		this->aliases[context]["RowStart"]->Set(my + y);
+		alias.columnStart->Set(mx + x);
+		alias.rowStart->Set(my + y);
 
 		if (this->sizeByRange)
 		{
-			if (width < 0)	this->aliases[context]["ColumnEnd"]->Reset();
-			else			this->aliases[context]["ColumnEnd"]->Set(mx + x + width - 1);
+			if (width < 0)	alias.columnEnd->Reset();
+			else			alias.columnEnd->Set(mx + x + width - 1);
 
-			if (height < 0)	this->aliases[context]["RowEnd"]->Reset();
-			else			this->aliases[context]["RowEnd"]->Set(my + y + height - 1);
+			if (height < 0)	alias.rowEnd->Reset();
+			else			alias.rowEnd->Set(my + y + height - 1);
 		}
 		else
 		{
-			if (width < 0)	this->aliases[context]["Width"]->Reset();
-			else			this->aliases[context]["Width"]->Set(width);
+			if (width < 0)	alias.width->Reset();
+			else			alias.width->Set(width);
 
-			if (height < 0)	this->aliases[context]["Height"]->Reset();
-			else			this->aliases[context]["Height"]->Set(height);
+			if (height < 0)	alias.height->Reset();
+			else			alias.height->Set(height);
 		}
 
 		return true;
@@ -333,37 +310,45 @@ namespace psinc
 
 	bool Camera::Capture(DataHandler *handler, Mode mode, int flash)
 	{
-		int width, height;
+		int width	= 0;
+		int height	= 0;
+		auto &alias	= this->aliases[context];
 
 		if (this->sizeByRange)
 		{
-			width	= this->aliases[this->context]["ColumnEnd"]->Get() - this->aliases[this->context]["ColumnStart"]->Get() + 1;
-			height	= this->aliases[this->context]["RowEnd"]->Get() - this->aliases[this->context]["RowStart"]->Get() + 1;
+			width	= alias.columnEnd->Get() - alias.columnStart->Get() + 1;
+			height	= alias.rowEnd->Get() - alias.rowStart->Get() + 1;
 		}
 		else
 		{
-			width	= this->aliases[this->context]["Width"]->Get();
-			height	= this->aliases[this->context]["Height"]->Get();
+			width	= alias.width->Get();
+			height	= alias.height->Get();
 		}
 
 		int size = width * height * (this->hdr ? 2 : 1);
 
-		this->receive.Resize(size);
-
-		switch (mode)
+		if (size)
 		{
-			case Mode::Normal:			this->send[5] = Commands::Capture;				break;
-			case Mode::Master:			this->send[5] = Commands::MasterCapture;		break;
-			case Mode::SlaveRising:		this->send[5] = Commands::SlaveCaptureRising;	break;
-			case Mode::SlaveFalling:	this->send[5] = Commands::SlaveCaptureFalling;	break;
+			this->receive.Resize(size);
+
+			switch (mode)
+			{
+				case Mode::Normal:			this->send[5] = Commands::Capture;				break;
+				case Mode::Master:			this->send[5] = Commands::MasterCapture;		break;
+				case Mode::SlaveRising:		this->send[5] = Commands::SlaveCaptureRising;	break;
+				case Mode::SlaveFalling:	this->send[5] = Commands::SlaveCaptureFalling;	break;
+			}
+
+			this->send[6] = flash;
+			this->send[7] = (byte)(size & 0xff);
+			this->send[8] = (byte)((size >> 8) & 0xff);
+			this->send[9] = (byte)((size >> 16) & 0xff);
+
+			return
+				this->transport.Transfer(&this->send, &this->receive, handler->waiting) &&
+				handler->Process(this->monochrome, this->hdr, this->receive, width, height, this->bayerMode);
 		}
 
-		this->send[6] = flash;
-		this->send[7] = (byte)(size & 0xff);
-		this->send[8] = (byte)((size >> 8) & 0xff);
-		this->send[9] = (byte)((size >> 16) & 0xff);
-
-		return this->transport.Transfer(&this->send, &this->receive, handler->waiting)
-			&& handler->Process(this->monochrome, this->hdr, this->receive, width, height, this->bayerMode);
+		return false;
 	}
 }
