@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     ImageHandler<byte> handler(image);
 
     // Initialise the camera with a callback function for handling connection events.
-    camera.Initialise("", [&](bool connected) {
+    camera.Initialise("", [](bool connected) {
 
         // The connected flag indicates the event type.
         cout << "Camera has been " << (connected ? "connected" : "disconnected") << endl;
