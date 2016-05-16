@@ -1,3 +1,15 @@
+libpsinc0 (0.1.0) unstable; urgency=medium
+
+  * Restructured and removed legacy C# driver.
+  * Added support for mt9 cameras.
+  * Improvements to transport connection management.
+  * Updated ImageHandler for 8-bit and 16-bit images.
+  * Bayer decoding optimisations.
+  * Implementation of a C wrapper for better interop.
+  * Improved aliasing of common features.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Mon, 16 May 2016 14:31:44 +0100
+
 libpsinc0 (0.0.17) unstable; urgency=medium
 
   * Now using the new logger and string format from libemergent.
