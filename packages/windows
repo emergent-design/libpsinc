@@ -17,7 +17,7 @@ cp /opt/qt5-win-x64/bin/Qt5Core.dll $dst/
 cp /opt/qt5-win-x64/bin/Qt5Gui.dll $dst/
 cp /opt/qt5-win-x64/bin/Qt5Widgets.dll $dst/
 cp /opt/qt5-win-x64/plugins/platforms/qwindows.dll $dst/platforms/
-cp ../bin/iconograph-qt.exe $dst/
+cp ../bin/iconograph.exe $dst/
 
 7z a $dst-`cat version`.7z $dst
 
