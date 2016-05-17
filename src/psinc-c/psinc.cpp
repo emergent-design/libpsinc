@@ -124,7 +124,7 @@ extern "C"
 
 	bool psinc_camera_connected(psinc_camera *camera)
 	{
-		if (!camera) return PSINC_INVALID_CAMERA;
+		if (!camera) return false;
 
 		return reinterpret_cast<Camera *>(camera)->Connected();
 	}
