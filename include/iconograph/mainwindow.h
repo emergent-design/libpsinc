@@ -63,6 +63,10 @@ class MainWindow : public QMainWindow
 //		void on_lensCheck_toggled(bool checked);
 //		void on_lensBox_valueChanged(double);
 
+		void on_framerateSlider_valueChanged(int value);
+
+		void on_framerateCheck_toggled(bool checked);
+
 	signals:
 
 		void connectionChanged(bool connected);
@@ -122,4 +126,8 @@ class MainWindow : public QMainWindow
 		int rangeWindow		= 256;
 
 		std::chrono::time_point<std::chrono::steady_clock> last = std::chrono::steady_clock::now();
+		std::chrono::time_point<std::chrono::steady_clock> rateLast = std::chrono::steady_clock::now();
+
+		long rateLimit		= 40000;
+		bool rateEnabled	= true;
 };

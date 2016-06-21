@@ -175,6 +175,15 @@ void MainWindow::Grab()
 			return false;
 		}
 
+		if (this->stream && this->rateEnabled)
+		{
+			this_thread::sleep_for(microseconds(std::max(0l,
+				this->rateLimit - duration_cast<microseconds>(steady_clock::now() - this->rateLast).count()
+			)));
+
+			this->rateLast = steady_clock::now();
+		}
+
 		return this->stream;
 	});
 }
@@ -288,6 +297,8 @@ void MainWindow::on_adcReset_clicked()						{ ui->adcSlider->setValue(camera.ali
 void MainWindow::on_colourCheck_toggled(bool checked)		{ handler.Initialise(this->image, checked); }
 void MainWindow::on_portraitCheck_toggled(bool checked)		{ portrait = checked; }
 void MainWindow::on_grabFrame_clicked()						{ if (!this->stream) this->Grab(); }
+void MainWindow::on_framerateSlider_valueChanged(int value)	{ rateLimit = lrint(1000000.0 / value); }
+void MainWindow::on_framerateCheck_toggled(bool checked)	{ rateEnabled = checked; }
 
 void MainWindow::on_streamCheck_toggled(bool checked)
 {
@@ -406,3 +417,5 @@ void MainWindow::on_regionButton_clicked()
 //{
 //	this->ui->lensCheck->setChecked(false);
 //}
+
+
