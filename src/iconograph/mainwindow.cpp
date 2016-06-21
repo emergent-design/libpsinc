@@ -178,7 +178,7 @@ void MainWindow::Grab()
 		if (this->stream && this->rateEnabled)
 		{
 			this_thread::sleep_for(microseconds(std::max(0l,
-				this->rateLimit - duration_cast<microseconds>(steady_clock::now() - this->rateLast).count()
+				this->rateLimit - (long)duration_cast<microseconds>(steady_clock::now() - this->rateLast).count()
 			)));
 
 			this->rateLast = steady_clock::now();
