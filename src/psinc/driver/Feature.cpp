@@ -69,8 +69,9 @@ namespace psinc
 	{
 		if (this->parent && !this->readonly && !this->invalid.count(value))
 		{
-			if (this->flag)	this->parent->SetBit(this->offset, value);
-			else			this->parent->Set(this->offset, this->mask, value);
+			return this->flag
+				? this->parent->SetBit(this->offset, value)
+				: this->parent->Set(this->offset, this->mask, value);
 		}
 
 		return false;

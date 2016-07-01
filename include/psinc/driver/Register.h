@@ -25,11 +25,11 @@ namespace psinc
 
 
 			/// Sets the value of this register and transmits to the camera
-			void Set(int offset, int mask, int value);
+			bool Set(int offset, int mask, int value);
 
 
 			/// Sets an individual bit of this register and transmits to the camera
-			void SetBit(int offset, bool value);
+			bool SetBit(int offset, bool value);
 
 
 			/// Refresh the local value of this register by reading from the camera

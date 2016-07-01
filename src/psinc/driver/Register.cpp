@@ -47,7 +47,7 @@ namespace psinc
 	}
 
 
-	void Register::Set(int offset, int mask, int value)
+	bool Register::Set(int offset, int mask, int value)
 	{
 		atomic<bool> waiting(false);
 		this->value = (this->value & ~mask) | ((value << offset) & mask);
@@ -62,11 +62,11 @@ namespace psinc
 			0xff									// Terminator
 		};
 
-		this->transport->Transfer(&data, nullptr, waiting);
+		return this->transport->Transfer(&data, nullptr, waiting);
 	}
 
 
-	void Register::SetBit(int offset, bool value)
+	bool Register::SetBit(int offset, bool value)
 	{
 		atomic<bool> waiting(false);
 		if (value) 	this->value |= 1 << offset;
@@ -79,7 +79,7 @@ namespace psinc
 		};
 
 
-		this->transport->Transfer(&data, nullptr, waiting);
+		return this->transport->Transfer(&data, nullptr, waiting);
 	}
 
 
