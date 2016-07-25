@@ -301,9 +301,21 @@ namespace psinc
 				result = (write || check) ? transferred == buffer->Size() : true;
 
 				// When requested, truncate the buffer to the size of data actually received.
-				if (!write && result && truncate) buffer->Truncate(transferred);
+				if (!write && result && truncate)
+				{
+					buffer->Truncate(transferred);
+				}
 
-				if (!result) Log::Error("USB device %s - Incomplete transfer when %s", this->id, write ? "writing" : "reading");
+				if (!result)
+				{
+					Log::Error(
+						"USB device %s - Incomplete transfer when %s (%d of %d bytes)",
+						this->id,
+						write ? "writing" : "reading",
+						transferred,
+						buffer->Size()
+					);
+				}
 			}
 			else if (err == LIBUSB_ERROR_NO_DEVICE || err == LIBUSB_ERROR_IO)
 			{
