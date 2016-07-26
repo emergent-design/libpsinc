@@ -45,7 +45,15 @@ namespace psinc
 			Device CustomDevice(byte index);
 
 			/// Resets the instrument.
-			bool Reset();
+			///
+			/// Level 0: full hardware reset at the USB transport level.
+			/// Level 1: full soft reset at the camera chip level.
+			/// Level 2: a soft reset that simply tells the camera to reset the communications buffers.
+			///
+			/// Level 2 is for use in the situation where an I/O error has caused the communications
+			/// to potentially get out of step.
+			bool Reset(byte level = 0);
+
 
 			/// Retrieve list of all serial numbers for any connected instruments of the given type
 			static std::vector<std::string> List(Type product = Type::Camera);

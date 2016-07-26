@@ -123,10 +123,21 @@ namespace psinc
 	}
 
 
-	bool Instrument::Reset()
+	bool Instrument::Reset(byte level)
 	{
-		return this->transport.Reset();
+		if (level == 0)
+		{
+			return this->transport.Reset();
+		}
+
+		atomic<bool> waiting(false);
+		Buffer<byte> command = {
+			0x00, 0x00, 0x00, 0x00, 0x00,								// Header
+			Commands::ResetChip, (byte)(level - 1), 0x00, 0x00, 0x00,	// Command
+			0xff														// Terminator
+		};
+
+		return level < 3 ? this->transport.Transfer(&command, nullptr, waiting) : false;
 	}
 }
-
 
