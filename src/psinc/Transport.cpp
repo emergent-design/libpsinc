@@ -318,15 +318,15 @@ namespace psinc
 					);
 				}
 			}
-			else if (err == LIBUSB_ERROR_NO_DEVICE || err == LIBUSB_ERROR_IO)
+			else if (this->legacy && (err == LIBUSB_ERROR_NO_DEVICE || err == LIBUSB_ERROR_IO))
 			{
-				if (this->legacy)
-				{
-					Log::Error("%u: USB device %s - Device has been disconnected", Timestamp::LogTime(), this->id);
-					this->Release();
-				}
+				Log::Error("%u: USB device %s - Device has been disconnected", Timestamp::LogTime(), this->id);
+				this->Release();
 			}
-			else Log::Error("%u: USB device %s - Transfer error %d when %s", Timestamp::LogTime(), this->id, err, write ? "writing" : "reading");
+			else
+			{
+				Log::Error("%u: USB device %s - Transfer error %d when %s", Timestamp::LogTime(), this->id, err, write ? "writing" : "reading");
+			}
 
 			return result;
 		}
