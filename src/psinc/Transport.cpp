@@ -183,7 +183,7 @@ namespace psinc
 					{
 						if (libusb_claim_interface(this->handle, 0) == 0)
 						{
-							Log::Info("USB device claimed: %s", this->id);
+							Log::Info("%u: USB device claimed - %s", Timestamp::LogTime(), this->id);
 							return true;
 						}
 					}
@@ -250,7 +250,7 @@ namespace psinc
 			libusb_release_interface(this->handle, 0);
 			libusb_close(this->handle);
 
-			Log::Info("USB deviced released: %s", this->id);
+			Log::Info("%u: USB deviced released - %s", Timestamp::LogTime(), this->id);
 
 			this->handle	= nullptr;
 			this->id		= "";
@@ -309,7 +309,8 @@ namespace psinc
 				if (!result)
 				{
 					Log::Error(
-						"USB device %s - Incomplete transfer when %s (%d of %d bytes)",
+						"%u: USB device %s - Incomplete transfer when %s (%d of %d bytes)",
+						Timestamp::LogTime(),
 						this->id,
 						write ? "writing" : "reading",
 						transferred,
@@ -321,11 +322,11 @@ namespace psinc
 			{
 				if (this->legacy)
 				{
-					Log::Error("USB device %s - Device has been disconnected", this->id);
+					Log::Error("%u: USB device %s - Device has been disconnected", Timestamp::LogTime(), this->id);
 					this->Release();
 				}
 			}
-			else Log::Error("USB device %s - Transfer error %d when %s", this->id, err, write ? "writing" : "reading");
+			else Log::Error("%u: USB device %s - Transfer error %d when %s", Timestamp::LogTime(), this->id, err, write ? "writing" : "reading");
 
 			return result;
 		}

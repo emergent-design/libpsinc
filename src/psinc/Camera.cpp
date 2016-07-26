@@ -198,10 +198,10 @@ namespace psinc
 						if (r.second.Page() == page) r.second.Refresh(data);
 					}
 
-					Log::Info("Successfully refreshed registers for page %d", page);
+					Log::Info("%u: Successfully refreshed registers for page %d", Timestamp::LogTime(), page);
 					break;
 				}
-				else Log::Error("Failed to refresh registers for page %d", page);
+				else Log::Error("%u: Failed to refresh registers for page %d", Timestamp::LogTime(), page);
 			}
 		}
 
