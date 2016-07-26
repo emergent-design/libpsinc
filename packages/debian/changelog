@@ -1,3 +1,9 @@
+libpsinc0 (0.1.3) unstable; urgency=medium
+
+  * Added time point to logging.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 26 Jul 2016 11:36:40 +0100
+
 libpsinc0 (0.1.2) unstable; urgency=medium
 
   * Additional logging information when transfer errors occur.
