@@ -73,7 +73,7 @@ namespace psinc
 		Buffer<byte> data(11 + size);
 
 		memcpy(data.Data(), command, 10);
-		memcpy(data.Data() + 10, data, size);
+		memcpy(data.Data() + 10, buffer, size);
 		data[size+10] = 0xff;					// Terminator
 
 		return this->transport ? this->transport->Transfer(&data, nullptr, waiting) : false;
