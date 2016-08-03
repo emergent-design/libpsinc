@@ -119,9 +119,9 @@ namespace psinc
 
 	bool Transport::Match(libusb_device_handle *device, int index)
 	{
-		unsigned char data[64];
+		unsigned char data[128];
 
-		libusb_get_string_descriptor_ascii(device, index, data, 64);
+		libusb_get_string_descriptor_ascii(device, index, data, 128);
 
 		this->id = reinterpret_cast<char *>(data);
 
@@ -204,7 +204,7 @@ namespace psinc
 	{
 		vector<string> result;
 
-		unsigned char data[64];
+		unsigned char data[128];
 		libusb_device **list;
 		libusb_device_descriptor descriptor;
 		libusb_device_handle *handle;
@@ -219,7 +219,7 @@ namespace psinc
 			{
 				if (libusb_open(*device, &handle) == 0)
 				{
-					libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 64);
+					libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 128);
 
 					result.push_back(reinterpret_cast<char *>(data));
 
