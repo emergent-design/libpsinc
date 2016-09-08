@@ -131,7 +131,7 @@ namespace psinc
 
 	bool Transport::Valid(libusb_device *device, uint16_t product)
 	{
-		static const set<uint16_t> VENDORS = { 0x0525 };
+		static const set<uint16_t> VENDORS = { 0x2dd8, 0x0525 };
 		libusb_device_descriptor descriptor;
 
 		return libusb_get_device_descriptor(device, &descriptor) == 0
