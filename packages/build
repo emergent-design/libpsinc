@@ -32,11 +32,14 @@ for root in "lib${LIBRARY}0" "lib${LIBRARY}-dev"; do
 
 	echo -n "  Removing temporary files and setting permissions ... "
 		find $root -name '*~' -type f -exec rm {} \;
-		find $root/usr -type d -exec chmod 0755 {} \;
-		find $root/usr -type f -exec chmod 0644 {} \;
-		[ -e $root/DEBIAN/postinst ] && chmod 0755 $root/DEBIAN/postinst
-		[ -e $root/DEBIAN/postrm ] && chmod 0755 $root/DEBIAN/postrm
-		[ -e $root/DEBIAN/shlibs ] && chmod 0644 $root/DEBIAN/shlibs
+		find $root -type d -exec chmod 0755 {} \;
+		[ -d "$root/usr" ] && find $root/usr -type f -exec chmod 0644 {} \;
+		[ -d "$root/etc" ] && find $root/etc -type f -exec chmod 0644 {} \;
+		[ -d "$root/lib" ] && find $root/lib -type f -exec chmod 0644 {} \;
+		chmod -f 0755 $root/usr/bin/*
+		chmod -f 0755 $root/DEBIAN/*
+		chmod -f 0644 $root/DEBIAN/conffiles
+		chmod -f 0644 $root/DEBIAN/shlibs
 	echo "done"
 
 	echo -n "  Building deb ... "

@@ -1,10 +1,10 @@
 Package: libpsinc-dev
-Version: 0.0.0
+Version: 0.1.6
 Section: libdevel
 Priority: optional
 Architecture: amd64
 Maintainer: Dan Parnham <dan@emergent-design.co.uk>
-Installed-Size: 84
+Installed-Size: 132
 Depends: libpsinc0
 Suggests: pkg-config
 Description: Development headers for libpsinc
