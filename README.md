@@ -1,7 +1,7 @@
 libpsinc
 ========
 
-libpsinc is a cross-platform acquisition driver for the [Perception-SI Ltd](http://www.psi-ltd.com) range of cameras. It provides a C++14 implementation that we test on Linux and Windows, but are unable to support Mac (it may work, but we have no way of checking). The core functionality is also wrapped by a C API allowing for easier interop with languages such as C#. An example
+libpsinc is a cross-platform acquisition library for the [Perception-SI Ltd](http://www.psi-ltd.com) range of cameras. It provides a C++14 implementation that we test on Linux and Windows, but are unable to support Mac (it may work, but we have no way of checking). The core functionality is also wrapped by a C API allowing for easier interop with languages such as C#. An example
 C# wrapper library has also been included that should work with both .NET and mono.
 
 libpsinc relies upon [libusb](http://libusb.info/); see the libpsinc [installation instructions](https://github.com/emergent-design/libpsinc/wiki/Installation) for your platform.

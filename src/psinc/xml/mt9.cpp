@@ -173,7 +173,7 @@ namespace psinc { namespace chip { const char *mt9 = R"xml(
 		<feature name="tempsens_test_ctrl" bits="3" offset="1" min="0" max="7" default="0" />
 		<feature name="tempsens_power_on" bits="1" offset="0" min="0" max="1" default="0" />
 	</register>
-
+)xml" R"xml(
 	<register address="0x30bc">
 		<feature name="green1_gain_int_cb" bits="3" offset="5" min="0" max="7" default="1" />
 		<feature name="green1_gain_frac_cb" bits="5" offset="0" min="0" max="31" default="0" />

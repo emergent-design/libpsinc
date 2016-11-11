@@ -176,6 +176,7 @@ namespace psinc { namespace chip { const char *v024 = R"xml(
 		<feature name="Test Enable" bits="1" offset="13" min="0" max="1" default="0" />
 		<feature name="Flip Two-Wire Serial Interface Test Data" bits="1" offset="14" min="0" max="1" default="0" />
 	</register>
+)xml" R"xml(
 	<register address="0x80">
 		<feature name="A: Tile Gain X0 Y0" bits="4" min="1" max="15" default="4" />
 		<feature name="Sample Weight X0 Y0" bits="4" offset="4" min="1" max="15" default="15" />
