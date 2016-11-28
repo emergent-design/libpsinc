@@ -50,36 +50,50 @@ namespace psinc
 	bool Register::Set(int offset, int mask, int value)
 	{
 		atomic<bool> waiting(false);
-		this->value = (this->value & ~mask) | ((value << offset) & mask);
 
-		Buffer<byte> data = {
-			0x00, 0x00, 0x00, 0x00, 0x00, 			// Header
-			Commands::WriteRegister, 				// Command
-			(byte)(this->address & 0xff),
-			(byte)((this->address >> 8) & 0xff),
-			(byte)(this->value & 0xff),
-			(byte)((this->value >> 8) & 0xff),
-			0xff									// Terminator
-		};
+		int updated = (this->value & ~mask) | ((value << offset) & mask);
 
-		return this->transport->Transfer(&data, nullptr, waiting);
+		if (this->value != updated)
+		{
+			this->value = updated;
+
+			Buffer<byte> data = {
+				0x00, 0x00, 0x00, 0x00, 0x00, 			// Header
+				Commands::WriteRegister, 				// Command
+				(byte)(this->address & 0xff),
+				(byte)((this->address >> 8) & 0xff),
+				(byte)(this->value & 0xff),
+				(byte)((this->value >> 8) & 0xff),
+				0xff									// Terminator
+			};
+
+			return this->transport->Transfer(&data, nullptr, waiting);
+		}
+
+		return true;
 	}
 
 
 	bool Register::SetBit(int offset, bool value)
 	{
 		atomic<bool> waiting(false);
-		if (value) 	this->value |= 1 << offset;
-		else 		this->value &= ~(1 << offset);
 
-		Buffer<byte> data = {
-			0x00, 0x00, 0x00, 0x00, 0x00,
-			Commands::WriteBit, (byte)(this->address & 0xff), (byte)((this->address >> 8) & 0xff), (byte)offset, (byte)((value ? 1 : 0)),
-			0xff
-		};
+		int updated = value ? (this->value | (1 << offset)) : this->value & ~(1 << offset);
 
+		if (this->value != updated)
+		{
+			this->value = updated;
 
-		return this->transport->Transfer(&data, nullptr, waiting);
+			Buffer<byte> data = {
+				0x00, 0x00, 0x00, 0x00, 0x00,
+				Commands::WriteBit, (byte)(this->address & 0xff), (byte)((this->address >> 8) & 0xff), (byte)offset, (byte)((value ? 1 : 0)),
+				0xff
+			};
+
+			return this->transport->Transfer(&data, nullptr, waiting);
+		}
+
+		return true;
 	}
 
 
