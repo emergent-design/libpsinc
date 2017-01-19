@@ -1,5 +1,6 @@
 #include "psinc/Transport.h"
 #include <emergent/logger/Logger.hpp>
+#include <emergent/String.hpp>
 #include <regex>
 #include <set>
 
@@ -123,7 +124,7 @@ namespace psinc
 
 		libusb_get_string_descriptor_ascii(device, index, data, 128);
 
-		this->id = reinterpret_cast<char *>(data);
+		this->id = String::trim(reinterpret_cast<char *>(data), ' ');
 
 		return this->serial.empty() ? true : regex_match(this->id, regex(this->serial));
 	}
@@ -200,9 +201,9 @@ namespace psinc
 	}
 
 
-	vector<string> Transport::List(uint16_t product)
+	map<string, string> Transport::List(uint16_t product)
 	{
-		vector<string> result;
+		map<string, string> result;
 
 		unsigned char data[128];
 		libusb_device **list;
@@ -220,17 +221,21 @@ namespace psinc
 				if (libusb_open(*device, &handle) == 0)
 				{
 					libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 128);
+					string serial = String::trim(reinterpret_cast<char *>(data), ' ');
 
-					result.push_back(reinterpret_cast<char *>(data));
+					libusb_get_string_descriptor_ascii(handle, descriptor.iProduct, data, 128);
+					result[serial] = reinterpret_cast<char *>(data);
 
 					libusb_close(handle);
 				}
 			}
 		}
 
+		libusb_free_device_list(list, 0);
 		libusb_exit(context);
 
 		return result;
+
 	}
 
 

@@ -29,7 +29,12 @@ namespace psinc
 	}
 
 
-	vector<string> Instrument::List(Type product)
+	// vector<string> Instrument::List(Type product)
+	// {
+	// 	return Transport::List((uint16_t)product);
+	// }
+
+	map<string, string> Instrument::List(Type product)
 	{
 		return Transport::List((uint16_t)product);
 	}

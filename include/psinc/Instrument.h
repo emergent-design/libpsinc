@@ -56,7 +56,7 @@ namespace psinc
 
 
 			/// Retrieve list of all serial numbers for any connected instruments of the given type
-			static std::vector<std::string> List(Type product = Type::Camera);
+			static std::map<std::string, std::string> List(Type product = Type::Camera);
 
 
 			/// A map of available devices that can be controlled by (or are part of)

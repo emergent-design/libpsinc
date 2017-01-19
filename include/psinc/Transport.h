@@ -7,6 +7,7 @@
 #include <libusb-1.0/libusb.h>
 #include <mutex>
 #include <queue>
+#include <map>
 
 
 namespace psinc
@@ -50,9 +51,9 @@ namespace psinc
 			void Disconnect();
 
 
-			/// Return a list of serial numbers for all connected devices
-			/// that match the given product ID.
-			static std::vector<std::string> List(uint16_t product);
+			/// Return a list of serial numbers and product descriptions for all
+			/// connected devices that match the given product ID.
+			static std::map<std::string, std::string> List(uint16_t product);
 
 
 		private:
