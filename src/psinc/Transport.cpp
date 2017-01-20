@@ -2,7 +2,6 @@
 #include <emergent/logger/Logger.hpp>
 #include <emergent/String.hpp>
 #include <regex>
-#include <set>
 
 using namespace std;
 using namespace emergent;
@@ -34,10 +33,11 @@ namespace psinc
 	}
 
 
-	bool Transport::Initialise(uint16_t product, string serial, std::function<void(bool)> onConnection, int timeout)
+	bool Transport::Initialise(const std::set<uint16_t> &vendors, uint16_t product, string serial, std::function<void(bool)> onConnection, int timeout)
 	{
-		this->serial		= serial;
+		this->vendors		= vendors;
 		this->product		= product;
+		this->serial		= serial;
 		this->onConnection	= onConnection;
 		this->timeout		= timeout;
 
@@ -92,7 +92,7 @@ namespace psinc
 		Pending item;
 		if (this->pending.try_dequeue(item))
 		{
-			if (Valid(item.device, this->product))
+			if (Valid(item.device, this->vendors, this->product))
 			{
 				if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT && this->handle)
 				{
@@ -130,13 +130,12 @@ namespace psinc
 	}
 
 
-	bool Transport::Valid(libusb_device *device, uint16_t product)
+	bool Transport::Valid(libusb_device *device, const std::set<uint16_t> &vendors, uint16_t product)
 	{
-		static const set<uint16_t> VENDORS = { 0x2dd8, 0x0525 };
 		libusb_device_descriptor descriptor;
 
 		return libusb_get_device_descriptor(device, &descriptor) == 0
-			&& VENDORS.count(descriptor.idVendor)
+			&& vendors.count(descriptor.idVendor)
 			&& descriptor.idProduct == product;
 	}
 
@@ -149,7 +148,7 @@ namespace psinc
 		// Loop through the list of connected USB devices
 		for (libusb_device **device = list; *device; device++)
 		{
-			if (Valid(*device, this->product))
+			if (Valid(*device, this->vendors, this->product))
 			{
 				// If a particular device matches the known vendor, product ID then attempt to claim it.
 				if (this->Claim(*device))
@@ -201,7 +200,7 @@ namespace psinc
 	}
 
 
-	map<string, string> Transport::List(uint16_t product)
+	map<string, string> Transport::List(const std::set<uint16_t> &vendors, uint16_t product)
 	{
 		map<string, string> result;
 
@@ -216,7 +215,7 @@ namespace psinc
 
 		for (libusb_device **device = list; *device; device++)
 		{
-			if (Valid(*device, product) && libusb_get_device_descriptor(*device, &descriptor) == 0)
+			if (Valid(*device, vendors, product) && libusb_get_device_descriptor(*device, &descriptor) == 0)
 			{
 				if (libusb_open(*device, &handle) == 0)
 				{

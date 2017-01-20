@@ -1,3 +1,10 @@
+libpsinc0 (0.1.8) unstable; urgency=medium
+
+  * The supported set of vendors can now be selected at runtime.
+  * The library version (including build timestamp) is now available.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 20 Jan 2017 17:30:15 +0000
+
 libpsinc0 (0.1.7) unstable; urgency=medium
 
   * Device listing function now includes the product description (breaking).

@@ -22,6 +22,13 @@ namespace psinc
 				Odometer	= 0xaac0,
 			};
 
+			struct Vendors
+			{
+				static const std::set<uint16_t> All;	// All vendors
+				static const std::set<uint16_t> PSI;	// Only PSI
+			};
+
+
 
 			/// Default Constructor
 			Instrument() {}
@@ -34,7 +41,7 @@ namespace psinc
 			/// treated as a regex and, combined with the cameras ability to append the camera
 			/// name to the end of the serial number in the USB descriptor, provides a powerful
 			/// way to reliably connect to a specific camera.
-			virtual void Initialise(Type product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500);
+			virtual void Initialise(Type product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500, const std::set<uint16_t> &vendors = Vendors::All);
 
 			/// Checks if this instance is currently connected to a physical device
 			/// @return True if a device appears to be connected.
@@ -56,7 +63,7 @@ namespace psinc
 
 
 			/// Retrieve list of all serial numbers for any connected instruments of the given type
-			static std::map<std::string, std::string> List(Type product = Type::Camera);
+			static std::map<std::string, std::string> List(Type product = Type::Camera, const std::set<uint16_t> &vendors = Vendors::All);
 
 
 			/// A map of available devices that can be controlled by (or are part of)

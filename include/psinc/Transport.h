@@ -8,7 +8,7 @@
 #include <mutex>
 #include <queue>
 #include <map>
-
+#include <set>
 
 namespace psinc
 {
@@ -27,7 +27,8 @@ namespace psinc
 			/// Initialises the transport with the product ID and
 			/// serial of interest.
 			/// The serial string will be treated as a regex expression.
-			bool Initialise(uint16_t product, std::string serial, std::function<void(bool)> onConnection, int timeout = 500);
+			/// The netchip flag will enable the legacy vendor ID for older cameras
+			bool Initialise(const std::set<uint16_t> &vendors, uint16_t product, std::string serial, std::function<void(bool)> onConnection, int timeout = 500);
 
 
 			/// Poll to allow hotplug detection to work.
@@ -53,7 +54,7 @@ namespace psinc
 
 			/// Return a list of serial numbers and product descriptions for all
 			/// connected devices that match the given product ID.
-			static std::map<std::string, std::string> List(uint16_t product);
+			static std::map<std::string, std::string> List(const std::set<uint16_t> &vendors, uint16_t product);
 
 
 		private:
@@ -84,7 +85,7 @@ namespace psinc
 
 
 			/// Check that the device matches an expected vendor and product ID.
-			static bool Valid(libusb_device *device, uint16_t product);
+			static bool Valid(libusb_device *device, const std::set<uint16_t> &vendors, uint16_t product);
 
 
 			/// Tranfer the given data to the device (write) or from the device (!write)
@@ -94,6 +95,9 @@ namespace psinc
 			/// Releases the device.
 			void Release();
 
+
+			/// List of supported vendor IDs
+			std::set<uint16_t> vendors;
 
 			/// Product ID that we are interested in
 			uint16_t product;
@@ -134,7 +138,6 @@ namespace psinc
 
 			// Windows does not yet support hotplugging so adapt accordingly
 			bool legacy = false;
-
 
 			/// Allows an internal global function to push onto the pending queue
 			friend int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data);

@@ -10,6 +10,10 @@ using namespace emergent;
 
 namespace psinc
 {
+	const set<uint16_t> Instrument::Vendors::All = { 0x2dd8, 0x0525 };
+	const set<uint16_t> Instrument::Vendors::PSI = { 0x2dd8 };
+
+
 	Instrument::~Instrument()
 	{
 		if (this->initialised)
@@ -34,13 +38,13 @@ namespace psinc
 	// 	return Transport::List((uint16_t)product);
 	// }
 
-	map<string, string> Instrument::List(Type product)
+	map<string, string> Instrument::List(Type product, const set<uint16_t> &vendors)
 	{
-		return Transport::List((uint16_t)product);
+		return Transport::List(vendors, (uint16_t)product);
 	}
 
 
-	void Instrument::Initialise(Type product, string serial, std::function<void(bool)> onConnection, int timeout)
+	void Instrument::Initialise(Type product, string serial, std::function<void(bool)> onConnection, int timeout, const set<uint16_t> &vendors)
 	{
 		this->onConnection = onConnection;
 
@@ -77,7 +81,7 @@ namespace psinc
 			});
 		}
 
-		this->transport.Initialise((uint16_t)product, serial, [&](bool connected) {
+		this->transport.Initialise(vendors, (uint16_t)product, serial, [&](bool connected) {
 			this->configured = false;
 
 			if (this->onConnection && !connected)
