@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 #include <emergent/logger/Logger.hpp>
-//#include <entity/json.hpp>
 #include <iostream>
 
 
@@ -161,6 +160,7 @@ QImage *MainWindow::ConvertWindow()
 void MainWindow::Grab()
 {
 	auto *handler = this->hdrMode == Hdr::Simple ? (DataHandler *)&this->handler : (DataHandler *)&this->hdrHandler;
+
 
 	this->camera.GrabImage(this->mode, *handler, [&](bool status) {
 

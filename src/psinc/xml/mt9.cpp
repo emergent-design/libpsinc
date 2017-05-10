@@ -30,9 +30,9 @@ namespace psinc { namespace chip { const char *mt9 = R"xml(
 	<register address="0x300c"><feature name="line_length_pck" bits="16" min="1650" max="" default="1650" /></register>
 	<register address="0x300e"><feature name="revision_number" bits="8" min="0" max="255" default="34" /></register>
 	<register address="0x3010"><feature name="lock_control" bits="16" min="48815" max="48879" default="48879" invalid="48816-48878" /></register>
-	<register address="0x3012"><feature name="coarse_integration_time" bits="16" min="0" max="65535" default="16" /></register>
+	<register address="0x3012"><feature name="coarse_integration_time" bits="16" min="3" max="65535" default="16" /></register>
 	<register address="0x3014"><feature name="fine_integration_time" bits="16" min="0" max="65535" default="0" /></register>
-	<register address="0x3016"><feature name="coarse_integration_time_cb" bits="16" min="0" max="65535" default="16" /></register>
+	<register address="0x3016"><feature name="coarse_integration_time_cb" bits="16" min="3" max="65535" default="16" /></register>
 	<register address="0x3018"><feature name="fine_integration_time_cb" bits="16" min="0" max="65535" default="0" /></register>
 
 	<register address="0x301a">

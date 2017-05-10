@@ -137,7 +137,8 @@ namespace psinc
 			moodycamel::ConcurrentQueue<Pending> pending;
 
 			// Windows does not yet support hotplugging so adapt accordingly
-			bool legacy = false;
+			bool legacy 		= false;
+			bool legacyAlert	= false;
 
 			/// Allows an internal global function to push onto the pending queue
 			friend int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data);

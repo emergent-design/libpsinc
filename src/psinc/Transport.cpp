@@ -69,7 +69,11 @@ namespace psinc
 	{
 		if (this->legacy)
 		{
-			if (!this->handle) this->LegacyConnect();
+			if (!this->handle)
+			{
+				this->LegacyConnect();
+			}
+
 			return;
 		}
 
@@ -102,7 +106,10 @@ namespace psinc
 							this->Release();
 						this->cs.unlock();
 
-						if (this->onConnection) this->onConnection(false);
+						if (this->onConnection)
+						{
+							this->onConnection(false);
+						}
 					}
 				}
 
@@ -142,6 +149,14 @@ namespace psinc
 
 	void Transport::LegacyConnect()
 	{
+		// Without hotplug facility only indication that a disconnect
+		// occurred is via the legacyAlert flag.
+		if (this->legacyAlert && this->onConnection)
+		{
+			this->onConnection(false);
+			this->legacyAlert = false;
+		}
+
 		libusb_device **list;
 		libusb_get_device_list(this->context, &list);
 
@@ -250,6 +265,11 @@ namespace psinc
 	{
 		if (this->handle)
 		{
+			if (this->legacy)
+			{
+				this->legacyAlert = true;
+			}
+
 			// Release the device and close the handle
 			libusb_release_interface(this->handle, 0);
 			libusb_close(this->handle);
