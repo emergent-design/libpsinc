@@ -24,16 +24,5 @@
 	{
 		"trim_trailing_white_space_on_save": true,
     	"ensure_newline_at_eof_on_save": true,
-
-    	"sublimeclang_show_output_panel": false,
-		"sublimeclang_options":
-		[
-			"-isystem", "/usr/include",
-			"-isystem", "/usr/include/c++/*",
-
-			"-I${project_path}/include",
-			"-Wall",
-			"-Wno-overloaded-virtual"
-		]
 	}
 }
