@@ -79,6 +79,8 @@ namespace psinc
 			// Will return -1 if the value could not be retrieved.
 			int GetRegister(int address);
 
+			// Returns the chip type for the currently connected camera or "unknown" if no camera is present.
+			const std::string GetType();
 
 			/// A map of feature name to Feature instance for the connected device
 			/// A "Feature" is a representation of a property of the imaging chip.
@@ -168,5 +170,8 @@ namespace psinc
 			// data to expect. In normal operation it looks for "Width" and "Height" aliases, whereas
 			// in sizeByRange mode it expects to find "ColumnStart", "RowStart", "ColumnEnd", "RowEnd".
 			bool sizeByRange = false;
+
+			// The current chip type
+			std::string chip = "unknown";
 	};
 }

@@ -4,7 +4,6 @@
 #include <emergent/String.hpp>
 #include <emergent/Timer.hpp>
 #include <emergent/logger/Logger.hpp>
-// #include <modbus/modbus.h>
 #include <psinc/flash/HPFC.hpp>
 #include <libserialport.h>
 

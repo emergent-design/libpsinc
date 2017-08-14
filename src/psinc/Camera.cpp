@@ -113,6 +113,7 @@ namespace psinc
 
 	bool Camera::Configure(xml_node xml)
 	{
+		this->chip			= xml.attribute("chip").as_string();
 		this->contextCount	= xml.attribute("contexts").as_int(1);
 		this->hdr			= xml.attribute("hdr").as_bool();
 		this->sizeByRange	= xml.attribute("sizeByRange").as_bool();
@@ -249,6 +250,12 @@ namespace psinc
 		}
 
 		return -1;
+	}
+
+
+	const string Camera::GetType()
+	{
+		return this->Connected() ? this->chip : "unknown";
 	}
 
 
