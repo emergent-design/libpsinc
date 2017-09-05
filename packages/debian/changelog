@@ -1,3 +1,9 @@
+libpsinc0 (0.1.11) unstable; urgency=medium
+
+  * Fixed threading related virtual destructor bug.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 05 Sep 2017 16:03:28 +0100
+
 libpsinc0 (0.1.10) unstable; urgency=medium
 
   * Fixed memory leak in the device list helper function.

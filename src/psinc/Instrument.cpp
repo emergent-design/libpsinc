@@ -16,9 +16,16 @@ namespace psinc
 
 	Instrument::~Instrument()
 	{
-		if (this->initialised)
+		this->Dispose();
+	}
+
+
+	void Instrument::Dispose()
+	{
+		if (this->initialised && this->run)
 		{
-			this->run = false;
+			this->run			= false;
+			this->initialised	= false;
 
 			// Notify the thread to wake so that it can then exit
 			this->condition.notify_one();
@@ -32,11 +39,6 @@ namespace psinc
 		return { &this->transport, "", index };
 	}
 
-
-	// vector<string> Instrument::List(Type product)
-	// {
-	// 	return Transport::List((uint16_t)product);
-	// }
 
 	map<string, string> Instrument::List(Type product, const set<uint16_t> &vendors)
 	{

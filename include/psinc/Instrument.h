@@ -73,6 +73,10 @@ namespace psinc
 
 		protected:
 
+			/// Shuts down the thread, can be called by a derived class to ensure that
+			/// members are not accessed after being deleted.
+			void Dispose();
+
 			/// Called when an instrument is connected. The instrument is not considered
 			/// fully connected until it is successfully configured.
 			virtual bool Configure() { return true; }
