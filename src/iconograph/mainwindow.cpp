@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QFileDialog>
 #include <emergent/logger/Logger.hpp>
 #include <iostream>
 
@@ -357,6 +358,7 @@ void MainWindow::on_hdrModeBox_currentIndexChanged(int index)
 	this->ui->rangeStartBox->setEnabled(this->hdrMode == Hdr::Range);
 	this->ui->rangeWindowSlider->setEnabled(this->hdrMode == Hdr::Range);
 	this->ui->rangeWindowBox->setEnabled(this->hdrMode == Hdr::Range);
+	this->ui->saveHdrButton->setEnabled(this->hdrMode != Hdr::Simple);
 }
 
 
@@ -379,7 +381,16 @@ void MainWindow::on_saveHdrButton_clicked()
 {
 	if (this->hdrImage.Size())
 	{
-		this->hdrImage.SaveRaw("capture.eri");
+		auto path = QFileDialog::getSaveFileName(this, "Save image", QDir::currentPath(), "PNG image (*.png);;Emergent raw image (*.eri)");
+
+		if (path.endsWith("eri"))
+		{
+			this->hdrImage.SaveRaw(path.toStdString());
+		}
+		else
+		{
+			this->hdrImage.Save(path.toStdString());
+		}
 	}
 }
 
