@@ -123,7 +123,7 @@ class MainWindow : public QMainWindow
 
 		Hdr hdrMode			= Hdr::Simple;
 		int rangeStart		= 0;
-		int rangeWindow		= 256;
+		int rangeWindow		= 4096;
 
 		std::chrono::time_point<std::chrono::steady_clock> last = std::chrono::steady_clock::now();
 		std::chrono::time_point<std::chrono::steady_clock> rateLast = std::chrono::steady_clock::now();

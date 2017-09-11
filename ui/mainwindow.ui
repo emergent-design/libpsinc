@@ -635,7 +635,7 @@
            <number>256</number>
           </property>
           <property name="value">
-           <number>256</number>
+           <number>4096</number>
           </property>
           <property name="tracking">
            <bool>true</bool>
@@ -691,7 +691,7 @@
            <number>32</number>
           </property>
           <property name="value">
-           <number>256</number>
+           <number>4096</number>
           </property>
          </widget>
         </item>

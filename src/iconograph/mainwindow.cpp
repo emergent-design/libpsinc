@@ -101,9 +101,10 @@ QImage *MainWindow::ConvertRange(int start, int window)
 
 		for (x=0; x<width; x++)
 		{
-			*dst++ = Maths::clamp<byte>((256 * (*src++ - start)) / window);
-			*dst++ = Maths::clamp<byte>((256 * (*src++ - start)) / window);
-			*dst++ = Maths::clamp<byte>((256 * (*src++ - start)) / window);
+			// mt9 camera uses the upper 12-bits so bitshift the value first
+			*dst++ = Maths::clamp<byte>((256 * ((*src++ >> 4) - start)) / window);
+			*dst++ = Maths::clamp<byte>((256 * ((*src++ >> 4) - start)) / window);
+			*dst++ = Maths::clamp<byte>((256 * ((*src++ >> 4)- start)) / window);
 		}
 	}
 
@@ -132,9 +133,10 @@ QImage *MainWindow::ConvertWindow()
 	{
 		for (x=0; x<rw; x++)
 		{
-			this->histogram[*src++]++;
-			this->histogram[*src++]++;
-			this->histogram[*src++]++;
+			// mt9 camera uses the upper 12-bits so bitshift the value first
+			this->histogram[*src++ >> 4]++;
+			this->histogram[*src++ >> 4]++;
+			this->histogram[*src++ >> 4]++;
 		}
 	}
 
@@ -153,7 +155,7 @@ QImage *MainWindow::ConvertWindow()
 		sum += this->histogram[high];
 	}
 
-	return this->ConvertRange(low, std::max(256, high - low));
+	return this->ConvertRange(low, high - low); //std::max(256, high - low));
 }
 
 
