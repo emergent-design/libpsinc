@@ -293,6 +293,8 @@ namespace psinc
 
 	bool Camera::SetWindow(byte context, int x, int y, int width, int height)
 	{
+		lock_guard<mutex> lock(this->window);
+
 		auto &alias	= this->aliases[context];
 		int mx		= alias.columnStart->Minimum();
 		int my		= alias.rowStart->Minimum();
@@ -323,6 +325,8 @@ namespace psinc
 
 	bool Camera::Capture(DataHandler *handler, Mode mode, int flash)
 	{
+		lock_guard<mutex> lock(this->window);
+
 		int width	= 0;
 		int height	= 0;
 		auto &alias	= this->aliases[context];

@@ -173,5 +173,8 @@ namespace psinc
 
 			// The current chip type
 			std::string chip = "unknown";
+
+			// A lock used for ensuring that changes to the window do not occur whilst grabbing an image
+			std::mutex window;
 	};
 }
