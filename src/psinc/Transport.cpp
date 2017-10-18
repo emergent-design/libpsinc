@@ -349,7 +349,7 @@ namespace psinc
 			}
 			else
 			{
-				Log::Error("%u: USB device %s - Transfer error %d when %s", Timestamp::LogTime(), this->id, err, write ? "writing" : "reading");
+				Log::Error("%u: USB device %s - %s (%d) when %s", Timestamp::LogTime(), this->id, libusb_error_name(err), err, write ? "writing" : "reading");
 			}
 
 			return result;

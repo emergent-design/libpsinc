@@ -39,6 +39,32 @@ namespace psinc
 				}
 
 
+				static std::string Find(const std::string &id)
+				{
+					sp_port **list;
+					std::string result = "";
+
+					if (sp_list_ports(&list) == SP_OK)
+					{
+						for (sp_port **port = list; *port; port++)
+						{
+							std::cout << sp_get_port_name(*port) << std::endl;
+
+							if (sp_get_port_transport(*port) == SP_TRANSPORT_USB)
+							{
+								// Test code only for the moment
+								std::cout << '\t' << sp_get_port_usb_manufacturer(*port) << std::endl;
+								std::cout << '\t' << sp_get_port_usb_serial(*port) << std::endl;
+							}
+						}
+
+						sp_free_port_list(list);
+					}
+
+					return result;
+				}
+
+
 				bool Connected()
 				{
 					return this->serial;
