@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 	this->handler.Initialise(this->image);
 	this->hdrHandler.Initialise(this->hdrImage);
-	this->camera.Initialise("", [&](bool c) { emit connectionChanged(c); });
+	this->camera.Initialise("", [&](bool c) { emit connectionChanged(c); }, 50);
 
 	this->Grab();
 }
@@ -406,6 +406,22 @@ void MainWindow::on_regionButton_clicked()
 }
 
 
+void MainWindow::on_resetButton_clicked()
+{
+	switch (this->ui->resetBox->currentIndex())
+	{
+		case 0:	this->camera.Reset(ResetLevel::Connection);							break;
+		case 1:	this->camera.Reset(ResetLevel::Control);							break;
+		case 2:	this->camera.Reset(ResetLevel::Command);							break;
+		case 3:	this->camera.Reset(ResetLevel::Communications);						break;
+		case 4:	this->camera.Reset(ResetLevel::Imaging);		this->UpdateUi();	break;
+		case 5:	this->camera.Reset(ResetLevel::ImagingSoft);	this->UpdateUi();	break;
+		case 6:	this->camera.Reset(ResetLevel::Io);									break;
+	}
+
+}
+
+
 //void MainWindow::on_lensCheck_toggled(bool checked)
 //{
 //	if (checked)
@@ -430,5 +446,7 @@ void MainWindow::on_regionButton_clicked()
 //{
 //	this->ui->lensCheck->setChecked(false);
 //}
+
+
 
 

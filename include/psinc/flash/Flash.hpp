@@ -26,14 +26,10 @@ namespace psinc
 				}
 
 
-				// The slow flag forces the communications to transmit one byte at a time. This should
-				// only be used when communicating with a flash via a camera. If there is a direct serial
-				// connection to the flash then this should be left disabled.
-				bool Initialise(const std::string &connection, uint8_t address, bool slow = false)
+				bool Initialise(const std::string &connection, uint8_t address)
 				{
 					this->connection	= connection;
 					this->address		= address;
-					this->slow			= slow;
 
 					return this->Connect();
 				}
@@ -49,12 +45,27 @@ namespace psinc
 						for (sp_port **port = list; *port; port++)
 						{
 							std::cout << sp_get_port_name(*port) << std::endl;
+							std::cout << "\t Description: " << sp_get_port_description(*port) << std::endl;
 
 							if (sp_get_port_transport(*port) == SP_TRANSPORT_USB)
 							{
 								// Test code only for the moment
-								std::cout << '\t' << sp_get_port_usb_manufacturer(*port) << std::endl;
-								std::cout << '\t' << sp_get_port_usb_serial(*port) << std::endl;
+								int vid=0, pid=0, bus=0, address=0;
+								sp_get_port_usb_vid_pid(*port, &vid, &pid);
+								sp_get_port_usb_bus_address(*port, &bus, &address);
+
+								std::cout << emg::String::format("\t         VID: 0x%04x", vid) << std::endl;
+								std::cout << emg::String::format("\t         PID: 0x%04x", pid) << std::endl;
+								std::cout << emg::String::format("\t         Bus: %d", bus) << std::endl;
+								std::cout << emg::String::format("\t     Address: %d", address) << std::endl;
+
+								auto man		= sp_get_port_usb_manufacturer(*port);
+								auto product	= sp_get_port_usb_product(*port);
+								auto serial		= sp_get_port_usb_serial(*port);
+
+								std::cout << "\tManufacturer: " << (man ? man : "-") << std::endl;
+								std::cout << "\t     Product: " << (product ? product : "-") << std::endl;
+								std::cout << "\t      Serial: " << (serial ? serial : "-") << std::endl;
 							}
 						}
 
@@ -138,10 +149,7 @@ namespace psinc
 							return false;
 						}
 
-						if (this->slow)
-						{
-							std::this_thread::sleep_for(2ms);
-						}
+						std::this_thread::sleep_for(10ms);
 					}
 
 					return true;
@@ -152,7 +160,7 @@ namespace psinc
 				{
 					if (!this->serial && !this->Connect())
 					{
-						return {};
+						return { 0 };
 					}
 
 					std::array<uint16_t, N> result = { 0 };
@@ -161,17 +169,12 @@ namespace psinc
 					{
 						if (!this->Write(address + i, 0x00, false))
 						{
-							return {};
+							return { 0 };
 						}
 
 						if (!this->Read(result[i]))
 						{
-							return {};
-						}
-
-						if (this->slow)
-						{
-							std::this_thread::sleep_for(2ms);
+							return { 0 };
 						}
 					}
 
@@ -185,23 +188,9 @@ namespace psinc
 					*(uint16_t *)(buffer + 3)	= value;
 					*(uint16_t *)(buffer + 5)	= CRC(buffer);
 
-					if (this->slow)
+					if (!Check(sp_blocking_write(this->serial, buffer, 7, 50), 7, "write"))
 					{
-						for (int i=0; i<7; i++)
-						{
-							if (!Check(sp_blocking_write(this->serial, buffer + i, 1, 10), 1, "write"))
-							{
-								return false;
-							}
-							std::this_thread::sleep_for(1ms);
-						}
-					}
-					else
-					{
-						if (!Check(sp_blocking_write(this->serial, buffer, 7, 50), 7, "write"))
-						{
-							return false;
-						}
+						return false;
 					}
 
 					return true;
@@ -212,28 +201,8 @@ namespace psinc
 				{
 					uint8_t buffer[7] = { 0 };
 
-					if (this->slow)
+					if (!Check(sp_blocking_read(this->serial, buffer, 7, 50), 7, "read"))
 					{
-						for (int i=0; i<7; i++)
-						{
-							if (!Check(sp_blocking_read(this->serial, buffer + i, 1, 10), 1, "read"))
-							{
-								return false;
-							}
-							std::this_thread::sleep_for(1ms);
-						}
-					}
-					else
-					{
-						if (!Check(sp_blocking_read(this->serial, buffer, 7, 50), 7, "read"))
-						{
-							return false;
-						}
-					}
-
-					if (CRC(buffer) != *(uint16_t *)(buffer + 5))
-					{
-						emg::Log::Error("Flash control read CRC error");
 						return false;
 					}
 
@@ -279,7 +248,7 @@ namespace psinc
 
 					if (sp_get_port_by_name(this->connection.c_str(), &this->serial) == SP_OK)
 					{
-						if (sp_open(this->serial, (sp_mode)3) == SP_OK)
+						if (sp_open(this->serial, SP_MODE_READ_WRITE) == SP_OK)
 						{
 							sp_set_baudrate(this->serial, 9600);
 							sp_set_bits(this->serial, 8);
@@ -324,7 +293,6 @@ namespace psinc
 				sp_port *serial = nullptr;
 				uint8_t address	= 0;
 				uint8_t empty	= 0;
-				bool slow		= false;
 
 				std::string connection;
 				emg::Timer last;

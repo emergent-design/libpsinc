@@ -120,10 +120,11 @@ namespace psinc
 				}
 			}
 
-			if (this->Main())
-			{
-				this->condition.wait_for(lock, 50ms);
-			}
+			// if (this->Main())
+			// {
+			// 	this->condition.wait_for(lock, 50ms);
+			// }
+			this->condition.wait_for(lock, this->Main() ? 50ms : 10us);
 		}
 	}
 
@@ -134,21 +135,41 @@ namespace psinc
 	}
 
 
-	bool Instrument::Reset(byte level)
+	bool Instrument::Reset(ResetLevel level)
 	{
-		if (level == 0)
+		switch (level)
 		{
-			return this->transport.Reset();
+			case ResetLevel::Connection:	return this->transport.Reset(false);
+			case ResetLevel::Control:		return this->transport.Reset(true);
+			default:						break;
 		}
 
 		atomic<bool> waiting(false);
 		Buffer<byte> command = {
-			0x00, 0x00, 0x00, 0x00, 0x00,								// Header
-			Commands::ResetChip, (byte)(level - 1), 0x00, 0x00, 0x00,	// Command
-			0xff														// Terminator
+			0x00, 0x00, 0x00, 0x00, 0x00,						// Header
+			Commands::ResetChip, (byte)level, 0x00, 0x00, 0x00,	// Command
+			0xff												// Terminator
 		};
 
-		return level < 3 ? this->transport.Transfer(&command, nullptr, waiting) : false;
+		if (level == ResetLevel::Imaging || level == ResetLevel::ImagingSoft)
+		{
+			// Do not allow image grabbing during this reset operation
+			lock_guard<mutex> lock(this->cs);
+
+			if (this->transport.Transfer(&command, nullptr, waiting))
+			{
+				// Give the imaging chip a chance to recover
+				this_thread::sleep_for(500ms);
+
+				// If just the imaging chip is being reset then the a camera will need
+				// to refresh registers, since this is at instrument level then a full
+				// reconfiguration is required.
+				return this->configured = this->Configure();
+			}
+
+			return false;
+		}
+
+		return this->transport.Transfer(&command, nullptr, waiting);
 	}
 }
-

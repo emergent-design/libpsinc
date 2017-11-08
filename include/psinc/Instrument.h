@@ -9,6 +9,18 @@
 
 namespace psinc
 {
+	enum class ResetLevel : uint8_t
+	{
+		Connection		= 0xff,	// Full hardware reset at the USB transport level
+		Control			= 0xfe,	// Full camera reset triggered via the USB control pipe
+		Command			= 0x00,	// Full camera reset triggered via standard libpsinc command
+		Communications	= 0x01,	// A soft reset that simply tells the camera to reset the communications buffer
+		Imaging			= 0x02,	// A reset of the imaging chip only - registers will be refreshed automatically
+		ImagingSoft		= 0x03,	// A soft reset of the imaging chip only - registers will be refreshed automatically
+		Io				= 0x04	// Reset of the I/O sub-systems within the camera
+	};
+
+
 	/// The base class for a Camera but it can also be used directly when communicating
 	/// with hardware that is not a camera or should you wish to use devices connected
 	/// to a camera but not actually grab any images.
@@ -52,14 +64,7 @@ namespace psinc
 			Device CustomDevice(byte index);
 
 			/// Resets the instrument.
-			///
-			/// Level 0: full hardware reset at the USB transport level.
-			/// Level 1: full soft reset at the camera chip level.
-			/// Level 2: a soft reset that simply tells the camera to reset the communications buffers.
-			///
-			/// Level 2 is for use in the situation where an I/O error has caused the communications
-			/// to potentially get out of step.
-			bool Reset(byte level = 0);
+			bool Reset(ResetLevel level = ResetLevel::Connection);
 
 
 			/// Retrieve list of all serial numbers for any connected instruments of the given type

@@ -60,8 +60,38 @@ namespace psinc
 
 	int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data)
 	{
-		reinterpret_cast<Transport *>(data)->pending.enqueue({ device, event });
+		reinterpret_cast<Transport *>(data)->Pending(device, event);
 		return 0;
+	}
+
+
+	void Transport::Pending(libusb_device *device, libusb_hotplug_event event)
+	{
+		if (Valid(device, this->vendors, this->product))
+		{
+			if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT && this->handle)
+			{
+				if (device == libusb_get_device(this->handle))
+				{
+					this->cs.lock();
+						this->Release();
+					this->cs.unlock();
+
+					if (this->onConnection)
+					{
+						this->onConnection(false);
+					}
+				}
+			}
+
+			if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED && !this->handle)
+			{
+				if (this->Claim(device) && this->onConnection)
+				{
+					this->onConnection(true);
+				}
+			}
+		}
 	}
 
 
@@ -92,36 +122,6 @@ namespace psinc
 
 		struct timeval tv = { 0, time * 1000 };
 		libusb_handle_events_timeout_completed(this->context, &tv, nullptr);
-
-		Pending item;
-		if (this->pending.try_dequeue(item))
-		{
-			if (Valid(item.device, this->vendors, this->product))
-			{
-				if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT && this->handle)
-				{
-					if (item.device == libusb_get_device(this->handle))
-					{
-						this->cs.lock();
-							this->Release();
-						this->cs.unlock();
-
-						if (this->onConnection)
-						{
-							this->onConnection(false);
-						}
-					}
-				}
-
-				if (item.event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED && !this->handle)
-				{
-					if (this->Claim(item.device) && this->onConnection)
-					{
-						this->onConnection(true);
-					}
-				}
-			}
-		}
 	}
 
 
@@ -283,13 +283,21 @@ namespace psinc
 
 
 
-	bool Transport::Reset()
+	bool Transport::Reset(bool control)
 	{
 		lock_guard<mutex> lock(this->cs);
 
 		if (this->handle)
 		{
-			if (libusb_reset_device(this->handle) != 0)
+			if (control)
+			{
+				libusb_control_transfer(this->handle, 0x40, 0xf2, 0, 0, 0, 0, this->timeout);
+
+				// This tells the camera to reset itself and will therefore result in
+				// disconnection so assume that the handle is now invalid.
+				this->Release();
+			}
+			else if (libusb_reset_device(this->handle) != 0)
 			{
 				// Something has gone wrong with the reset and so the device appears
 				// as if it has been reconnected. Therefore this handle is invalid

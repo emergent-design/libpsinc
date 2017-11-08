@@ -67,6 +67,8 @@ class MainWindow : public QMainWindow
 
 		void on_framerateCheck_toggled(bool checked);
 
+		void on_resetButton_clicked();
+
 	signals:
 
 		void connectionChanged(bool connected);

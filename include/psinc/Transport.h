@@ -2,8 +2,6 @@
 
 #include <emergent/Emergent.hpp>
 #include <emergent/struct/Buffer.hpp>
-#include <emergent/concurrentqueue.h>
-// #include <psinc/transport/Transport.h>
 #include <libusb-1.0/libusb.h>
 #include <mutex>
 #include <queue>
@@ -44,7 +42,7 @@ namespace psinc
 
 
 			/// Reset the connection to the actual device.
-			bool Reset();
+			bool Reset(bool control = false);
 
 
 			/// Force a disconnection of this device (if connected)
@@ -61,12 +59,12 @@ namespace psinc
 
 			/// Simple structure for queueing up connection/disconnection
 			/// events for handling in Poll().
-			struct Pending
-			{
-				libusb_device *device;
-				libusb_hotplug_event event;
-			};
-
+			// struct Pending
+			// {
+			// 	libusb_device *device;
+			// 	libusb_hotplug_event event;
+			// };
+			void Pending(libusb_device *device, libusb_hotplug_event event);
 
 			/// Retrieve the serial number of the device (then stored as id).
 			/// If a particular pattern is required then return true if there
@@ -123,7 +121,6 @@ namespace psinc
 			/// Required timeout for bulk transfers
 			int timeout = 500;
 
-
 			/// Reference for registering hotplugging callback
 			libusb_hotplug_callback_handle hotplug;
 
@@ -132,9 +129,6 @@ namespace psinc
 
 			/// Storage for the registered callback (if required)
 			std::function<void(bool)> onConnection = nullptr;
-
-			/// A thread-safe queue for registering connection/disconnection events
-			moodycamel::ConcurrentQueue<Pending> pending;
 
 			// Windows does not yet support hotplugging so adapt accordingly
 			bool legacy 		= false;

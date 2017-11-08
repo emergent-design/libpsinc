@@ -52,7 +52,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="settingsTab">
        <attribute name="title">
@@ -534,7 +534,7 @@
         <string>Expert</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="4" column="9">
+        <item row="4" column="8">
          <widget class="QSpinBox" name="rangeStartBox">
           <property name="enabled">
            <bool>false</bool>
@@ -547,14 +547,14 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="9">
+        <item row="1" column="8">
          <widget class="QLabel" name="bitShiftLabel">
           <property name="text">
            <string>Bit shift (simple mode)</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="5" colspan="4">
+        <item row="2" column="5" colspan="3">
          <widget class="QComboBox" name="hdrModeBox">
           <item>
            <property name="text">
@@ -573,7 +573,7 @@
           </item>
          </widget>
         </item>
-        <item row="2" column="9">
+        <item row="2" column="8">
          <widget class="QSpinBox" name="bitShiftBox">
           <property name="maximum">
            <number>15</number>
@@ -583,27 +583,10 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="5" colspan="4">
+        <item row="1" column="5" colspan="3">
          <widget class="QLabel" name="hdrModeLabel">
           <property name="text">
            <string>Mode</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5" colspan="4">
-         <widget class="QLabel" name="hdrHeading">
-          <property name="font">
-           <font>
-            <pointsize>11</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>HDR</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -617,7 +600,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="7">
+        <item row="5" column="6">
          <widget class="QSlider" name="rangeWindowSlider">
           <property name="enabled">
            <bool>false</bool>
@@ -651,7 +634,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="7">
+        <item row="4" column="6">
          <widget class="QSlider" name="rangeStartSlider">
           <property name="enabled">
            <bool>false</bool>
@@ -676,7 +659,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="9">
+        <item row="5" column="8">
          <widget class="QSpinBox" name="rangeWindowBox">
           <property name="enabled">
            <bool>false</bool>
@@ -705,7 +688,7 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="0" colspan="10">
+        <item row="10" column="0" colspan="9">
          <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -767,6 +750,19 @@
           </property>
          </widget>
         </item>
+        <item row="6" column="0">
+         <widget class="QSpinBox" name="xRegionBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+         </widget>
+        </item>
         <item row="5" column="0" colspan="4">
          <widget class="QLabel" name="regionLabel">
           <property name="font">
@@ -784,6 +780,13 @@
           </property>
          </widget>
         </item>
+        <item row="6" column="1">
+         <widget class="QSpinBox" name="yRegionBox">
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="addressLabel">
           <property name="sizePolicy">
@@ -797,26 +800,6 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QSpinBox" name="xRegionBox">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximum">
-           <number>2048</number>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QSpinBox" name="yRegionBox">
-          <property name="maximum">
-           <number>2048</number>
           </property>
          </widget>
         </item>
@@ -869,6 +852,31 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="4" rowspan="10">
+         <widget class="Line" name="line">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
         <item row="4" column="0" colspan="2">
          <widget class="QPushButton" name="getButton">
           <property name="text">
@@ -902,31 +910,6 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="4" rowspan="10">
-         <widget class="Line" name="line">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
         <item row="9" column="3">
          <widget class="QCheckBox" name="lensCheck">
           <property name="enabled">
@@ -934,6 +917,16 @@
           </property>
           <property name="text">
            <string>Enable</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="8">
+         <widget class="QPushButton" name="saveHdrButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Save HDR</string>
           </property>
          </widget>
         </item>
@@ -969,13 +962,83 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="9">
-         <widget class="QPushButton" name="saveHdrButton">
-          <property name="enabled">
-           <bool>false</bool>
+        <item row="0" column="5" colspan="4">
+         <widget class="QLabel" name="hdrHeading">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
-           <string>Save HDR</string>
+           <string>HDR</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="8">
+         <widget class="QPushButton" name="resetButton">
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="5" colspan="2">
+         <widget class="QComboBox" name="resetBox">
+          <item>
+           <property name="text">
+            <string>Connection (full reset at transport level)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Control (full reset via control pipe)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Command (full reset via standard command)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Communications (soft reset of communication buffers)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Imaging (reset of imaging chip only)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Imaging Soft (soft reset of imaging chip only)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>I/O (reset of the I/O sub-systems)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="8" column="6">
+         <widget class="QLabel" name="resetHeading">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Reset</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
