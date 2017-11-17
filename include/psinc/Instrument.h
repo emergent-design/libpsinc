@@ -9,7 +9,7 @@
 
 namespace psinc
 {
-	enum class ResetLevel : uint8_t
+	enum class ResetLevel
 	{
 		Connection		= 0xff,	// Full hardware reset at the USB transport level
 		Control			= 0xfe,	// Full camera reset triggered via the USB control pipe

@@ -137,6 +137,7 @@ namespace psinc
 
 	bool Instrument::Reset(ResetLevel level)
 	{
+		cout << (int)level << endl;
 		switch (level)
 		{
 			case ResetLevel::Connection:	return this->transport.Reset(false);
