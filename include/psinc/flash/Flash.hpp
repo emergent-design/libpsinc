@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <regex>
 #include <emergent/String.hpp>
 #include <emergent/Timer.hpp>
 #include <emergent/logger/Logger.hpp>
@@ -26,6 +27,7 @@ namespace psinc
 				}
 
 
+				// Set the serial port connection string and device address, then initiate a connection
 				bool Initialise(const std::string &connection, uint8_t address)
 				{
 					this->connection	= connection;
@@ -35,7 +37,9 @@ namespace psinc
 				}
 
 
-				static std::string Find(const std::string &id)
+				// Helper function to find the connection string for a specific USB based serial port.
+				// It accepts the same type of regex serial string as a Camera/Instrument.
+				static std::string Find(const std::string &serial)
 				{
 					sp_port **list;
 					std::string result = "";
@@ -44,29 +48,59 @@ namespace psinc
 					{
 						for (sp_port **port = list; *port; port++)
 						{
-							std::cout << sp_get_port_name(*port) << std::endl;
-							std::cout << "\t Description: " << sp_get_port_description(*port) << std::endl;
-
 							if (sp_get_port_transport(*port) == SP_TRANSPORT_USB)
 							{
-								// Test code only for the moment
-								int vid=0, pid=0, bus=0, address=0;
-								sp_get_port_usb_vid_pid(*port, &vid, &pid);
-								sp_get_port_usb_bus_address(*port, &bus, &address);
+								auto id = emg::String::trim(sp_get_port_usb_serial(*port), ' ');
 
-								std::cout << emg::String::format("\t         VID: 0x%04x", vid) << std::endl;
-								std::cout << emg::String::format("\t         PID: 0x%04x", pid) << std::endl;
-								std::cout << emg::String::format("\t         Bus: %d", bus) << std::endl;
-								std::cout << emg::String::format("\t     Address: %d", address) << std::endl;
-
-								auto man		= sp_get_port_usb_manufacturer(*port);
-								auto product	= sp_get_port_usb_product(*port);
-								auto serial		= sp_get_port_usb_serial(*port);
-
-								std::cout << "\tManufacturer: " << (man ? man : "-") << std::endl;
-								std::cout << "\t     Product: " << (product ? product : "-") << std::endl;
-								std::cout << "\t      Serial: " << (serial ? serial : "-") << std::endl;
+								if (std::regex_match(id, std::regex(serial)))
+								{
+									result = sp_get_port_name(*port);
+									break;
+								}
 							}
+						}
+
+						sp_free_port_list(list);
+					}
+
+					return result;
+				}
+
+
+				// List all serial ports on the system
+				static std::map<std::string, std::string> List()
+				{
+					sp_port **list;
+					std::map<std::string, std::string> result;
+
+					if (sp_list_ports(&list) == SP_OK)
+					{
+						for (sp_port **port = list; *port; port++)
+						{
+							result[sp_get_port_name(*port)] = sp_get_port_description(*port);
+							// std::cout << sp_get_port_name(*port) << std::endl;
+							// std::cout << "\t Description: " << sp_get_port_description(*port) << std::endl;
+
+							// if (sp_get_port_transport(*port) == SP_TRANSPORT_USB)
+							// {
+							// 	// Test code only for the moment
+							// 	int vid=0, pid=0, bus=0, address=0;
+							// 	sp_get_port_usb_vid_pid(*port, &vid, &pid);
+							// 	sp_get_port_usb_bus_address(*port, &bus, &address);
+
+							// 	std::cout << emg::String::format("\t         VID: 0x%04x", vid) << std::endl;
+							// 	std::cout << emg::String::format("\t         PID: 0x%04x", pid) << std::endl;
+							// 	std::cout << emg::String::format("\t         Bus: %d", bus) << std::endl;
+							// 	std::cout << emg::String::format("\t     Address: %d", address) << std::endl;
+
+							// 	auto man		= sp_get_port_usb_manufacturer(*port);
+							// 	auto product	= sp_get_port_usb_product(*port);
+							// 	auto serial		= sp_get_port_usb_serial(*port);
+
+							// 	std::cout << "\tManufacturer: " << (man ? man : "-") << std::endl;
+							// 	std::cout << "\t     Product: " << (product ? product : "-") << std::endl;
+							// 	std::cout << "\t      Serial: " << (serial ? serial : "-") << std::endl;
+							// }
 						}
 
 						sp_free_port_list(list);
