@@ -35,8 +35,8 @@ namespace psinc
 				byte index				= 0;	///< Which device this is
 				uint16_t functionality	= 0;	///< Bitmask indicating which device functions are supported
 				uint16_t channels		= 0;	///< Number of available channels (contiguous, zero-indexed)
-				byte reserved[4];				///> Reserved registers for future use
-				byte status[4];					///> Status flag registers
+				byte reserved[4]		= { 0 };///> Reserved registers for future use
+				byte status[4]			= { 0 };///> Status flag registers
 			};
 
 

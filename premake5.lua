@@ -21,7 +21,7 @@ solution "psinc"
 		files				{ "include/psinc/**h", "src/psinc/**.cpp", "src/psinc-c/**.cpp" }
 
 		configuration "linux"
-			flags				"Symbols"
+			symbols				"On"
 			postbuildcommands	"./strip lib/libpsinc.so"
 
 		configuration "not vs*"

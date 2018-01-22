@@ -1,0 +1,32 @@
+stages:
+  - build
+
+build-check:
+  image: emergent:xenial
+  stage: build
+  only:
+    - master
+  before_script:
+    - dpkg -i /packages/xenial/oss/libemergent-dev.deb
+  script:
+    - premake5 gmake
+    - make -j4
+
+package-xenial:
+  image: emergent:xenial
+  stage: build
+  only:
+    - tags
+  before_script:
+    - dpkg -i /packages/xenial/oss/libemergent-dev.deb
+  script:
+    - premake5 gmake
+    - make -j4
+    - cd packages
+    - ./build
+    - mkdir -p /packages/xenial/oss/
+    - cp libpsinc-dev_*.deb /packages/xenial/oss/libpsinc-dev.deb
+    - cp libpsinc0_*.deb /packages/xenial/oss/libpsinc0.deb
+  artifacts:
+    paths:
+      - packages/*.deb
