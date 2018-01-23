@@ -1,3 +1,9 @@
+libpsinc0 (0.1.13) unstable; urgency=medium
+
+  * Flash control helper class (over serial port).
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 23 Jan 2018 00:41:12 +0000
+
 libpsinc0 (0.1.12) unstable; urgency=medium
 
   * New reset functionality.
