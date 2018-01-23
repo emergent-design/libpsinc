@@ -34,6 +34,6 @@ solution "psinc"
 			targetname	"psinc_%{cfg.buildcfg}_%{cfg.platform}"
 
 			configuration "debug"
-				flags		"Symbols"
+				symbols		"On"
 			configuration "release"
 				optimize	"Full"
