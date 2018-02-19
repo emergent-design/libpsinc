@@ -46,7 +46,7 @@ namespace psinc
 	}
 
 
-	void Instrument::Initialise(Type product, string serial, std::function<void(bool)> onConnection, int timeout, const set<uint16_t> &vendors)
+	void Instrument::Initialise(uint16_t product, string serial, std::function<void(bool)> onConnection, int timeout, const set<uint16_t> &vendors)
 	{
 		this->onConnection = onConnection;
 

@@ -28,7 +28,7 @@ namespace psinc
 	{
 		public:
 
-			enum class Type : uint16_t
+			enum Type : uint16_t
 			{
 				Camera		= 0xaaca,
 				Odometer	= 0xaac0,
@@ -53,7 +53,7 @@ namespace psinc
 			/// treated as a regex and, combined with the cameras ability to append the camera
 			/// name to the end of the serial number in the USB descriptor, provides a powerful
 			/// way to reliably connect to a specific camera.
-			virtual void Initialise(Type product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500, const std::set<uint16_t> &vendors = Vendors::All);
+			virtual void Initialise(uint16_t product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500, const std::set<uint16_t> &vendors = Vendors::All);
 
 			/// Checks if this instance is currently connected to a physical device
 			/// @return True if a device appears to be connected.
