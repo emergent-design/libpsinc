@@ -28,10 +28,9 @@ namespace psinc
 
 
 				// Set the serial port connection string and device address, then initiate a connection
-				bool Initialise(const std::string &connection, uint8_t address)
+				bool Initialise(const std::string &connection) //, uint8_t address)
 				{
-					this->connection	= connection;
-					this->address		= address;
+					this->connection = connection;
 
 					return this->Connect();
 				}
@@ -117,23 +116,23 @@ namespace psinc
 
 
 				// Set the UI LED colour
-				bool Ui(uint8_t r, uint8_t g, uint8_t b) { return Write<2>(HPFC01::UiLed, { uint16_t((g << 8) + r), b }); }
+				bool Ui(uint8_t address, uint8_t r, uint8_t g, uint8_t b) { return Write<2>(address, HPFC01::UiLed, { uint16_t((g << 8) + r), b }); }
 
 
 				// Gets and sets the "time on" values of banks 1-4 for the given quick select group
-				std::array<uint16_t, 4> Group(uint8_t group)						{ return group < 0x10 ? Read<4>(HPFC01::TimeOnStart + (group << 2)) : std::array<uint16_t, 4>(); }
-				bool Group(uint8_t group, const std::array<uint16_t, 4> &values)	{ return group < 0x10 ? Write(HPFC01::TimeOnStart + (group << 2), values) : false; }
+				std::array<uint16_t, 4> Group(uint8_t address, uint8_t group)						{ return group < 0x10 ? Read<4>(address, HPFC01::TimeOnStart + (group << 2)) : std::array<uint16_t, 4>(); }
+				bool Group(uint8_t address, uint8_t group, const std::array<uint16_t, 4> &values)	{ return group < 0x10 ? Write(address, HPFC01::TimeOnStart + (group << 2), values) : false; }
 
 				// Gets and sets the "time on" values for continuous mode
-				std::array<uint16_t, 4> Continuous()								{ return Read<4>(HPFC01::TimeOnContinuous); }
-				bool Continuous(const std::array<uint16_t, 4> &values)				{ return Write(HPFC01::TimeOnContinuous, values); }
-				bool EnableContinuous(bool enable)									{ return Write<1>(HPFC01::Config1, { uint16_t(enable ? 0x01 : 0x00) }); }
+				std::array<uint16_t, 4> Continuous(uint8_t address)									{ return Read<4>(address, HPFC01::TimeOnContinuous); }
+				bool Continuous(uint8_t address, const std::array<uint16_t, 4> &values)				{ return Write(address, HPFC01::TimeOnContinuous, values); }
+				bool EnableContinuous(uint8_t address, bool enable)									{ return Write<1>(address, HPFC01::Config1, { uint16_t(enable ? 0x01 : 0x00) }); }
 
 
 				// First value is the driver temperature, second value is the LED board temperature. Both are in degrees Celsius.
-				std::array<double, 2> Temperature()
+				std::array<double, 2> Temperature(uint8_t address)
 				{
-					auto values = Read<2>(HPFC01::Temperature);
+					auto values = Read<2>(address, HPFC01::Temperature);
 
 					return {
 						0.00390625 * (values[0] & 0x8000 ? -1 : 1)  * (values[0] & 0x7fff),
@@ -142,34 +141,53 @@ namespace psinc
 				}
 
 
-				std::string ID()
+				std::string ID(uint8_t address)
 				{
-					auto values = Read<5>(HPFC01::ID);
+					auto values = Read<5>(address, HPFC01::ID);
 
 					return emg::String::format("%04x%04x%04x%04x%04x", values[4], values[3], values[2], values[1], values[0]);
 				}
 
 
 				// Sets the address of the connected device
-				bool Address(uint8_t value)			{ return Write<1>(HPFC01::Address, { value }); }
-				std::array<uint16_t, 2> Version()	{ return Read<2>(HPFC01::Hardware); }
-				uint8_t CurrentLevel()				{ return Read<1>(HPFC01::CurrentLevel)[0]; }
-				bool CurrentLevel(uint8_t value)	{ return Write<1>(HPFC01::CurrentLevel, { value }); }
-				uint8_t VoltageLevel()				{ return Read<1>(HPFC01::VoltageLevel)[0]; }
-				bool VoltageLevel(uint8_t value)	{ return Write<1>(HPFC01::VoltageLevel, { value }); }
-				double VoltageIn()					{ return Read<1>(HPFC01::VoltageIn)[0] * 0.001220703 / 0.227053; }
-				double VoltageOut()					{ return Read<1>(HPFC01::VoltageOut)[0] * 0.001220703 / 0.135447; }
+				bool Address(uint8_t address, uint8_t value)		{ return Write<1>(address, HPFC01::Address, { value }); }
+				std::array<uint16_t, 2> Version(uint8_t address)	{ return Read<2>(address, HPFC01::Hardware); }
+				uint8_t CurrentLevel(uint8_t address)				{ return Read<1>(address, HPFC01::CurrentLevel)[0]; }
+				bool CurrentLevel(uint8_t address, uint8_t value)	{ return Write<1>(address, HPFC01::CurrentLevel, { value }); }
+				uint8_t VoltageLevel(uint8_t address)				{ return Read<1>(address, HPFC01::VoltageLevel)[0]; }
+				bool VoltageLevel(uint8_t address, uint8_t value)	{ return Write<1>(address, HPFC01::VoltageLevel, { value }); }
+				double VoltageIn(uint8_t address)					{ return Read<1>(address, HPFC01::VoltageIn)[0] * 0.001220703 / 0.227053; }
+				double VoltageOut(uint8_t address)					{ return Read<1>(address, HPFC01::VoltageOut)[0] * 0.001220703 / 0.135447; }
 
 				// Save the current registers to the internal EEROM so that they will persist after a power cycle.
-				bool Save() { return Write<1>(HPFC01::Config0, { 0x02 }); }
+				bool Save(uint8_t address) { return Write<1>(address, HPFC01::Config0, { 0x02 }); }
 
 				// Overwrite the current register values with those in the internal EEROM (as if it had been power cycled).
-				bool Load() { return Write<1>(HPFC01::Config0, { 0x01 }); }
+				bool Load(uint8_t address) { return Write<1>(address, HPFC01::Config0, { 0x01 }); }
+
+
+				// Read from an i2c device (such as the LED board) using the extension registers
+				uint16_t Extension(uint8_t address, uint16_t deviceAddress, uint16_t registerAddress)
+				{
+					if (Write<2>(address, HPFC01::ExtensionAddress, { deviceAddress, registerAddress }))
+					{
+						return Read<1>(address, HPFC01::ExtensionData)[0];
+					}
+
+					return 0;
+				}
+
+
+				// Write to an i2c device (such as the LED board) using the extension registers
+				bool Extension(uint8_t address, uint16_t deviceAddress, uint16_t registerAddress, uint16_t value)
+				{
+					return Write<3>(address, HPFC01::ExtensionAddress, { deviceAddress, registerAddress, value });
+				}
 
 
 			private:
 
-				template <size_t N> bool Write(uint8_t address, const std::array<uint16_t, N> &values)
+				template <size_t N> bool Write(uint8_t address, uint8_t registerAddress, const std::array<uint16_t, N> &values)
 				{
 					if (!this->serial && !this->Connect())
 					{
@@ -178,7 +196,7 @@ namespace psinc
 
 					for (uint8_t i=0; i<N; i++)
 					{
-						if (!this->Write((uint8_t)address + i, values[i], true))
+						if (!this->Write(address, registerAddress + i, values[i], true))
 						{
 							return false;
 						}
@@ -190,7 +208,7 @@ namespace psinc
 				}
 
 
-				template <size_t N> const std::array<uint16_t, N> Read(uint8_t address)
+				template <size_t N> const std::array<uint16_t, N> Read(uint8_t address, uint8_t registerAddress)
 				{
 					if (!this->serial && !this->Connect())
 					{
@@ -201,7 +219,7 @@ namespace psinc
 
 					for (uint8_t i=0; i<N; i++)
 					{
-						if (!this->Write(address + i, 0x00, false))
+						if (!this->Write(address, registerAddress + i, 0x00, false))
 						{
 							return { 0 };
 						}
@@ -216,9 +234,9 @@ namespace psinc
 				}
 
 
-				bool Write(uint8_t address, uint16_t value, bool set)
+				bool Write(uint8_t address, uint8_t registerAddress, uint16_t value, bool set)
 				{
-					uint8_t buffer[7]			= { this->address, 0, set ? uint8_t(address ^ 0x80) : address };
+					uint8_t buffer[7]			= { address, 0, set ? uint8_t(registerAddress ^ 0x80) : registerAddress };
 					*(uint16_t *)(buffer + 3)	= value;
 					*(uint16_t *)(buffer + 5)	= CRC(buffer);
 
@@ -325,7 +343,6 @@ namespace psinc
 				}
 
 				sp_port *serial = nullptr;
-				uint8_t address	= 0;
 				uint8_t empty	= 0;
 
 				std::string connection;
