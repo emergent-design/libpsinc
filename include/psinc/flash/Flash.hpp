@@ -185,6 +185,20 @@ namespace psinc
 				}
 
 
+				// Hardware version and ID of LED board
+				std::string LedHardware(uint8_t address)
+				{
+					auto values = Read<2>(address, HPFC01::LedHardware);
+					return emg::String::format("%04x%04x", values[1], values[0]);
+				}
+
+				std::string LedID(uint8_t address)
+				{
+					auto values = Read<4>(address, HPFC01::LedID);
+					return emg::String::format("%04x%04x%04x%04x", values[3], values[2], values[1], values[0]);
+				}
+
+
 			private:
 
 				template <size_t N> bool Write(uint8_t address, uint8_t registerAddress, const std::array<uint16_t, N> &values)

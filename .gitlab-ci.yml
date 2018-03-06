@@ -32,6 +32,24 @@ package-xenial:
     paths:
       - packages/*.deb
 
+package-windows:
+  image: emergent:windows
+  stage: build
+  only:
+    - tags
+  script:
+    - premake5 --os=windows gmake
+    - make CXX=x86_64-w64-mingw32-g++ -j4
+    - PATH=/opt/qt5-win-x64/bin:$PATH qmake -spec win32-g++ -o iconograph.make iconograph.pro
+    - make -f iconograph.make
+    - cd packages
+    - ./windows
+    - mkdir -p /packages/windows/oss/
+    - cp libpsinc-*.7z /packages/windows/oss/libpsinc.7z
+  artifacts:
+    paths:
+      - packages/*.7z
+
 deploy-packages:
   image: emergent:deploy
   stage: deploy
@@ -50,3 +68,4 @@ deploy-packages:
   script:
     - cd packages
     - scp *.deb jenkins@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/ubuntu/
+    - scp *.7z jenkins@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/windows/

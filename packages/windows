@@ -1,7 +1,8 @@
 #!/bin/bash
 
-dst="psinc-w64"
 
+# A full iconograph package containing all required dependencies
+dst="iconograph"
 mkdir $dst
 mkdir $dst/platforms
 
@@ -20,5 +21,17 @@ cp /opt/qt5-win-x64/plugins/platforms/qwindows.dll $dst/platforms/
 cp ../bin/iconograph.exe $dst/
 
 7z a $dst-`cat version`.7z $dst
+rm -r $dst
 
+
+# A dev package for libpsinc containing headers and binaries
+dst="libpsinc"
+mkdir -p $dst/include
+mkdir -p $dst/lib
+
+cp -r ../include/psinc $dst/include/
+cp ../lib/psinc.dll $dst/lib/
+cp ../lib/psinc.lib $dst/lib/
+
+7z a $dst-`cat version`.7z $dst
 rm -r $dst
