@@ -41,7 +41,7 @@ package-windows:
     - premake5 --os=windows gmake
     - make CXX=x86_64-w64-mingw32-g++ -j4
     - PATH=/opt/qt5-win-x64/bin:$PATH qmake -spec win32-g++ -o iconograph.make iconograph.pro
-    - make -f iconograph.make
+    - make -f iconograph.make -j4
     - cd packages
     - ./windows
     - mkdir -p /packages/windows/oss/

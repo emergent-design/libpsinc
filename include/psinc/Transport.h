@@ -3,10 +3,12 @@
 #include <emergent/Emergent.hpp>
 #include <emergent/struct/Buffer.hpp>
 #include <libusb-1.0/libusb.h>
+#include <atomic>
 #include <mutex>
 #include <queue>
 #include <map>
 #include <set>
+
 
 namespace psinc
 {
