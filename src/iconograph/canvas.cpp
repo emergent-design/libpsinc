@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
