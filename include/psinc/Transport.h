@@ -12,6 +12,8 @@
 
 namespace psinc
 {
+	using emg::byte;
+
 	/// USB transport implementation.
 	///
 	/// Uses libusb to connect to and communicate with the physical

@@ -13,7 +13,7 @@
 //#define exp10(v) (std::pow(10, v))
 //#endif
 
-
+using emg::byte;
 namespace Ui { class MainWindow; }
 
 
