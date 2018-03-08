@@ -58,6 +58,7 @@ deploy-packages:
     - tags
   dependencies:
     - package-xenial
+    - package-windows
   before_script:
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
