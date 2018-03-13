@@ -1,3 +1,9 @@
+libpsinc0 (0.1.15) unstable; urgency=medium
+
+  * Fixed ambiguity with byte definition (VS2015).
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 13 Mar 2018 12:05:15 +0000
+
 libpsinc0 (0.1.14) unstable; urgency=medium
 
   * Updated to use libemergent v0.0.11.
