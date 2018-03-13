@@ -1,7 +1,6 @@
 #include "psinc.h"
 #include "psinc/Camera.h"
 
-using namespace std;
 using namespace psinc;
 using namespace emg;
 
@@ -53,7 +52,7 @@ extern "C"
 
 		// Perhaps we need some sort of buffer view to handle this case without
 		// unnecessary memory allocation and copying.
-		Buffer<byte> data(size);
+		Buffer<emg::byte> data(size);
 
 		if (c->devices.count(device))
 		{

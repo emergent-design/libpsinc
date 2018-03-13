@@ -4,9 +4,9 @@
 #include <emergent/logger/Logger.hpp>
 #include <thread>
 
-using namespace std;
 using namespace psinc;
 using namespace emg;
+using namespace std::chrono;
 
 
 template <typename T> int _psinc_grab(Camera *camera, ImageBase<T> *image)
@@ -24,7 +24,7 @@ template <typename T> int _psinc_grab(Camera *camera, ImageBase<T> *image)
 
 	while (camera->Grabbing())
 	{
-		this_thread::sleep_for(1ms);
+		std::this_thread::sleep_for(1ms);
 	}
 
 	return result;
@@ -35,7 +35,7 @@ extern "C"
 {
 	void psinc_enable_logging()
 	{
-		Log::Initialise({ unique_ptr<logger::Sink>(new logger::Console()) });
+		Log::Initialise({ std::unique_ptr<logger::Sink>(new logger::Console()) });
 		Log::Verbosity(Severity::Info);
 	}
 
@@ -68,7 +68,7 @@ extern "C"
 
 	int psinc_camera_grab(psinc_camera *camera, emg_image *image)
 	{
-		return _psinc_grab(reinterpret_cast<Camera *>(camera), reinterpret_cast<ImageBase<byte> *>(image));
+		return _psinc_grab(reinterpret_cast<Camera *>(camera), reinterpret_cast<ImageBase<emg::byte> *>(image));
 	}
 
 
