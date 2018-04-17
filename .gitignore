@@ -26,6 +26,7 @@ obj/
 .directory
 .build-*/
 .codelite/
+.vs/
 
 psinc.workspace.*
 compilation.db

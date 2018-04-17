@@ -1,3 +1,9 @@
+libpsinc0 (0.1.16) unstable; urgency=medium
+
+  * Added bionic build.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 17 Apr 2018 23:16:13 +0100
+
 libpsinc0 (0.1.15) unstable; urgency=medium
 
   * Fixed ambiguity with byte definition (VS2015).

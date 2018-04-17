@@ -32,6 +32,25 @@ package-xenial:
     paths:
       - packages/*.deb
 
+package-bionic:
+  image: emergent:bionic
+  stage: build
+  only:
+    - tags
+  before_script:
+    - dpkg -i /packages/bionic/oss/libemergent-dev.deb
+  script:
+    - premake5 gmake
+    - make -j4
+    - cd packages
+    - ./build
+    - mkdir -p /packages/bionic/oss/
+    - cp libpsinc-dev_*.deb /packages/bionic/oss/libpsinc-dev.deb
+    - cp libpsinc0_*.deb /packages/bionic/oss/libpsinc0.deb
+  # artifacts:
+  #   paths:
+  #     - packages/*.deb
+
 package-windows:
   image: emergent:windows
   stage: build
