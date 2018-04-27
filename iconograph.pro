@@ -9,6 +9,7 @@ TEMPLATE = app
 INCLUDEPATH += include/iconograph include
 SOURCES += src/iconograph/*.cpp
 HEADERS += include/iconograph/*.h
+RESOURCES += resources/*.qrc
 FORMS   += ui/*.ui
 LIBS    += -Llib -lpsinc -lfreeimage
 CONFIG  += rtti

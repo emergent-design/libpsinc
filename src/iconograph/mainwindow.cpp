@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	this->ui->advancedTable->setItemDelegate(this->delegate);
 	this->ui->advancedTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 	this->ui->advancedTable->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	this->ui->tabs->setCurrentIndex(0);
 
 	this->handler.Initialise(this->image);
 	this->hdrHandler.Initialise(this->hdrImage);
@@ -302,6 +303,8 @@ void MainWindow::on_portraitCheck_toggled(bool checked)		{ portrait = checked; }
 void MainWindow::on_grabFrame_clicked()						{ if (!this->stream) this->Grab(); }
 void MainWindow::on_framerateSlider_valueChanged(int value)	{ rateLimit = lrint(1000000.0 / value); }
 void MainWindow::on_framerateCheck_toggled(bool checked)	{ rateEnabled = checked; }
+void MainWindow::on_zoomButton_toggled(bool checked)		{ if (checked) ui->canvas->SetMode(Canvas::Mode::Zoom); }
+void MainWindow::on_selectButton_toggled(bool checked)		{ if (checked) ui->canvas->SetMode(Canvas::Mode::Select); }
 
 void MainWindow::on_streamCheck_toggled(bool checked)
 {
@@ -446,6 +449,8 @@ void MainWindow::on_resetButton_clicked()
 //{
 //	this->ui->lensCheck->setChecked(false);
 //}
+
+
 
 
 

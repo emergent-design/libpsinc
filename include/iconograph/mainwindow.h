@@ -57,17 +57,17 @@ class MainWindow : public QMainWindow
 		void on_rangeStartBox_valueChanged(int value);
 
 		void on_saveHdrButton_clicked();
-
 		void on_regionButton_clicked();
 
 //		void on_lensCheck_toggled(bool checked);
 //		void on_lensBox_valueChanged(double);
 
 		void on_framerateSlider_valueChanged(int value);
-
 		void on_framerateCheck_toggled(bool checked);
-
 		void on_resetButton_clicked();
+
+		void on_zoomButton_toggled(bool checked);
+		void on_selectButton_toggled(bool checked);
 
 	signals:
 

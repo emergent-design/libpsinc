@@ -11,6 +11,12 @@ class Canvas : public QLabel
 
 	public:
 
+		enum class Mode
+		{
+			Zoom,
+			Select
+		};
+
 		Canvas(QWidget *parent = 0, Qt::WindowFlags f = 0);
 //		~Canvas() {}
 
@@ -19,12 +25,16 @@ class Canvas : public QLabel
 		QRect Roi();
 
 
+		void SetMode(Mode mode);
+
+
 	protected slots:
 
 		virtual void paintEvent(QPaintEvent *);
 		virtual void mouseMoveEvent(QMouseEvent *event);
 		virtual void mousePressEvent(QMouseEvent *event);
 		virtual void mouseReleaseEvent(QMouseEvent *);
+		virtual void wheelEvent(QWheelEvent *event);
 
 	private:
 
@@ -33,5 +43,12 @@ class Canvas : public QLabel
 		QRect transient	= { 0, 0, 0, 0 };
 		QRect rect		= { 0, 0, 0, 0 };
 		double scale	= 1.0;
+
+		// Corner offset when panning the image
+		QPoint offset	= { 0, 0 };
+		double minScale	= 0.0;
+		double zoom		= -1;	// <0 = fill canvas
+
+		Mode mode		= Mode::Zoom;
 };
 
