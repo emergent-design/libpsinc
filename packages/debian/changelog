@@ -1,3 +1,13 @@
+libpsinc0 (0.1.17) unstable; urgency=medium
+
+  * Iconograph modifications:
+  *  Rearranged the expert tab layout.
+  *  Added a toolbar beside the canvas for mode switching.
+  *    Zoom mode allows scroll-wheel zooming and left-click panning.
+  *    Select mode works as before (rectangle selection for HDR processing).
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 27 Apr 2018 18:24:05 +0100
+
 libpsinc0 (0.1.16) unstable; urgency=medium
 
   * Added bionic build.
