@@ -40,9 +40,9 @@ namespace psinc
 	}
 
 
-	map<string, string> Instrument::List(Type product, const set<uint16_t> &vendors)
+	map<string, string> Instrument::List(uint16_t product, const set<uint16_t> &vendors)
 	{
-		return Transport::List(vendors, (uint16_t)product);
+		return Transport::List(vendors, product);
 	}
 
 
