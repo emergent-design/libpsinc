@@ -65,6 +65,7 @@ package-windows:
     - ./windows
     - mkdir -p /packages/windows/oss/
     - cp libpsinc-*.7z /packages/windows/oss/libpsinc.7z
+    - cp iconograph-*.7z /packages/windows/oss/iconograph.7z
   artifacts:
     paths:
       - packages/*.7z

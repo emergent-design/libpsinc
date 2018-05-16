@@ -24,6 +24,9 @@ solution "psinc"
 			symbols				"On"
 			postbuildcommands	"./strip lib/libpsinc.so"
 
+		configuration "windows"
+			kind "StaticLib"
+
 		configuration "not vs*"
 			buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++14", "-O3", "-D_FORTIFY_SOURCE=2" }
 			linkoptions 	{ "-Wl,-soname,libpsinc.so.0" }
