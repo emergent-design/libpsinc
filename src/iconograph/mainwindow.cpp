@@ -15,7 +15,12 @@ using namespace emergent;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-	Log::Initialise({ unique_ptr<logger::Sink>(new logger::Console()) });
+	#ifdef __linux__
+		Log::Initialise({ unique_ptr<logger::Sink>(new logger::Console()) });
+	#elif
+    	Log::Initialise({ unique_ptr<logger::Sink>(new logger::LogFile("iconograph.log")) });
+	#endif
+
 	Log::Verbosity(Severity::Info);
 
 	connect(this, SIGNAL(connectionChanged(bool)), this, SLOT(onConnection(bool)));
