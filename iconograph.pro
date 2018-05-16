@@ -11,7 +11,7 @@ SOURCES += src/iconograph/*.cpp
 HEADERS += include/iconograph/*.h
 RESOURCES += resources/*.qrc
 FORMS   += ui/*.ui
-LIBS    += -Llib -lpsinc -lfreeimage
+LIBS    += -Llib -lpsinc -lfreeimage -lusb-1.0
 CONFIG  += rtti
 
 DESTDIR = bin
