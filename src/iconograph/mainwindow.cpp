@@ -244,11 +244,18 @@ void MainWindow::UpdateSlider(QSlider *slider, QSpinBox *spin, string alias)
 
 	if (aliases.Contains(alias))
 	{
-		slider->setEnabled(true);
-		spin->setEnabled(true);
-		slider->setRange(aliases[alias]->Minimum(), aliases[alias]->Maximum());
-		spin->setRange(slider->minimum(), slider->maximum());
-		slider->setValue(aliases[alias]->Get());
+		int value = aliases[alias]->Get();
+
+		slider->blockSignals(true);
+		spin->blockSignals(true);
+			slider->setEnabled(true);
+			spin->setEnabled(true);
+			slider->setRange(aliases[alias]->Minimum(), aliases[alias]->Maximum());
+			spin->setRange(slider->minimum(), slider->maximum());
+			slider->setValue(value);
+			spin->setValue(value);
+		slider->blockSignals(false);
+		spin->blockSignals(false);
 	}
 	else
 	{

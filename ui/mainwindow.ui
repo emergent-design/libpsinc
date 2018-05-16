@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>836</width>
+    <width>995</width>
     <height>576</height>
    </rect>
   </property>
@@ -156,7 +156,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="settingsTab">
        <property name="sizePolicy">
@@ -1183,7 +1183,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>836</width>
+     <width>995</width>
      <height>22</height>
     </rect>
    </property>
