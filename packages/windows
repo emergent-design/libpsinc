@@ -13,8 +13,8 @@ cp /usr/lib/gcc/x86_64-w64-mingw32/7.2-posix/libstdc++-6.dll $dst/
 cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $dst/
 cp /usr/x86_64-w64-mingw32/lib/freeimage.dll $dst/
 cp /usr/x86_64-w64-mingw32/lib/libusb-1.0.dll $dst/
-cp ../lib/psinc.dll $dst/
-cp ../lib/psinc.lib $dst/
+# cp ../lib/psinc.dll $dst/
+# cp ../lib/psinc.lib $dst/
 
 cp /opt/qt5-win-x64/bin/Qt5Core.dll $dst/
 cp /opt/qt5-win-x64/bin/Qt5Gui.dll $dst/
@@ -32,7 +32,7 @@ mkdir -p $dst/include
 mkdir -p $dst/lib
 
 cp -r ../include/psinc $dst/include/
-cp ../lib/psinc.dll $dst/lib/
+# cp ../lib/psinc.dll $dst/lib/
 cp ../lib/psinc.lib $dst/lib/
 
 7z a $dst-`cat version`.7z $dst
