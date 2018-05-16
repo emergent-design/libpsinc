@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
 	#ifdef __linux__
 		Log::Initialise({ unique_ptr<logger::Sink>(new logger::Console()) });
-	#elif
+	#else
     	Log::Initialise({ unique_ptr<logger::Sink>(new logger::LogFile("iconograph.log")) });
 	#endif
 
