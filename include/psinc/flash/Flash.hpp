@@ -126,7 +126,21 @@ namespace psinc
 				// Gets and sets the "time on" values for continuous mode
 				std::array<uint16_t, 4> Continuous(uint8_t address)									{ return Read<4>(address, HPFC01::TimeOnContinuous); }
 				bool Continuous(uint8_t address, const std::array<uint16_t, 4> &values)				{ return Write(address, HPFC01::TimeOnContinuous, values); }
-				bool EnableContinuous(uint8_t address, bool enable)									{ return Write<1>(address, HPFC01::Config1, { uint16_t(enable ? 0x01 : 0x00) }); }
+
+
+				bool EnableContinuous(uint8_t address, bool enable) { return SetBit(address, HPFC01::Config1, HPFC01::Configuration::Continuous, enable); }
+
+				// Only applicable in continuous mode, changes the timing for camera triggering to reduce power consumption where appropriate
+				bool EnablePreemptiveTiming(uint8_t address, bool enable) { return SetBit(address, HPFC01::Config1, HPFC01::Configuration::PreemptiveTiming, enable); }
+
+
+				// Applicable when not in continuous mode. Switches the triggering polarity so that the flash is triggered on falling edge instead of rising.
+				bool EnableFallingEdge(uint8_t address, bool enable) { return SetBit(address, HPFC01::Config1, HPFC01::Configuration::FallingEdge, enable); }
+
+
+				// Expert mode for setting Config1 - will override all bits in the configuration with the given value
+				bool SetConfiguration(uint8_t address, uint16_t value) { return Write<1>(address, HPFC01::Config1, { value }); }
+
 
 
 				// First value is the driver temperature, second value is the LED board temperature. Both are in degrees Celsius.
@@ -200,6 +214,16 @@ namespace psinc
 
 
 			private:
+
+
+				bool SetBit(uint8_t address, uint8_t registerAddress, uint8_t mask, bool value)
+				{
+					auto current	= this->Read<1>(address, registerAddress);
+					current[0]		= value ? (current[0] | mask) : (current[0] & ~mask);
+
+					return this->Write<1>(address, registerAddress, current);
+				}
+
 
 				template <size_t N> bool Write(uint8_t address, uint8_t registerAddress, const std::array<uint16_t, N> &values)
 				{

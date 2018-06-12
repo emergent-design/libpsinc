@@ -38,6 +38,18 @@ namespace psinc
 			static const uint8_t LedHardware		= 0x5a;		// LED board hardware version
 			static const uint8_t LedExtHardware		= 0x5b;	 	// LED board hardware extension version
 			static const uint8_t LedID				= 0x5c;		// LED board ID low byte - subsequent 3 addresses are remaining bytes of ID
+
+
+			// Bit masks for configuration register Config1
+			struct Configuration
+			{
+				static const uint16_t Continuous		= 0b00000001;
+				static const uint16_t PreemptiveTiming	= 0b00000010;
+				static const uint16_t FallingEdge		= 0b00000100;
+			};
 		};
 	}
 }
+
+
+
