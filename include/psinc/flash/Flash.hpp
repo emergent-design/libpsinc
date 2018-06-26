@@ -49,12 +49,16 @@ namespace psinc
 						{
 							if (sp_get_port_transport(*port) == SP_TRANSPORT_USB)
 							{
-								auto id = emg::String::trim(sp_get_port_usb_serial(*port), ' ');
-
-								if (std::regex_match(id, std::regex(serial)))
+								auto name = sp_get_port_usb_serial(*port);
+								if (name)
 								{
-									result = sp_get_port_name(*port);
-									break;
+									auto id = emg::String::trim(name, ' ');
+
+									if (std::regex_match(id, std::regex(serial)))
+									{
+										result = sp_get_port_name(*port);
+										break;
+									}
 								}
 							}
 						}
