@@ -1,3 +1,9 @@
+libpsinc0 (0.1.18) unstable; urgency=medium
+
+  * Fixes for the Flash helper
+
+ -- Dan <dan@kryten>  Wed, 04 Jul 2018 21:17:01 +0100
+
 libpsinc0 (0.1.17) unstable; urgency=medium
 
   * Iconograph modifications:
