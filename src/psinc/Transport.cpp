@@ -86,10 +86,11 @@ namespace psinc
 
 			if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED && !this->handle)
 			{
-				if (this->Claim(device) && this->onConnection)
-				{
-					this->onConnection(true);
-				}
+				this->pending.push(device);
+				// if (this->Claim(device) && this->onConnection)
+				// {
+				// 	this->onConnection(true);
+				// }
 			}
 		}
 	}
@@ -122,6 +123,15 @@ namespace psinc
 
 		struct timeval tv = { 0, time * 1000 };
 		libusb_handle_events_timeout_completed(this->context, &tv, nullptr);
+
+		while (!this->pending.empty())
+		{
+			if (this->Claim(this->pending.front()) && this->onConnection)
+			{
+				this->onConnection(true);
+			}
+			this->pending.pop();
+		}
 	}
 
 

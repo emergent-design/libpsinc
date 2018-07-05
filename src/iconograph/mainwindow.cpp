@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 	this->handler.Initialise(this->image);
 	this->hdrHandler.Initialise(this->hdrImage);
-	this->camera.Initialise("", [&](bool c) { emit connectionChanged(c); }, 50);
+    this->camera.Initialise("", [&](bool c) { emit connectionChanged(c); }, 50);
 
 	this->Grab();
 }

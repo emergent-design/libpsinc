@@ -134,6 +134,8 @@ namespace psinc
 			/// Storage for the registered callback (if required)
 			std::function<void(bool)> onConnection = nullptr;
 
+			std::queue<libusb_device *> pending;
+
 			// Windows does not yet support hotplugging so adapt accordingly
 			bool legacy 		= false;
 			bool legacyAlert	= false;
