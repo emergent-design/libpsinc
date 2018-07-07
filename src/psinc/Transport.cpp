@@ -126,7 +126,7 @@ namespace psinc
 
 		while (!this->pending.empty())
 		{
-			if (this->Claim(this->pending.front()) && this->onConnection)
+			if (!this->handle && this->Claim(this->pending.front()) && this->onConnection)
 			{
 				this->onConnection(true);
 			}
