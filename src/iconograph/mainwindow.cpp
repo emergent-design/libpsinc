@@ -177,6 +177,10 @@ void MainWindow::Grab()
 		{
 			emit imageGrabbed(this->Convert());
 		}
+		else
+		{
+			this->droppedCount++;
+		}
 
 		if (this->restartGrab)
 		{
@@ -213,7 +217,7 @@ void MainWindow::onGrab(QImage *image)
 
 		if (duration_cast<milliseconds>(steady_clock::now() - this->last).count() >= 5000)
 		{
-			this->ui->status->showMessage(QString::fromStdString(String::format("Camera connected (%.1f fps)", 0.2 * this->frameCount)));
+			this->ui->status->showMessage(QString::fromStdString(String::format("Camera connected (%.1f fps, %d dropped)", 0.2 * this->frameCount, this->droppedCount)));
 			this->frameCount	= 0;
 			this->last			= steady_clock::now();
 		}
@@ -228,7 +232,8 @@ void MainWindow::onConnection(bool connected)
 {
 	if (connected != this->connected)
 	{
-		this->connected = connected;
+		this->droppedCount	= 0;
+		this->connected		= connected;
 
 		if (connected)
 		{

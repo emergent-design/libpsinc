@@ -116,6 +116,7 @@ class MainWindow : public QMainWindow
 //		Map<byte> mapper;
 
 		int frameCount		= 0;
+		int droppedCount	= 0;
 		byte context		= 0;
 		bool stream			= true;
 		bool connected		= false;
