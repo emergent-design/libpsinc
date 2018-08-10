@@ -69,6 +69,8 @@ class MainWindow : public QMainWindow
 		void on_zoomButton_toggled(bool checked);
 		void on_selectButton_toggled(bool checked);
 
+		void on_spinBox_valueChanged(int value);
+
 	signals:
 
 		void connectionChanged(bool connected);

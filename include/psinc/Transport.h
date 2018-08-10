@@ -33,6 +33,9 @@ namespace psinc
 			bool Initialise(const std::set<uint16_t> &vendors, uint16_t product, std::string serial, std::function<void(bool)> onConnection, int timeout = 500);
 
 
+			void SetTimeout(int timeout);
+
+
 			/// Poll to allow hotplug detection to work.
 			void Poll(int time);
 
@@ -136,9 +139,12 @@ namespace psinc
 
 			std::queue<libusb_device *> pending;
 
+			// Disconnection can happen for a number of reasons so use a flag to indicate
+			// that the onConnection event requires triggering at the next opportunity.
+			bool disconnect = false;
+
 			// Windows does not yet support hotplugging so adapt accordingly
-			bool legacy 		= false;
-			bool legacyAlert	= false;
+			bool legacy = false;
 
 			/// Allows an internal global function to push onto the pending queue
 			friend int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data);

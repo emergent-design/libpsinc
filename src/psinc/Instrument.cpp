@@ -172,4 +172,10 @@ namespace psinc
 
 		return this->transport.Transfer(&command, nullptr, waiting);
 	}
+
+
+	void Instrument::SetTimeout(int timeout)
+	{
+		this->transport.SetTimeout(timeout);
+	}
 }

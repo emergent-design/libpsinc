@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 	this->handler.Initialise(this->image);
 	this->hdrHandler.Initialise(this->hdrImage);
-    this->camera.Initialise("", [&](bool c) { emit connectionChanged(c); }, 50);
+    this->camera.Initialise("", [&](bool c) { emit connectionChanged(c); }, 200);
 
 	this->Grab();
 }
@@ -438,7 +438,12 @@ void MainWindow::on_resetButton_clicked()
 		case 5:	this->camera.Reset(ResetLevel::ImagingSoft);	this->UpdateUi();	break;
 		case 6:	this->camera.Reset(ResetLevel::Io);									break;
 	}
+}
 
+
+void MainWindow::on_spinBox_valueChanged(int value)
+{
+	this->camera.SetTimeout(value);
 }
 
 
@@ -466,6 +471,8 @@ void MainWindow::on_resetButton_clicked()
 //{
 //	this->ui->lensCheck->setChecked(false);
 //}
+
+
 
 
 

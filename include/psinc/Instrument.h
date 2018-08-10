@@ -66,6 +66,9 @@ namespace psinc
 			/// Resets the instrument.
 			bool Reset(ResetLevel level = ResetLevel::Connection);
 
+			/// Set the timeout for the underlying transport layer
+			void SetTimeout(int timeout);
+
 
 			/// Retrieve list of all serial numbers for any connected instruments of the given type
 			static std::map<std::string, std::string> List(uint16_t product = Type::Camera, const std::set<uint16_t> &vendors = Vendors::All);
