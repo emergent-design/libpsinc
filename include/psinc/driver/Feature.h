@@ -27,8 +27,12 @@ namespace psinc
 			/// @param[in] parent Pointer to the parent register (if there is one)
 			Feature(pugi::xml_node configuration, Register *parent);
 
+			/// Check if a particular value is valid for this feature. Useful if a previous Set function
+			/// has failed to distinguish an invalid value from a communications problem.
+			bool Valid(int value);
 
 			/// Set the value of this feature. Will return false if the supplied value is out of range
+			/// or communication with the camera failed
 			virtual bool Set(int value);
 
 			/// Set to the minimum value for this feature
@@ -36,6 +40,10 @@ namespace psinc
 
 			/// Set to the maximum value for this feature
 			bool SetHigh();
+
+			/// Set to the default value - same as the Reset() function but returns a bool
+			/// instead to indicate whether or not the set succeeded.
+			bool SetDefault();
 
 			/// Treat this feature as a flag and set to minimum if false and maximum if true
 			bool Set(bool high);

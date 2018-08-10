@@ -298,28 +298,26 @@ namespace psinc
 		auto &alias	= this->aliases[context];
 		int mx		= alias.columnStart->Minimum();
 		int my		= alias.rowStart->Minimum();
-
-		alias.columnStart->Set(mx + x);
-		alias.rowStart->Set(my + y);
+		bool result = alias.columnStart->Set(mx + x) && alias.rowStart->Set(my + y);
 
 		if (this->sizeByRange)
 		{
-			if (width < 0)	alias.columnEnd->Reset();
-			else			alias.columnEnd->Set(mx + x + width - 1);
+			if (width < 0)	result &= alias.columnEnd->Reset();
+			else			result &= alias.columnEnd->Set(mx + x + width - 1);
 
-			if (height < 0)	alias.rowEnd->Reset();
-			else			alias.rowEnd->Set(my + y + height - 1);
+			if (height < 0)	result &= alias.rowEnd->Reset();
+			else			result &= alias.rowEnd->Set(my + y + height - 1);
 		}
 		else
 		{
-			if (width < 0)	alias.width->Reset();
-			else			alias.width->Set(width);
+			if (width < 0)	result &= alias.width->Reset();
+			else			result &= alias.width->Set(width);
 
-			if (height < 0)	alias.height->Reset();
-			else			alias.height->Set(height);
+			if (height < 0)	result &= alias.height->Reset();
+			else			result &= alias.height->Set(height);
 		}
 
-		return true;
+		return result;
 	}
 
 

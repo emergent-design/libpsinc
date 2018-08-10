@@ -55,19 +55,22 @@ namespace psinc
 
 		if (this->value != updated)
 		{
-			this->value = updated;
-
 			Buffer<byte> data = {
 				0x00, 0x00, 0x00, 0x00, 0x00, 			// Header
 				Commands::WriteRegister, 				// Command
 				(byte)(this->address & 0xff),
 				(byte)((this->address >> 8) & 0xff),
-				(byte)(this->value & 0xff),
-				(byte)((this->value >> 8) & 0xff),
+				(byte)(updated & 0xff),
+				(byte)((updated >> 8) & 0xff),
 				0xff									// Terminator
 			};
 
-			return this->transport->Transfer(&data, nullptr, waiting);
+			if (!this->transport->Transfer(&data, nullptr, waiting))
+			{
+				return false;
+			}
+
+			this->value = updated;
 		}
 
 		return true;
@@ -82,15 +85,18 @@ namespace psinc
 
 		if (this->value != updated)
 		{
-			this->value = updated;
-
 			Buffer<byte> data = {
 				0x00, 0x00, 0x00, 0x00, 0x00,
 				Commands::WriteBit, (byte)(this->address & 0xff), (byte)((this->address >> 8) & 0xff), (byte)offset, (byte)((value ? 1 : 0)),
 				0xff
 			};
 
-			return this->transport->Transfer(&data, nullptr, waiting);
+			if (!this->transport->Transfer(&data, nullptr, waiting))
+			{
+				return false;
+			}
+
+			this->value = updated;
 		}
 
 		return true;

@@ -419,10 +419,13 @@ void MainWindow::on_saveHdrButton_clicked()
 
 void MainWindow::on_regionButton_clicked()
 {
-	this->camera.SetWindow(0,
+	if (!this->camera.SetWindow(0,
 		this->ui->xRegionBox->value(), this->ui->yRegionBox->value(),
 		this->ui->widthRegionBox->value(), this->ui->heightRegionBox->value()
-	);
+	))
+	{
+		Log::Error("Failed to set window region parameters");
+	}
 }
 
 

@@ -65,9 +65,15 @@ namespace psinc
 	}
 
 
+	bool Feature::Valid(int value)
+	{
+		return value >= this->minimum && value <= this->maximum && !this->invalid.count(value);
+	}
+
+
 	bool Feature::Set(int value)
 	{
-		if (this->parent && !this->readonly && !this->invalid.count(value))
+		if (this->parent && !this->readonly && this->Valid(value))
 		{
 			return this->flag
 				? this->parent->SetBit(this->offset, value)
@@ -87,6 +93,12 @@ namespace psinc
 	bool Feature::SetHigh()
 	{
 		return this->Set(this->maximum);
+	}
+
+
+	bool Feature::SetDefault()
+	{
+		return this->Set(this->defaultValue);
 	}
 
 
@@ -116,8 +128,7 @@ namespace psinc
 
 	int Feature::Reset()
 	{
-		this->Set(this->defaultValue);
-		return this->defaultValue;
+		return this->Set(this->defaultValue) ? this->defaultValue : this->Get();
 	}
 
 
