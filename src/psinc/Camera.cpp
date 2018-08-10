@@ -302,19 +302,19 @@ namespace psinc
 
 		if (this->sizeByRange)
 		{
-			if (width < 0)	result &= alias.columnEnd->Reset();
-			else			result &= alias.columnEnd->Set(mx + x + width - 1);
+			if (width < 0)	result = result && alias.columnEnd->SetDefault();
+			else			result = result && alias.columnEnd->Set(mx + x + width - 1);
 
-			if (height < 0)	result &= alias.rowEnd->Reset();
-			else			result &= alias.rowEnd->Set(my + y + height - 1);
+			if (height < 0)	result = result && alias.rowEnd->SetDefault();
+			else			result = result && alias.rowEnd->Set(my + y + height - 1);
 		}
 		else
 		{
-			if (width < 0)	result &= alias.width->Reset();
-			else			result &= alias.width->Set(width);
+			if (width < 0)	result = result && alias.width->SetDefault();
+			else			result = result && alias.width->Set(width);
 
-			if (height < 0)	result &= alias.height->Reset();
-			else			result &= alias.height->Set(height);
+			if (height < 0)	result = result && alias.height->SetDefault();
+			else			result = result && alias.height->Set(height);
 		}
 
 		return result;
