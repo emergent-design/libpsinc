@@ -71,6 +71,8 @@ class MainWindow : public QMainWindow
 
 		void on_spinBox_valueChanged(int value);
 
+		void on_sampleQuality_toggled(bool checked);
+
 	signals:
 
 		void connectionChanged(bool connected);
@@ -125,13 +127,14 @@ class MainWindow : public QMainWindow
 		bool portrait		= false;
 		bool switchMode		= false;
 		bool restartGrab	= false;
+		bool sampleQuality	= false;	// Enable line quality sampling
 
 		Hdr hdrMode			= Hdr::Simple;
 		int rangeStart		= 0;
 		int rangeWindow		= 4096;
 
-		std::chrono::time_point<std::chrono::steady_clock> last = std::chrono::steady_clock::now();
-		std::chrono::time_point<std::chrono::steady_clock> rateLast = std::chrono::steady_clock::now();
+		std::chrono::time_point<std::chrono::steady_clock> last			= std::chrono::steady_clock::now();
+		std::chrono::time_point<std::chrono::steady_clock> rateLast		= std::chrono::steady_clock::now();
 
 		long rateLimit		= 40000;
 		bool rateEnabled	= true;
