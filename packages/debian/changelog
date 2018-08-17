@@ -1,3 +1,13 @@
+libpsinc0 (0.1.21) unstable; urgency=medium
+
+  * Improvement in disconnection event handling.
+  * Added ability to change the transport layer timeout.
+  * Fixed bug with register setting.
+  * Added Valid and SetDefault helper functions to Feature.
+  * SetWindow function for Camera now checks for success.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 17 Aug 2018 10:56:37 +0100
+
 libpsinc0 (0.1.20) unstable; urgency=medium
 
   * Fix issue where the handle gets overwritten when trying to claim other 
