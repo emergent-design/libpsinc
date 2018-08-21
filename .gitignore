@@ -30,4 +30,5 @@ obj/
 
 psinc.workspace.*
 compilation.db
-
+*.AppImage
+*.stash

@@ -90,3 +90,27 @@ deploy-packages:
     - cd packages
     - scp *.deb jenkins@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/ubuntu/
     - scp *.7z jenkins@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/windows/
+
+package-appimage:
+  image: emergent:xenial
+  stage: build
+  only:
+    - web
+  before_script:
+    - dpkg -i /packages/xenial/oss/libemergent-dev.deb
+  script:
+    - premake5 gmake
+    - make -j4
+    - qmake -o iconograph.make CONFIG+=release iconograph.pro
+    - make -f iconograph.make -j4
+    - cd packages
+    - mkdir -p appdir/usr/bin
+    - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+    - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+    - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+    - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/iconograph.desktop -bundle-non-qt-libs
+    - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/iconograph.desktop -appimage
+    # - cp Iconograph-x86_64.AppImage /packages/xenial/oss/
+  artifacts:
+    paths:
+      - packages/*.AppImage
