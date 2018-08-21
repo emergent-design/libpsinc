@@ -103,14 +103,20 @@ package-appimage:
     - make -j4
     - qmake -o iconograph.make CONFIG+=release iconograph.pro
     - make -f iconograph.make -j4
+    - mkdir -p packages/appdir/usr/bin
+    - mkdir -p packages/appdir/usr/lib
+    - cp bin/iconograph packages/appdir/usr/bin/
+    - cp lib/libpsinc.so packages/appdir/usr/lib/libpsinc.so.0
     - cd packages
-    - mkdir -p appdir/usr/bin
     - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
     - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-    - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-    - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/iconograph.desktop -bundle-non-qt-libs
-    - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/iconograph.desktop -appimage
+    - ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
+    - unset QTDIR; unset QT_PLUGIN_PATH; unset LD_LIBRARY_PATH
+    - squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -bundle-non-qt-libs
+    - squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -appimage
     # - cp Iconograph-x86_64.AppImage /packages/xenial/oss/
   artifacts:
     paths:
       - packages/*.AppImage
+
+
