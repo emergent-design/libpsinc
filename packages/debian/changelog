@@ -1,3 +1,9 @@
+libpsinc0 (0.1.22) unstable; urgency=medium
+
+  * Additional information when logging a transport error.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Wed, 17 Oct 2018 12:06:45 +0100
+
 libpsinc0 (0.1.21) unstable; urgency=medium
 
   * Improvement in disconnection event handling.

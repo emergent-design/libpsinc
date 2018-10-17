@@ -330,9 +330,9 @@ namespace psinc
 	{
 		if (buffer)
 		{
-			int transferred;
-			bool result	= false;
-			int err		= libusb_bulk_transfer(this->handle, write ? WRITE_PIPE : READ_PIPE, *buffer, buffer->Size(), &transferred, this->timeout);
+			int transferred	= 0;
+			bool result		= false;
+			int err			= libusb_bulk_transfer(this->handle, write ? WRITE_PIPE : READ_PIPE, *buffer, buffer->Size(), &transferred, this->timeout);
 
 			if (!err)
 			{
@@ -363,7 +363,7 @@ namespace psinc
 			}
 			else
 			{
-				Log::Error("%u: USB device %s - %s (%d) when %s", Timestamp::LogTime(), this->id, libusb_error_name(err), err, write ? "writing" : "reading");
+				Log::Error("%u: USB device %s - %s (%d) when %s (%d bytes transferred)", Timestamp::LogTime(), this->id, libusb_error_name(err), err, write ? "writing" : "reading", transferred);
 			}
 
 			return result;
