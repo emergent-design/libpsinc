@@ -282,7 +282,7 @@ namespace psinc
 					*(uint16_t *)(buffer + 3)	= value;
 					*(uint16_t *)(buffer + 5)	= CRC(buffer);
 
-					if (!Check(sp_blocking_write(this->serial, buffer, 7, 50), 7, "write"))
+					if (!Check(sp_blocking_write(this->serial, buffer, 7, 50), 7))
 					{
 						return false;
 					}
@@ -295,7 +295,7 @@ namespace psinc
 				{
 					uint8_t buffer[7] = { 0 };
 
-					if (!Check(sp_blocking_read(this->serial, buffer, 7, 50), 7, "read"))
+					if (!Check(sp_blocking_read(this->serial, buffer, 7, 50), 7))
 					{
 						return false;
 					}
@@ -305,15 +305,13 @@ namespace psinc
 				}
 
 
-				bool Check(sp_return result, int expected, const char *which)
+				bool Check(sp_return result, int expected)
 				{
 					if ((int)result == expected)
 					{
 						this->errors = 0;
 						return true;
 					}
-
-					// emg::Log::Error("Flash control %s error: %s", which, sp_last_error_message());
 
 					if (++this->errors > 4)
 					{
