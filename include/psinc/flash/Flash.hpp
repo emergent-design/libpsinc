@@ -307,11 +307,23 @@ namespace psinc
 
 				bool Check(sp_return result, int expected, const char *which)
 				{
-					if ((int)result == expected) return true;
+					if ((int)result == expected)
+					{
+						this->errors = 0;
+						return true;
+					}
 
-					emg::Log::Error("Flash control %s error: %s", which, sp_last_error_message());
+					// emg::Log::Error("Flash control %s error: %s", which, sp_last_error_message());
 
-					this->Free();
+					if (++this->errors > 4)
+					{
+						emg::Log::Error(
+							"Multiple errors reading/writing to flash on '%s', attempting reconnection",
+							this->connection.c_str()
+						);
+
+						this->Free();
+					}
 
 					return false;
 				}
@@ -386,6 +398,7 @@ namespace psinc
 
 				sp_port *serial = nullptr;
 				uint8_t empty	= 0;
+				int errors		= 0;
 
 				std::string connection;
 				emg::Timer last;
