@@ -1,7 +1,9 @@
 #pragma once
 
 #include <psinc/handlers/DataHandler.hpp>
-#include <psinc/handlers/Decoder.hpp>
+#include <psinc/handlers/helpers/Bayer.hpp>
+#include <psinc/handlers/helpers/Monochrome.hpp>
+// #include <psinc/handlers/helpers/Filter.hpp>
 #include <emergent/image/Image.hpp>
 
 
@@ -15,19 +17,25 @@ namespace psinc
 	{
 		public:
 
+			struct Configuration
+			{
+				bool forceBayer = false;
+				// Filter::Configuration filter;
+			};
+
 			ImageHandler() {}
 
 
-			ImageHandler(emg::ImageBase<T> &image, bool forceBayer = false)
+			ImageHandler(emg::ImageBase<T> &image, const Configuration &configuration = {})
 			{
-				this->Initialise(image, forceBayer);
+				this->Initialise(image, configuration);
 			}
 
 
-			void Initialise(emg::ImageBase<T> &image, bool forceBayer = false)
+			void Initialise(emg::ImageBase<T> &image, const Configuration &configuration = {})
 			{
 				this->image			= &image;
-				this->forceBayer	= forceBayer;
+				this->configuration	= configuration;
 			}
 
 
@@ -39,10 +47,10 @@ namespace psinc
 			}
 
 
-			virtual bool Process(bool monochrome, bool hdr, emg::Buffer<byte> &data, int width, int height, byte bayerMode)
+			bool Process(bool monochrome, bool hdr, emg::Buffer<byte> &data, int width, int height, byte bayerMode) override
 			{
 				// Allow the monochrome flag to be overridden - could have unexpected effects.
-				if (this->forceBayer) monochrome = false;
+				if (configuration.forceBayer) monochrome = false;
 
 				int w = monochrome ? width : width - 4;
 				int h = monochrome ? height : height - 4;
@@ -54,16 +62,18 @@ namespace psinc
 
 					if (hdr)
 					{
-						if (monochrome)			Decoder::Mono((uint16_t *)data.Data(), this->image->Data(), width, height, depth, this->shiftBits);
-						else if (depth == 3)	Decoder::BayerColour((uint16_t *)data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
-						else					Decoder::BayerGrey((uint16_t *)data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
+						if (monochrome)			Monochrome::Decode((uint16_t *)data.Data(), this->image->Data(), width, height, depth, this->shiftBits);
+						else if (depth == 3)	Bayer::Colour((uint16_t *)data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
+						else					Bayer::Grey((uint16_t *)data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
 					}
 					else
 					{
-						if (monochrome)			Decoder::Mono(data.Data(), this->image->Data(), width, height, depth, this->shiftBits);
-						else if (depth == 3)	Decoder::BayerColour(data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
-						else					Decoder::BayerGrey(data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
+						if (monochrome)			Monochrome::Decode(data.Data(), this->image->Data(), width, height, depth, this->shiftBits);
+						else if (depth == 3)	Bayer::Colour(data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
+						else					Bayer::Grey(data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
 					}
+
+					// Filter::Process(this->configuration.filter, *this->image);
 
 					return true;
 				}
@@ -73,8 +83,8 @@ namespace psinc
 
 		protected:
 
-			emg::ImageBase<T> *image	= nullptr;
-			bool forceBayer				= false;
+			emg::ImageBase<T> *image = nullptr;
+			Configuration configuration;
 
 
 			// If dealing with HDR data, then apply this bit shift to incoming data

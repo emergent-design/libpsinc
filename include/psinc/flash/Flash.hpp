@@ -203,6 +203,12 @@ namespace psinc
 				}
 
 
+				uint16_t Config(uint8_t address)
+				{
+					return Read<1>(address, HPFC01::Config1)[0];
+				}
+
+
 				// Hardware version and ID of LED board
 				std::string LedHardware(uint8_t address)
 				{
