@@ -1,3 +1,9 @@
+libpsinc0 (0.1.25) unstable; urgency=medium
+
+  * Fix for mingw builds
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Thu, 21 Feb 2019 14:14:58 +0000
+
 libpsinc0 (0.1.24) unstable; urgency=medium
 
   * Flash helper now converts connection string to a canonical path (so that symlinks can be used).
