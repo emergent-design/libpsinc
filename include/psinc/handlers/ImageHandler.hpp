@@ -38,6 +38,12 @@ namespace psinc
 				this->configuration	= configuration;
 			}
 
+			void Initialise(emg::ImageBase<T> &image, bool forceBayer)
+			{
+				this->image = &image;
+				this->configuration.forceBayer = forceBayer;
+			}
+
 
 			// Set the amount of bitshifting (right) to perform when dealing with HDR data
 			// stored to byte image.

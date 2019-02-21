@@ -340,7 +340,7 @@ void MainWindow::on_gainCheck_toggled(bool checked)			{ camera.aliases[context].
 void MainWindow::on_adcSlider_valueChanged(int value)		{ camera.aliases[context].adcReference->Set(value); }
 void MainWindow::on_compandingCheck_toggled(bool checked)	{ camera.aliases[context].companding->Set(checked); }
 void MainWindow::on_adcReset_clicked()						{ ui->adcSlider->setValue(camera.aliases[context].adcReference->Reset()); }
-void MainWindow::on_colourCheck_toggled(bool checked)		{ handler.Initialise(this->image, { checked }); }
+void MainWindow::on_colourCheck_toggled(bool checked)		{ handler.Initialise(this->image, checked); }
 void MainWindow::on_portraitCheck_toggled(bool checked)		{ portrait = checked; }
 void MainWindow::on_grabFrame_clicked()						{ if (!this->stream) this->Grab(); }
 void MainWindow::on_framerateSlider_valueChanged(int value)	{ rateLimit = lrint(1000000.0 / value); }
