@@ -1,7 +1,7 @@
 #pragma once
 
 #include <emergent/Maths.hpp>
-#include <future>
+#include <emergent/thread/Persistent.hpp>
 
 
 namespace psinc
@@ -163,6 +163,11 @@ namespace psinc
 			//		3: BG,GR
 			template <typename T, typename U> static void Colour(T *src, U *dst, int width, int height, byte bayerMode, uint16_t shift)
 			{
+				// This function tends to be called repeatedly, so to avoid the overhead of thread construction when using std::async
+				// it uses a persistent thread instead. The PersistentThread is used by emergent::ThreadPool but even a ThreadPool of
+				// size 1 will create another thread to manage the queue, so using the PersistentThread directly is more efficient.
+				static thread_local emg::PersistentThread thread;
+
 				// If there are not an even number of rows and columns then do not convert
 				if (width % 2 || height % 2) return;
 
@@ -170,26 +175,28 @@ namespace psinc
 				int dh	= height - 4;
 				src 	+= width + width + 2;
 
-				std::future<void> even, odd;
+				std::future<void> f;
 
 				switch (bayerMode)
 				{
-					case 0: even	= std::async(std::launch::async, [=]() { Even(src, dst, dw, dh, width, shift, true); });
-							odd		= std::async(std::launch::async, [=]() { Odd(src + width, dst + 3 * dw, dw, dh, width, shift, true); });
+					case 0: f = thread.Run([=] { Even(src, dst, dw, dh, width, shift, true); });
+							Odd(src + width, dst + 3 * dw, dw, dh, width, shift, true);
 							break;
 
-					case 1: even	= std::async(std::launch::async, [=]() { Odd(src, dst, dw, dh, width, shift, true); });
-							odd		= std::async(std::launch::async, [=]() { Even(src + width, dst + 3 * dw, dw, dh, width, shift, true); });
+					case 1: f = thread.Run([=] { Odd(src, dst, dw, dh, width, shift, true); });
+							Even(src + width, dst + 3 * dw, dw, dh, width, shift, true);
 							break;
 
-					case 2: even	= std::async(std::launch::async, [=]() { Even(src, dst, dw, dh, width, shift, false); });
-							odd		= std::async(std::launch::async, [=]() { Odd(src + width, dst + 3 * dw, dw, dh, width, shift, false); });
+					case 2: f = thread.Run([=] { Even(src, dst, dw, dh, width, shift, false); });
+							Odd(src + width, dst + 3 * dw, dw, dh, width, shift, false);
 							break;
 
-					case 3: even	= std::async(std::launch::async, [=]() { Odd(src, dst, dw, dh, width, shift, false); });
-							odd		= std::async(std::launch::async, [=]() { Even(src + width, dst + 3 * dw, dw, dh, width, shift, false); });
+					case 3: f = thread.Run([=] { Odd(src, dst, dw, dh, width, shift, false); });
+							Even(src + width, dst + 3 * dw, dw, dh, width, shift, false);
 							break;
 				}
+
+				f.wait();
 			}
 
 

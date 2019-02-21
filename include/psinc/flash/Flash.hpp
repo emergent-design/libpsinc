@@ -7,6 +7,7 @@
 #include <emergent/logger/Logger.hpp>
 #include <psinc/flash/HPFC.hpp>
 #include <libserialport.h>
+#include <experimental/filesystem>
 
 
 namespace psinc
@@ -28,9 +29,13 @@ namespace psinc
 
 
 				// Set the serial port connection string and device address, then initiate a connection
-				bool Initialise(const std::string &connection) //, uint8_t address)
+				bool Initialise(const std::string &connection)
 				{
-					this->connection = connection;
+					#ifdef __linux__
+						this->connection = std::experimental::filesystem::canonical(connection);
+					#else
+						this->connection = connection;
+					#endif
 
 					return this->Connect();
 				}

@@ -1,3 +1,10 @@
+libpsinc0 (0.1.24) unstable; urgency=medium
+
+  * Flash helper now converts connection string to a canonical path (so that symlinks can be used).
+  * Bayer decoding updated to use PersistentThread to avoid thread creation overhead of using std::async.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Thu, 21 Feb 2019 11:53:41 +0000
+
 libpsinc0 (0.1.23) unstable; urgency=medium
 
   * Changed how read/write errors are handled in the Flash helper. 
