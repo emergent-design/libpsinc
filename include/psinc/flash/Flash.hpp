@@ -183,10 +183,31 @@ namespace psinc
 				double VoltageOut(uint8_t address)					{ return Read<1>(address, HPFC01::VoltageOut)[0] * 0.001220703 / 0.135447; }
 
 				// Save the current registers to the internal EEROM so that they will persist after a power cycle.
-				bool Save(uint8_t address) { return Write<1>(address, HPFC01::Config0, { 0x02 }); }
+				bool Save(uint8_t address) { return SetBit(address, HPFC01::Config0, HPFC01::Configuration::Save, true); }
 
 				// Overwrite the current register values with those in the internal EEROM (as if it had been power cycled).
-				bool Load(uint8_t address) { return Write<1>(address, HPFC01::Config0, { 0x01 }); }
+				bool Load(uint8_t address) { return SetBit(address, HPFC01::Config0, HPFC01::Configuration::Load, true); }
+
+
+				// Enable watchdog timer and reset based on receiving communications, flash triggers or both.
+				bool Watchdog(uint8_t address, bool comms, bool trigger)
+				{
+					auto current = this->Read<1>(address, HPFC01::Config0);
+					current[0] = comms		? (current[0] | HPFC01::Configuration::WatchdogComms)	: (current[0] & ~HPFC01::Configuration::WatchdogComms);
+					current[0] = trigger	? (current[0] | HPFC01::Configuration::WatchdogTrigger) : (current[0] & ~HPFC01::Configuration::WatchdogTrigger);
+
+					return this->Write<1>(address, HPFC01::Config0, current);
+				}
+
+				// Enable alternative trigger mode - polarity controls what level the data line must be to allow triggering
+				bool AlternativeTrigger(uint8_t address, bool enable, bool polarity)
+				{
+					auto current = this->Read<1>(address, HPFC01::Config1);
+					current[0] = enable		? (current[0] | HPFC01::Configuration::AlternativeTrigger)	: (current[0] & ~HPFC01::Configuration::AlternativeTrigger);
+					current[0] = polarity	? (current[0] | HPFC01::Configuration::AlternativePolarity) : (current[0] & ~HPFC01::Configuration::AlternativePolarity);
+
+					return this->Write<1>(address, HPFC01::Config1, current);
+				}
 
 
 				// Read from an i2c device (such as the LED board) using the extension registers

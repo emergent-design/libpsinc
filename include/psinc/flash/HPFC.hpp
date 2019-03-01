@@ -40,12 +40,23 @@ namespace psinc
 			static const uint8_t LedID				= 0x5c;		// LED board ID low byte - subsequent 3 addresses are remaining bytes of ID
 
 
-			// Bit masks for configuration register Config1
+			// Bit masks for configuration registers
 			struct Configuration
 			{
-				static const uint16_t Continuous		= 0b00000001;
-				static const uint16_t PreemptiveTiming	= 0b00000010;
-				static const uint16_t FallingEdge		= 0b00000100;
+				// Config 0
+				static const uint16_t Load					= 0b00000001;
+				static const uint16_t Save					= 0b00000010;
+				static const uint16_t ClearStatus			= 0b00000100;
+				static const uint16_t WatchdogComms			= 0b00001000;
+				static const uint16_t WatchdogTrigger		= 0b00010000;
+
+				// Config 1
+				static const uint16_t Continuous			= 0b00000001;
+				static const uint16_t PreemptiveTiming		= 0b00000010;
+				static const uint16_t FallingEdge			= 0b00000100;
+
+				static const uint16_t AlternativeTrigger	= 0b00010000;	// In this mode the data line becomes a flash enable signal
+				static const uint16_t AlternativePolarity	= 0b00100000;	// Polarity of the flash enable signal
 			};
 		};
 	}
