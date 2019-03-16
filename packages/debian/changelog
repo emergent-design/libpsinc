@@ -1,3 +1,9 @@
+libpsinc0 (0.1.26) unstable; urgency=medium
+
+  * Check path exists before attempting to find the canonical path in the Flash helper.
+
+ -- Dan <dan@kryten>  Sat, 16 Mar 2019 11:17:01 +0000
+
 libpsinc0 (0.1.25) unstable; urgency=medium
 
   * Fix for mingw builds

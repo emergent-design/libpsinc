@@ -32,7 +32,10 @@ namespace psinc
 				bool Initialise(const std::string &connection)
 				{
 					#ifdef __linux__
-						this->connection = std::experimental::filesystem::canonical(connection);
+						if (std::experimental::filesystem::exists(connection))
+						{
+							this->connection = std::experimental::filesystem::canonical(connection);
+						}
 					#else
 						this->connection = connection;
 					#endif
@@ -382,27 +385,30 @@ namespace psinc
 				{
 					this->Free();
 
-					if (sp_get_port_by_name(this->connection.c_str(), &this->serial) == SP_OK)
+					if (!this->connection.empty())
 					{
-						if (sp_open(this->serial, SP_MODE_READ_WRITE) == SP_OK)
+						if (sp_get_port_by_name(this->connection.c_str(), &this->serial) == SP_OK)
 						{
-							sp_set_baudrate(this->serial, 9600);
-							sp_set_bits(this->serial, 8);
-							sp_set_parity(this->serial, SP_PARITY_NONE);
-							sp_set_stopbits(this->serial, 1);
-							sp_set_flowcontrol(this->serial, SP_FLOWCONTROL_NONE);
+							if (sp_open(this->serial, SP_MODE_READ_WRITE) == SP_OK)
+							{
+								sp_set_baudrate(this->serial, 9600);
+								sp_set_bits(this->serial, 8);
+								sp_set_parity(this->serial, SP_PARITY_NONE);
+								sp_set_stopbits(this->serial, 1);
+								sp_set_flowcontrol(this->serial, SP_FLOWCONTROL_NONE);
 
-							sp_set_dtr(this->serial, SP_DTR_OFF);
-							sp_set_rts(this->serial, SP_RTS_OFF);
+								sp_set_dtr(this->serial, SP_DTR_OFF);
+								sp_set_rts(this->serial, SP_RTS_OFF);
 
-							sp_flush(this->serial, SP_BUF_BOTH);
+								sp_flush(this->serial, SP_BUF_BOTH);
 
-							emg::Log::Info("Flash control connected on '%s'", this->connection);
-						}
-						else
-						{
-							sp_free_port(this->serial);
-							this->serial = nullptr;
+								emg::Log::Info("Flash control connected on '%s'", this->connection);
+							}
+							else
+							{
+								sp_free_port(this->serial);
+								this->serial = nullptr;
+							}
 						}
 					}
 
