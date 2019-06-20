@@ -336,6 +336,19 @@ namespace psinc
 					}
 
 					value = *(uint16_t *)(buffer + 3);
+
+
+					if (CRC(buffer) != *(uint16_t *)(buffer + 5))
+					{
+						emg::Log::Error(
+							"CRC error reading from flash on '%s' - %d != %d",
+							this->connection.c_str(),
+							CRC(buffer), *(uint16_t *)(buffer + 5)
+						);
+
+						return false;
+					}
+
 					return true;
 				}
 
