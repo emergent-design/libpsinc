@@ -22,6 +22,15 @@ namespace psinc
 		{
 			public:
 
+				struct Status
+				{
+					long write		= 0;	// Number of writes
+					long read		= 0;	// Number of reads
+					long crc		= 0;	// Number of CRC errors during read
+					long errors		= 0;	// Number of read/write errors
+				};
+
+
 				~Flash()
 				{
 					this->Free();
@@ -251,6 +260,9 @@ namespace psinc
 					return emg::String::format("%04x%04x%04x%04x", values[3], values[2], values[1], values[0]);
 				}
 
+				Status GetStatus()	{ return this->status; }
+				void ResetStatus()	{ this->status = {}; }
+
 
 			private:
 
@@ -313,12 +325,14 @@ namespace psinc
 
 				bool Write(uint8_t address, uint8_t registerAddress, uint16_t value, bool set)
 				{
+					this->status.write++;
 					uint8_t buffer[7]			= { address, 0, set ? uint8_t(registerAddress ^ 0x80) : registerAddress };
 					*(uint16_t *)(buffer + 3)	= value;
 					*(uint16_t *)(buffer + 5)	= CRC(buffer);
 
 					if (!Check(sp_blocking_write(this->serial, buffer, 7, 50), 7))
 					{
+						this->status.errors++;
 						return false;
 					}
 
@@ -328,10 +342,12 @@ namespace psinc
 
 				bool Read(uint16_t &value)
 				{
+					this->status.read++;
 					uint8_t buffer[7] = { 0 };
 
 					if (!Check(sp_blocking_read(this->serial, buffer, 7, 50), 7))
 					{
+						this->status.errors++;
 						return false;
 					}
 
@@ -340,12 +356,7 @@ namespace psinc
 
 					if (CRC(buffer) != *(uint16_t *)(buffer + 5))
 					{
-						emg::Log::Error(
-							"CRC error reading from flash on '%s' - %d != %d",
-							this->connection.c_str(),
-							CRC(buffer), *(uint16_t *)(buffer + 5)
-						);
-
+						this->status.crc++;
 						return false;
 					}
 
@@ -449,8 +460,11 @@ namespace psinc
 				uint8_t empty	= 0;
 				int errors		= 0;
 
+
+
 				std::string connection;
 				emg::Timer last;
+				Status status;
 		};
 
 	}
