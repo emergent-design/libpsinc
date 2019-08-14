@@ -208,7 +208,12 @@ namespace psinc
 					{
 						if (libusb_claim_interface(this->handle, 0) == 0)
 						{
-							Log::Info("%u: USB device claimed - %s", Timestamp::LogTime(), this->id);
+							Log::Info(
+								"%u: USB (v%d.%d) device claimed - %s",
+								Timestamp::LogTime(),
+								(descriptor.bcdUSB >> 8) & 0xff,
+								descriptor.bcdUSB & 0xff,
+								this->id);
 							return true;
 						}
 					}
