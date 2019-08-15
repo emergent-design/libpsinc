@@ -241,9 +241,9 @@ namespace psinc
 				}
 
 
-				uint16_t Config(uint8_t address)
+				std::array<uint16_t, 2> Config(uint8_t address)
 				{
-					return Read<1>(address, HPFC01::Config1)[0];
+					return Read<2>(address, HPFC01::Config0);
 				}
 
 
