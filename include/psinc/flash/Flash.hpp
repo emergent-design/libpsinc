@@ -30,6 +30,14 @@ namespace psinc
 					long errors		= 0;	// Number of read/write errors
 				};
 
+				// template <size_t N> struct Result
+				// {
+				// 	bool success					= false;
+				// 	std::array<uint16_t, N> data	= { 0 };
+				// };
+
+				template <size_t N> using Result = std::tuple<bool, std::array<uint16_t, N>>;
+
 
 				~Flash()
 				{
@@ -141,12 +149,12 @@ namespace psinc
 
 
 				// Gets and sets the "time on" values of banks 1-4 for the given quick select group
-				std::array<uint16_t, 4> Group(uint8_t address, uint8_t group)						{ return group < 0x10 ? Read<4>(address, HPFC01::TimeOnStart + (group << 2)) : std::array<uint16_t, 4>(); }
+				Result<4> Group(uint8_t address, uint8_t group)										{ return group < 0x10 ? Read<4>(address, HPFC01::TimeOnStart + (group << 2)) : Result<4>(); }
 				bool Group(uint8_t address, uint8_t group, const std::array<uint16_t, 4> &values)	{ return group < 0x10 ? Write(address, HPFC01::TimeOnStart + (group << 2), values) : false; }
 
 				// Gets and sets the "time on" values for continuous mode
-				std::array<uint16_t, 4> Continuous(uint8_t address)									{ return Read<4>(address, HPFC01::TimeOnContinuous); }
-				bool Continuous(uint8_t address, const std::array<uint16_t, 4> &values)				{ return Write(address, HPFC01::TimeOnContinuous, values); }
+				Result<4> Continuous(uint8_t address)										{ return Read<4>(address, HPFC01::TimeOnContinuous); }
+				bool Continuous(uint8_t address, const std::array<uint16_t, 4> &values)		{ return Write(address, HPFC01::TimeOnContinuous, values); }
 
 
 				bool EnableContinuous(uint8_t address, bool enable) { return SetBit(address, HPFC01::Config1, HPFC01::Configuration::Continuous, enable); }
@@ -167,32 +175,46 @@ namespace psinc
 				// First value is the driver temperature, second value is the LED board temperature. Both are in degrees Celsius.
 				std::array<double, 2> Temperature(uint8_t address)
 				{
-					auto values = Read<2>(address, HPFC01::Temperature);
+					auto [success, data] = Read<2>(address, HPFC01::Temperature);
 
-					return {
-						0.00390625 * (values[0] & 0x8000 ? -1 : 1)  * (values[0] & 0x7fff),
-						0.00390625 * (values[1] & 0x8000 ? -1 : 1)  * (values[1] & 0x7fff)
-					};
+					if (success)
+					{
+						return {
+							0.00390625 * (data[0] & 0x8000 ? -1 : 1)  * (data[0] & 0x7fff),
+							0.00390625 * (data[1] & 0x8000 ? -1 : 1)  * (data[1] & 0x7fff)
+						};
+					}
+					return { 0 };
 				}
 
 
 				std::string ID(uint8_t address)
 				{
-					auto values = Read<5>(address, HPFC01::ID);
+					auto [success, data] = Read<5>(address, HPFC01::ID);
 
-					return emg::String::format("%04x%04x%04x%04x%04x", values[4], values[3], values[2], values[1], values[0]);
+					return success
+						? emg::String::format("%04x%04x%04x%04x%04x", data[4], data[3], data[2], data[1], data[0])
+						: "unknown";
 				}
 
 
 				// Sets the address of the connected device
 				bool Address(uint8_t address, uint8_t value)		{ return Write<1>(address, HPFC01::Address, { value }); }
-				std::array<uint16_t, 2> Version(uint8_t address)	{ return Read<2>(address, HPFC01::Hardware); }
-				uint8_t CurrentLevel(uint8_t address)				{ return Read<1>(address, HPFC01::CurrentLevel)[0]; }
+				Result<2> Version(uint8_t address)					{ return Read<2>(address, HPFC01::Hardware); }
+				Result<1> CurrentLevel(uint8_t address)				{ return Read<1>(address, HPFC01::CurrentLevel); }
 				bool CurrentLevel(uint8_t address, uint8_t value)	{ return Write<1>(address, HPFC01::CurrentLevel, { value }); }
-				uint8_t VoltageLevel(uint8_t address)				{ return Read<1>(address, HPFC01::VoltageLevel)[0]; }
+				Result<1> VoltageLevel(uint8_t address)				{ return Read<1>(address, HPFC01::VoltageLevel); }
 				bool VoltageLevel(uint8_t address, uint8_t value)	{ return Write<1>(address, HPFC01::VoltageLevel, { value }); }
-				double VoltageIn(uint8_t address)					{ return Read<1>(address, HPFC01::VoltageIn)[0] * 0.001220703 / 0.227053; }
-				double VoltageOut(uint8_t address)					{ return Read<1>(address, HPFC01::VoltageOut)[0] * 0.001220703 / 0.135447; }
+				double VoltageIn(uint8_t address)
+				{
+					auto [success, data] = Read<1>(address, HPFC01::VoltageIn);
+					return success ? data[0] * 0.001220703 / 0.227053 : 0;
+				}
+				double VoltageOut(uint8_t address)
+				{
+					auto [success, data] = Read<1>(address, HPFC01::VoltageOut);
+					return success ? data[0] * 0.001220703 / 0.135447 : 0;
+				}
 
 				// Save the current registers to the internal EEROM so that they will persist after a power cycle.
 				bool Save(uint8_t address) { return SetBit(address, HPFC01::Config0, HPFC01::Configuration::Save, true); }
@@ -204,33 +226,44 @@ namespace psinc
 				// Enable watchdog timer and reset based on receiving communications, flash triggers or both.
 				bool Watchdog(uint8_t address, bool comms, bool trigger)
 				{
-					auto current = this->Read<1>(address, HPFC01::Config0);
-					current[0] = comms		? (current[0] | HPFC01::Configuration::WatchdogComms)	: (current[0] & ~HPFC01::Configuration::WatchdogComms);
-					current[0] = trigger	? (current[0] | HPFC01::Configuration::WatchdogTrigger) : (current[0] & ~HPFC01::Configuration::WatchdogTrigger);
+					auto [success, data] = this->Read<1>(address, HPFC01::Config0);
 
-					return this->Write<1>(address, HPFC01::Config0, current);
+					if (success)
+					{
+						data[0] = comms		? (data[0] | HPFC01::Configuration::WatchdogComms)	: (data[0] & ~HPFC01::Configuration::WatchdogComms);
+						data[0] = trigger	? (data[0] | HPFC01::Configuration::WatchdogTrigger) : (data[0] & ~HPFC01::Configuration::WatchdogTrigger);
+
+						return this->Write<1>(address, HPFC01::Config0, data);
+					}
+
+					return false;
 				}
 
 				// Enable alternative trigger mode - polarity controls what level the data line must be to allow triggering
 				bool AlternativeTrigger(uint8_t address, bool enable, bool polarity)
 				{
-					auto current = this->Read<1>(address, HPFC01::Config1);
-					current[0] = enable		? (current[0] | HPFC01::Configuration::AlternativeTrigger)	: (current[0] & ~HPFC01::Configuration::AlternativeTrigger);
-					current[0] = polarity	? (current[0] | HPFC01::Configuration::AlternativePolarity) : (current[0] & ~HPFC01::Configuration::AlternativePolarity);
+					auto [success, data] = this->Read<1>(address, HPFC01::Config1);
 
-					return this->Write<1>(address, HPFC01::Config1, current);
+					if (success)
+					{
+						data[0] = enable	? (data[0] | HPFC01::Configuration::AlternativeTrigger)	: (data[0] & ~HPFC01::Configuration::AlternativeTrigger);
+						data[0] = polarity	? (data[0] | HPFC01::Configuration::AlternativePolarity) : (data[0] & ~HPFC01::Configuration::AlternativePolarity);
+
+						return this->Write<1>(address, HPFC01::Config1, data);
+					}
+					return false;
 				}
 
 
 				// Read from an i2c device (such as the LED board) using the extension registers
-				uint16_t Extension(uint8_t address, uint16_t deviceAddress, uint16_t registerAddress)
+				const Result<1> Extension(uint8_t address, uint16_t deviceAddress, uint16_t registerAddress)
 				{
 					if (Write<2>(address, HPFC01::ExtensionAddress, { deviceAddress, registerAddress }))
 					{
-						return Read<1>(address, HPFC01::ExtensionData)[0];
+						return Read<1>(address, HPFC01::ExtensionData);
 					}
 
-					return 0;
+					return { false, {} };
 				}
 
 
@@ -241,7 +274,7 @@ namespace psinc
 				}
 
 
-				std::array<uint16_t, 2> Config(uint8_t address)
+				const Result<2> Config(uint8_t address)
 				{
 					return Read<2>(address, HPFC01::Config0);
 				}
@@ -250,14 +283,18 @@ namespace psinc
 				// Hardware version and ID of LED board
 				std::string LedHardware(uint8_t address)
 				{
-					auto values = Read<2>(address, HPFC01::LedHardware);
-					return emg::String::format("%04x%04x", values[1], values[0]);
+					auto [success, data] = Read<2>(address, HPFC01::LedHardware);
+					return success
+						? emg::String::format("%04x%04x", data[1], data[0])
+						: "--------";
 				}
 
 				std::string LedID(uint8_t address)
 				{
-					auto values = Read<4>(address, HPFC01::LedID);
-					return emg::String::format("%04x%04x%04x%04x", values[3], values[2], values[1], values[0]);
+					auto [success, data] = Read<4>(address, HPFC01::LedID);
+					return success
+						? emg::String::format("%04x%04x%04x%04x", data[3], data[2], data[1], data[0])
+						: "----------------";
 				}
 
 				Status GetStatus()	{ return this->status; }
@@ -269,10 +306,15 @@ namespace psinc
 
 				bool SetBit(uint8_t address, uint8_t registerAddress, uint8_t mask, bool value)
 				{
-					auto current	= this->Read<1>(address, registerAddress);
-					current[0]		= value ? (current[0] | mask) : (current[0] & ~mask);
+					auto [success, data] = this->Read<1>(address, registerAddress);
 
-					return this->Write<1>(address, registerAddress, current);
+					if (success)
+					{
+						data[0]	= value ? (data[0] | mask) : (data[0] & ~mask);
+						return this->Write<1>(address, registerAddress, data);
+					}
+
+					return false;
 				}
 
 
@@ -297,11 +339,11 @@ namespace psinc
 				}
 
 
-				template <size_t N> const std::array<uint16_t, N> Read(uint8_t address, uint8_t registerAddress)
+				template <size_t N> const Result<N> Read(uint8_t address, uint8_t registerAddress)
 				{
 					if (!this->serial && !this->Connect())
 					{
-						return { 0 };
+						return { false, {} };
 					}
 
 					std::array<uint16_t, N> result = { 0 };
@@ -310,16 +352,16 @@ namespace psinc
 					{
 						if (!this->Write(address, registerAddress + i, 0x00, false))
 						{
-							return { 0 };
+							return { false, {} };
 						}
 
 						if (!this->Read(result[i]))
 						{
-							return { 0 };
+							return { false, {} };
 						}
 					}
 
-					return result;
+					return { true, result };
 				}
 
 
