@@ -1,6 +1,6 @@
 #include "psinc/Psinc.h"
 
-#define PSINC_VERSION "0.1.28"
+#define PSINC_VERSION "0.1.29"
 
 
 namespace psinc

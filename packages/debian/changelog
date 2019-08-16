@@ -1,3 +1,12 @@
+libpsinc0 (0.1.29) unstable; urgency=medium
+
+  * USB version number now displayed in log information
+  * Improvements to error handling in Flash helper module
+  * Deprecated line quality sampling (no longer supported)
+  * Added a save frame button - will save the next captured frame to a PNG in the current directory
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 16 Aug 2019 11:15:58 +0100
+
 libpsinc0 (0.1.28) unstable; urgency=medium
 
   * Added status logging in the Flash helper.
