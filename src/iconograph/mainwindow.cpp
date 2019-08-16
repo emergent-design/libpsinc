@@ -175,6 +175,19 @@ void MainWindow::Grab()
 
 		if (status)
 		{
+			if (this->save)
+			{
+				if (this->hdrMode == Hdr::Simple)
+				{
+					this->image.Save(String::format("grab_%s.png", emg::Timestamp::FNow()));
+				}
+				else
+				{
+					this->hdrImage.Save(String::format("grab_hdr_%s.png", emg::Timestamp::FNow()));
+				}
+				this->save = false;
+			}
+
 			emit imageGrabbed(this->Convert());
 		}
 		else
@@ -217,32 +230,11 @@ void MainWindow::onGrab(QImage *image)
 
 		if (duration_cast<milliseconds>(steady_clock::now() - this->last).count() >= 5000)
 		{
-			if (this->sampleQuality)
-			{
-				// Tallies of physical and link errors per second
-				int physicalCount	= 0;
-				int linkCount		= 0;
+			this->ui->status->showMessage(QString::fromStdString(String::format(
+				"Camera connected (%.1f fps, %d dropped)",
+				0.2 * this->frameCount, this->droppedCount
+			)));
 
-				auto data = this->camera.CustomDevice(0xfe).Read();
-
-				if (data.Size() == 4)
-				{
-					physicalCount	= data[0] + (data[1] << 8);
-					linkCount		= data[2] + (data[3] << 8);
-				}
-
-				this->ui->status->showMessage(QString::fromStdString(String::format(
-					"Camera connected (%.1f fps, %d dropped, %d phy/s, %d link/s)",
-					0.2 * this->frameCount, this->droppedCount, physicalCount, linkCount
-				)));
-			}
-			else
-			{
-				this->ui->status->showMessage(QString::fromStdString(String::format(
-					"Camera connected (%.1f fps, %d dropped)",
-					0.2 * this->frameCount, this->droppedCount
-				)));
-			}
 			this->frameCount	= 0;
 			this->last			= steady_clock::now();
 		}
@@ -441,6 +433,11 @@ void MainWindow::on_saveHdrButton_clicked()
 	}
 }
 
+void MainWindow::on_saveFrame_clicked()
+{
+	this->save = true;
+}
+
 
 void MainWindow::on_regionButton_clicked()
 {
@@ -499,9 +496,3 @@ void MainWindow::on_spinBox_valueChanged(int value)
 //{
 //	this->ui->lensCheck->setChecked(false);
 //}
-
-
-void MainWindow::on_sampleQuality_toggled(bool checked)
-{
-    this->sampleQuality = checked;
-}

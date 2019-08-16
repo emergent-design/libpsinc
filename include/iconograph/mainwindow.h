@@ -71,7 +71,7 @@ class MainWindow : public QMainWindow
 
 		void on_spinBox_valueChanged(int value);
 
-		void on_sampleQuality_toggled(bool checked);
+		void on_saveFrame_clicked();
 
 	signals:
 
@@ -127,7 +127,7 @@ class MainWindow : public QMainWindow
 		bool portrait		= false;
 		bool switchMode		= false;
 		bool restartGrab	= false;
-		bool sampleQuality	= false;	// Enable line quality sampling
+		bool save			= false;
 
 		Hdr hdrMode			= Hdr::Simple;
 		int rangeStart		= 0;
