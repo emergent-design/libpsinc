@@ -24,12 +24,6 @@ namespace psinc
 	}
 
 
-	Camera::~Camera()
-	{
-		this->Dispose();
-	}
-
-
 	void Camera::Initialise(string serial, std::function<void(bool)> onConnection, int timeout, const set<uint16_t> &vendors)
 	{
 		Instrument::Initialise(Type::Camera, serial, onConnection, timeout, vendors);

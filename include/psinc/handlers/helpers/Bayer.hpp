@@ -155,6 +155,18 @@ namespace psinc
 			}
 
 
+			#if defined(_MSC_VER)
+				// The MSVC compiler and runtimes have an issue with joining threads
+				// that have been created within a thread_local object. Instead use
+				// std::async which is implemented using a threadpool in MSVC.
+				#define PSINC_ASYNC(x) std::async(std::launch::async, x)
+			#else
+				// GCC/Clang/MinGW do not use a threadpool for std::async so
+				// use PersistentThread instead
+				#define PSINC_ASYNC(x) thread.Run(x)
+			#endif
+
+
 			// Decode data from a bayer sensor to an RGB image
 			// Bayer mode offsets:
 			//		0: RG,GB
@@ -163,10 +175,12 @@ namespace psinc
 			//		3: BG,GR
 			template <typename T, typename U> static void Colour(T *src, U *dst, int width, int height, byte bayerMode, uint16_t shift)
 			{
-				// This function tends to be called repeatedly, so to avoid the overhead of thread construction when using std::async
-				// it uses a persistent thread instead. The PersistentThread is used by emergent::ThreadPool but even a ThreadPool of
-				// size 1 will create another thread to manage the queue, so using the PersistentThread directly is more efficient.
-				static thread_local emg::PersistentThread thread;
+				#if !defined(_MSC_VER)
+					// This function tends to be called repeatedly, so to avoid the overhead of thread construction when using std::async
+					// it uses a persistent thread instead. The PersistentThread is used by emergent::ThreadPool but even a ThreadPool of
+					// size 1 will create another thread to manage the queue, so using the PersistentThread directly is more efficient.
+					static thread_local emg::PersistentThread thread;
+				#endif
 
 				// If there are not an even number of rows and columns then do not convert
 				if (width % 2 || height % 2) return;
@@ -179,26 +193,25 @@ namespace psinc
 
 				switch (bayerMode)
 				{
-					case 0: f = thread.Run([=] { Even(src, dst, dw, dh, width, shift, true); });
+					case 0: f = PSINC_ASYNC([=] { Even(src, dst, dw, dh, width, shift, true); });
 							Odd(src + width, dst + 3 * dw, dw, dh, width, shift, true);
 							break;
 
-					case 1: f = thread.Run([=] { Odd(src, dst, dw, dh, width, shift, true); });
+					case 1: f = PSINC_ASYNC([=] { Odd(src, dst, dw, dh, width, shift, true); });
 							Even(src + width, dst + 3 * dw, dw, dh, width, shift, true);
 							break;
 
-					case 2: f = thread.Run([=] { Even(src, dst, dw, dh, width, shift, false); });
+					case 2: f = PSINC_ASYNC([=] { Even(src, dst, dw, dh, width, shift, false); });
 							Odd(src + width, dst + 3 * dw, dw, dh, width, shift, false);
 							break;
 
-					case 3: f = thread.Run([=] { Odd(src, dst, dw, dh, width, shift, false); });
+					case 3: f = PSINC_ASYNC([=] { Odd(src, dst, dw, dh, width, shift, false); });
 							Even(src + width, dst + 3 * dw, dw, dh, width, shift, false);
 							break;
 				}
 
 				f.wait();
 			}
-
 
 
 			// Greyscale bayer green centre

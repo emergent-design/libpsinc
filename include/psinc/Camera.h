@@ -33,8 +33,6 @@ namespace psinc
 			/// Default Constructor
 			Camera();
 
-			/// Destructor
-			virtual ~Camera();
 
 			/// Initialises the transport to look for specific descriptors or on a particular
 			/// bus. It also starts the internal thread running. The serial string is actually
