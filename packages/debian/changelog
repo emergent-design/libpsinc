@@ -1,3 +1,10 @@
+libpsinc0 (0.1.30) unstable; urgency=medium
+
+  * Alternative use of std::async in Bayer decoding specifically for MSVC since it has
+    issues with threads created in a thread_local object.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 18 Oct 2019 11:24:48 +0100
+
 libpsinc0 (0.1.29) unstable; urgency=medium
 
   * USB version number now displayed in log information
