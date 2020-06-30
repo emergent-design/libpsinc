@@ -1,3 +1,9 @@
+libpsinc0 (0.1.31) unstable; urgency=medium
+
+  * Added focal support
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 30 Jun 2020 21:55:21 +0100
+
 libpsinc0 (0.1.30) unstable; urgency=medium
 
   * Alternative use of std::async in Bayer decoding specifically for MSVC since it has
