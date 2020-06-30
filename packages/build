@@ -5,7 +5,7 @@ FULLVERSION=$VERSION
 LIBRARY="psinc"
 
 if (($# == 1)); then
-	FULLVERSION=$VERSION-$1
+	FULLVERSION="$VERSION~$1"
 fi
 
 echo "Copying files ..."
@@ -28,7 +28,7 @@ for root in "lib${LIBRARY}0" "lib${LIBRARY}-dev"; do
 	echo -n "  Modifying control file ... "
 		SIZE=$(du -s $root/usr | tr -cd '[[:digit:]]')
 		sed -i "s/^Installed-Size.*/Installed-Size: $SIZE/" $root/DEBIAN/control
-		sed -i "s/^Version.*/Version: $VERSION/" $root/DEBIAN/control
+		sed -i "s/^Version.*/Version: $FULLVERSION/" $root/DEBIAN/control
 	echo "done"
 
 	echo -n "  Removing temporary files and setting permissions ... "
@@ -47,7 +47,7 @@ for root in "lib${LIBRARY}0" "lib${LIBRARY}-dev"; do
 		fakeroot dpkg-deb --build $root
 	echo "done"
 
-	mv ${root}.deb ${root}_${VERSION}_amd64.deb
+	mv ${root}.deb ${root}_${FULLVERSION}_amd64.deb
 done
 
 

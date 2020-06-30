@@ -166,6 +166,10 @@ struct Parameters
 	int effects		= 0;
 	int selected	= 0;
 	float fps		= 0.0;
+
+	// Hacked in for quizzing
+	std::string overlay = "";
+	bool quiz = false;
 };
 
 
@@ -199,6 +203,7 @@ void display(const Parameters &p)
 	mvprintw(7, 0, String::format("%c (g)reen    = %.5f", p.selected == 4 ? '*' : ' ', p.colour.green).c_str());
 	mvprintw(8, 0, String::format("%c (b)lue     = %.5f", p.selected == 5 ? '*' : ' ', p.colour.blue).c_str());
 	mvprintw(10, 0, String::format("%c f(x)      = %d", p.selected == 6 ? '*' : ' ', p.effects).c_str());
+	mvprintw(11, 0, String::format("%c (o)verlay = %s", p.quiz ? '>' : ' ', p.overlay.empty() ? "-" : p.overlay).c_str());
 }
 
 
@@ -219,11 +224,11 @@ void update(psinc::Camera &camera, Parameters &p)
 bool stream = true;
 
 
-void adjust(Parameters &p, int direction)
+void adjust(Parameters &p, int direction, int multiplier = 1)
 {
 	switch (p.selected)
 	{
-		case 0:	p.exposure		+= direction * 10;		break;
+		case 0:	p.exposure		+= direction * multiplier;	break;
 		case 1: p.gain			+= direction;			break;
 		case 2: p.flash			+= direction;			break;
 		case 3: p.colour.red	+= 0.03215 * direction;	break;
@@ -233,7 +238,7 @@ void adjust(Parameters &p, int direction)
 	}
 
 	p.flash		= std::max(0, std::min(p.flash, 255));
-	p.effects	= std::max(0, std::min(p.effects, 3));
+	p.effects	= std::max(0, std::min(p.effects, 4));
 }
 
 
@@ -246,7 +251,22 @@ bool keys(Parameters &p)
 		return false;
 	}
 
-	switch (ch)
+	if (p.quiz)
+	{
+		if (ch == 27)
+		{
+			p.quiz = false;
+		}
+		else if (ch >= 97 && ch <= 122)
+		{
+			p.overlay = std::toupper(ch);
+		}
+		else
+		{
+			p.overlay = "";
+		}
+	}
+	else switch (ch)
 	{
 		case 'q': stream = false;	break;
 		case 'e': p.selected = 0;	break;
@@ -265,14 +285,16 @@ bool keys(Parameters &p)
 		case '=': adjust(p,  1);	break;
 		case '+': adjust(p,  1);	break;
 
+		case 'o': p.quiz = true;	break;
+
 		case '\033':
 			getch();	// skip escape code '['
-			switch(getch())
+			switch (getch())
 			{
 				case 'A': p.selected = std::max(0, p.selected - 1);	break;
 				case 'B': p.selected = std::min(6, p.selected + 1); break;
-				case 'C': adjust(p, 1);		break;
-				case 'D': adjust(p, -1);	break;
+				case 'C': adjust(p, 1, 10);		break;
+				case 'D': adjust(p, -1, 10);	break;
 			}
 			break;
 	}
@@ -282,76 +304,93 @@ bool keys(Parameters &p)
 
 
 // Not to be left in
-// #include <imp/fiducials/Detector.h>
-// #include <imp/filter/EdgeDetect.h>
-// #include <imp/feature/EdgeRefine.h>
-// #include <imp/feature/ObjectExtract.h>
-// #include <imp/image/Draw.hpp>
-// #include <imp/image/Text.h>
+#include <imp/fiducials/Detector.h>
+#include <imp/filter/EdgeDetect.h>
+#include <imp/feature/EdgeRefine.h>
+#include <imp/feature/ObjectExtract.h>
+#include <imp/image/Draw.hpp>
+#include <imp/image/Text.h>
 
 
-// void process_fiducials(Output &output, emg::Image<byte, rgb> &src)
-// {
-// 	static const auto format = imp::Text::Format().Size(18).Colour(emg::RGB::Cyan).Background(emg::RGB::Black).Align(imp::Alignment::Auto).Offset(4);
+void process_fiducials(Output &output, emg::Image<byte, rgb> &src)
+{
+	static const auto format = imp::Text::Format().Size(18).Colour(emg::RGB::Cyan).Background(emg::RGB::Black).Align(imp::Alignment::Auto).Offset(4);
 
-// 	static imp::Text text;
-// 	static imp::fiducials::Detector detector;
-// 	static emg::Image<byte> buffer;
-// 	static emg::Image<byte, rgb> dst;
+	static imp::Text text;
+	static imp::fiducials::Detector detector;
+	static emg::Image<byte> buffer;
+	static emg::Image<byte, rgb> dst;
 
-// 	buffer = dst = src;
+	buffer = dst = src;
 
-// 	for (auto &f : detector.Find({}, buffer))
-// 	{
-// 		if (f.code < 0)
-// 		{
-// 			imp::Draw::Ellipse(dst, emg::RGB::Magenta, f.base);
-// 			imp::Draw::Cross(dst, emg::RGB::Magenta, f.position, 2);
-// 		}
-// 		else
-// 		{
-// 			const auto &m	= f.base.matrix;
-// 			double dx		= 0.75 * cos(f.orientation);
-// 			double dy		= 0.75 * sin(f.orientation);
-// 			double x		= f.position.x + m[0] * dx + m[1] * dy;
-// 			double y		= f.position.y + m[2] * dx + m[3] * dy;
+	for (auto &f : detector.Find({}, buffer))
+	{
+		if (f.code < 0)
+		{
+			imp::Draw::Ellipse(dst, emg::RGB::Magenta, f.base);
+			imp::Draw::Cross(dst, emg::RGB::Magenta, f.position, 2);
+		}
+		else
+		{
+			const auto &m	= f.base.matrix;
+			double dx		= 0.75 * cos(f.orientation);
+			double dy		= 0.75 * sin(f.orientation);
+			double x		= f.position.x + m[0] * dx + m[1] * dy;
+			double y		= f.position.y + m[2] * dx + m[3] * dy;
 
-// 			imp::Draw::SmoothLine(dst, emg::RGB::Cyan, f.position.x, f.position.y, x, y);
+			imp::Draw::SmoothLine(dst, emg::RGB::Cyan, f.position.x, f.position.y, x, y);
 
-// 			text.Render(dst, String::format("%d", f.code), format, lrint(f.position.x), lrint(f.position.y));
-// 		}
-// 	}
+			text.Render(dst, String::format("%d", f.code), format, lrint(f.position.x), lrint(f.position.y));
+		}
+	}
 
-// 	write(output.fd, dst.Data(), dst.Size() * 3);
-// }
+	write(output.fd, dst.Data(), dst.Size() * 3);
+}
 
 
-// void process_edge(Output &output, emg::Image<byte, rgb> &src)
-// {
-// 	static imp::EdgeDetect edge;
-// 	static imp::EdgeRefine refine;
-// 	static imp::ObjectExtract oe;
-// 	static emg::Image<byte> grey, buffer;
-// 	static emg::Image<byte, rgb> dst;
+void process_edge(Output &output, emg::Image<byte, rgb> &src)
+{
+	static imp::EdgeDetect edge;
+	static imp::EdgeRefine refine;
+	static imp::ObjectExtract oe;
+	static emg::Image<byte> grey, buffer;
+	static emg::Image<byte, rgb> dst;
 
-// 	dst.Resize(src.Width(), src.Height());
-// 	dst		= 0;
-// 	grey	= src;
+	dst.Resize(src.Width(), src.Height());
+	dst		= 0;
+	grey	= src;
 
-// 	edge.FindEdges(&grey, &buffer, -1);
-// 	auto objects = oe.Search(&buffer);
-// 	refine.Process(&grey, objects);
+	edge.FindEdges(&grey, &buffer, -1);
+	auto objects = oe.Search(&buffer);
+	refine.Process(&grey, objects);
 
-// 	dst = src;
-// 	imp::Draw::Objects(dst, emg::RGB::White, objects);
+	dst = src;
+	imp::Draw::Objects(dst, emg::RGB::White, objects);
 
-// 	write(output.fd, dst.Data(), dst.Size() * 3);
-// }
+	write(output.fd, dst.Data(), dst.Size() * 3);
+}
 
 
 void process_invert(Output &output, emg::Image<byte, rgb> &src)
 {
 	src.Invert();
+	write(output.fd, src.Data(), src.Size() * 3);
+}
+
+void process_quiz(Output &output, emg::Image<byte, rgb> &src, const Parameters &p)
+{
+	static auto format = imp::Text::Format()
+		.Align(imp::Alignment::Centre)
+		.Size(512)
+		.Colour(emg::RGB::White);
+
+	static imp::Text text;
+
+	if (p.quiz && !p.overlay.empty())
+	{
+		text.Render(src, p.overlay, format, src.Width() / 2, src.Height() / 2);
+	}
+
 	write(output.fd, src.Data(), src.Size() * 3);
 }
 
@@ -364,9 +403,11 @@ void process(Parameters &p, Output &output, emg::Image<byte, rgb> &src)
 	switch (p.effects)
 	{
 		case 1: process_invert(output, src);					break;
-		// case 2: process_edge(output, src);						break;
-		// case 3: process_fiducials(output, src);					break;
-		default: write(output.fd, src.Data(), src.Size() * 3);	break;
+		case 2: process_edge(output, src);						break;
+		case 3: process_fiducials(output, src);					break;
+		default: process_quiz(output, src, p);					break;
+		// case 4: process_quiz(output, src, p);					break;
+		// default: write(output.fd, src.Data(), src.Size() * 3);	break;
 	}
 
 	if (timer.Elapsed() > 2000)

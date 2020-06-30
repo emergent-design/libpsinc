@@ -5,7 +5,7 @@ includedir=${prefix}/include
 
 Name: libpsinc
 Description: Native driver for the PSI camera range
-Version: 0.1.6
+Version: 0.1.30~bionic
 Requires:
 Libs: -L${libdir} -lpsinc
 Cflags: -I${includedir}/psinc

@@ -5,8 +5,8 @@ stages:
 build-check:
   image: emergent:xenial
   stage: build
-  only:
-    - master
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
   before_script:
     - dpkg -i /packages/xenial/oss/libemergent-dev.deb
   script:
@@ -16,15 +16,15 @@ build-check:
 package-xenial:
   image: emergent:xenial
   stage: build
-  only:
-    - tags
+  rules:
+    - if: $CI_COMMIT_TAG
   before_script:
     - dpkg -i /packages/xenial/oss/libemergent-dev.deb
   script:
     - premake5 gmake
     - make -j4
     - cd packages
-    - ./build
+    - ./build xenial
     - mkdir -p /packages/xenial/oss/
     - cp libpsinc-dev_*.deb /packages/xenial/oss/libpsinc-dev.deb
     - cp libpsinc0_*.deb /packages/xenial/oss/libpsinc0.deb
@@ -35,27 +35,41 @@ package-xenial:
 package-bionic:
   image: emergent:bionic
   stage: build
-  only:
-    - tags
+  rules:
+    - if: $CI_COMMIT_TAG
   before_script:
     - dpkg -i /packages/bionic/oss/libemergent-dev.deb
   script:
     - premake5 gmake
     - make -j4
     - cd packages
-    - ./build
+    - ./build bionic
     - mkdir -p /packages/bionic/oss/
     - cp libpsinc-dev_*.deb /packages/bionic/oss/libpsinc-dev.deb
     - cp libpsinc0_*.deb /packages/bionic/oss/libpsinc0.deb
-  # artifacts:
-  #   paths:
-  #     - packages/*.deb
+
+package-focal:
+  image: emergent:focal
+  stage: build
+  rules:
+    - if: $CI_COMMIT_TAG
+  before_script:
+    - dpkg -i /packages/focal/oss/libemergent-dev.deb
+  script:
+    - premake5 gmake
+    - make -j4
+    - cd packages
+    - ./build focal
+    - mkdir -p /packages/focal/oss/
+    - cp libpsinc-dev_*.deb /packages/focal/oss/libpsinc-dev.deb
+    - cp libpsinc0_*.deb /packages/focal/oss/libpsinc0.deb
+
 
 package-windows:
   image: emergent:windows
   stage: build
-  only:
-    - tags
+  rules:
+    - if: $CI_COMMIT_TAG
   script:
     - premake5 --os=windows gmake
     - make CXX=x86_64-w64-mingw32-g++ -j4
@@ -73,9 +87,8 @@ package-windows:
 deploy-packages:
   image: emergent:deploy
   stage: deploy
-  when: on_success
-  only:
-    - tags
+  rules:
+    - if: $CI_COMMIT_TAG
   dependencies:
     - package-xenial
     - package-windows
@@ -91,11 +104,26 @@ deploy-packages:
     - scp *.deb jenkins@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/ubuntu/
     - scp *.7z jenkins@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/windows/
 
+deploy-phi:
+  image: emergent:deploy
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs: [ package-bionic, package-focal ]
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PHI_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - echo "$SSH_PHI_KNOWN" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - phi-deploy /packages/bionic/oss/libpsinc0.deb bionic oss
+    - phi-deploy /packages/focal/oss/libpsinc0.deb focal oss
+
 package-appimage:
   image: emergent:xenial
   stage: build
-  only:
-    - web
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
   before_script:
     - dpkg -i /packages/xenial/oss/libemergent-dev.deb
   script:
