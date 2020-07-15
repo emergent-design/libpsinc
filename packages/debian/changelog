@@ -1,3 +1,9 @@
+libpsinc0 (0.1.32) unstable; urgency=medium
+
+  * Patched the windows build for updated toolchain
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Wed, 15 Jul 2020 16:47:55 +0100
+
 libpsinc0 (0.1.31) unstable; urgency=medium
 
   * Added focal support
