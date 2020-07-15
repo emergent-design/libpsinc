@@ -70,6 +70,9 @@ package-windows:
   stage: build
   rules:
     - if: $CI_COMMIT_TAG
+  before_script:
+    - dpkg -i /packages/focal/oss/libemergent-dev.deb
+    - ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
   script:
     - premake5 --os=windows gmake
     - make CXX=x86_64-w64-mingw32-g++ -j4
