@@ -13,6 +13,18 @@ build-check:
     - premake5 gmake
     - make -j4
 
+
+build-bionic:
+  image: emergent:bionic
+  stage: build
+  before_script:
+    - dpkg -i /packages/bionic/oss/libemergent-dev.deb
+  script:
+    - premake5 gmake
+    - make -j16
+    - cp lib/libpsinc.so /packages/bionic/oss/
+    - cp lib/libpsinc.so.dbg /packages/bionic/oss/
+
 package-xenial:
   image: emergent:xenial
   stage: build
@@ -139,9 +151,12 @@ package-appimage:
     - cp bin/iconograph packages/appdir/usr/bin/
     - cp lib/libpsinc.so packages/appdir/usr/lib/libpsinc.so.0
     - cd packages
-    - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-    - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-    - ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
+    # - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+    # - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+    # - ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
+    - curl -sOJL "https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage"
+    - chmod a+x linuxdeployqt-6-x86_64.AppImage
+    - ./linuxdeployqt-6-x86_64.AppImage --appimage-extract
     - unset QTDIR; unset QT_PLUGIN_PATH; unset LD_LIBRARY_PATH
     - squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -bundle-non-qt-libs
     - squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -appimage

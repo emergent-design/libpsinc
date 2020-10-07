@@ -3,6 +3,8 @@
 #include <emergent/String.hpp>
 #include <regex>
 
+#include <psinc/TransportBuffer.hpp>
+
 using namespace std;
 using namespace emergent;
 
@@ -280,6 +282,8 @@ namespace psinc
 	{
 		if (this->handle)
 		{
+			this->readBuffer.Dispose();
+
 			// Release the device and close the handle
 			libusb_release_interface(this->handle, 0);
 			libusb_close(this->handle);
@@ -335,19 +339,33 @@ namespace psinc
 	{
 		if (buffer)
 		{
+			if (!write)
+			{
+				this->readBuffer.Resize(this->handle, buffer->Size());
+			}
+
 			int transferred	= 0;
 			bool result		= false;
-			int err			= libusb_bulk_transfer(this->handle, write ? WRITE_PIPE : READ_PIPE, *buffer, buffer->Size(), &transferred, this->timeout);
+			int err			= write
+				? libusb_bulk_transfer(this->handle, WRITE_PIPE, buffer->Data(), buffer->Size(), &transferred, this->timeout)
+				: libusb_bulk_transfer(this->handle, READ_PIPE, this->readBuffer.Data(), this->readBuffer.Size(), &transferred, this->timeout);
 
 			if (!err)
 			{
 				result = (write || check) ? transferred == buffer->Size() : true;
 
-				// When requested, truncate the buffer to the size of data actually received.
-				if (!write && result && truncate)
+
+				if (!write && result)
 				{
-					buffer->Truncate(transferred);
+					// When requested, truncate the buffer to the size of data actually received.
+					buffer->Set(this->readBuffer.Data(), truncate ? transferred : this->readBuffer.Size());
 				}
+
+
+				// if (!write && result && truncate)
+				// {
+				// 	buffer->Truncate(transferred);
+				// }
 
 				if (!result)
 				{

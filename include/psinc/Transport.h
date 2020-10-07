@@ -2,6 +2,7 @@
 
 #include <emergent/Emergent.hpp>
 #include <emergent/struct/Buffer.hpp>
+#include <psinc/TransportBuffer.hpp>
 #include <libusb-1.0/libusb.h>
 #include <atomic>
 #include <mutex>
@@ -145,6 +146,9 @@ namespace psinc
 
 			// Windows does not yet support hotplugging so adapt accordingly
 			bool legacy = false;
+
+
+			TransportBuffer readBuffer;
 
 			/// Allows an internal global function to push onto the pending queue
 			friend int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data);
