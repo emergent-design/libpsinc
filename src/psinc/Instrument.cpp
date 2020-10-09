@@ -129,7 +129,7 @@ namespace psinc
 	}
 
 
-	bool Instrument::Connected()
+	bool Instrument::Connected() const
 	{
 		return this->transport.Connected() && this->configured;
 	}
@@ -177,5 +177,11 @@ namespace psinc
 	void Instrument::SetTimeout(int timeout)
 	{
 		this->transport.SetTimeout(timeout);
+	}
+
+
+	uint8_t Instrument::UsbVersion() const
+	{
+		return this->transport.UsbVersion();
 	}
 }

@@ -231,8 +231,8 @@ void MainWindow::onGrab(QImage *image)
 		if (duration_cast<milliseconds>(steady_clock::now() - this->last).count() >= 5000)
 		{
 			this->ui->status->showMessage(QString::fromStdString(String::format(
-				"Camera connected (%.1f fps, %d dropped)",
-				0.2 * this->frameCount, this->droppedCount
+                "Camera connected - USB%d  - %.1f fps - %d dropped",
+                this->usbVersion, 0.2 * this->frameCount, this->droppedCount
 			)));
 
 			this->frameCount	= 0;
@@ -254,6 +254,7 @@ void MainWindow::onConnection(bool connected)
 
 		if (connected)
 		{
+            this->usbVersion = this->camera.UsbVersion();
 			this->UpdateUi();
 
 			this->ui->status->showMessage("Camera connected");

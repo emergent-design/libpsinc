@@ -42,7 +42,7 @@ namespace psinc
 
 
 			/// Report whether or not the transport is connected.
-			bool Connected();
+			bool Connected() const;
 
 
 			/// Transfer packets to and from the actual device
@@ -58,6 +58,10 @@ namespace psinc
 			void Disconnect();
 
 
+			/// Returns the USB major version of the connection and 0 if no device is connected
+			uint8_t UsbVersion() const;
+
+
 			/// Return a list of serial numbers and product descriptions for all
 			/// connected devices that match the given product ID.
 			static std::map<std::string, std::string> List(const std::set<uint16_t> &vendors, uint16_t product);
@@ -65,13 +69,7 @@ namespace psinc
 
 		private:
 
-			/// Simple structure for queueing up connection/disconnection
-			/// events for handling in Poll().
-			// struct Pending
-			// {
-			// 	libusb_device *device;
-			// 	libusb_hotplug_event event;
-			// };
+			/// Method for handling connection/disconnection events.
 			void Pending(libusb_device *device, libusb_hotplug_event event);
 
 			/// Retrieve the serial number of the device (then stored as id).
@@ -147,8 +145,11 @@ namespace psinc
 			// Windows does not yet support hotplugging so adapt accordingly
 			bool legacy = false;
 
+			// USB major version
+			uint8_t version = 0;
 
-			TransportBuffer readBuffer;
+			/// Attempt to allocate a DMA read buffer for bulk transfers
+			// TransportBuffer readBuffer;
 
 			/// Allows an internal global function to push onto the pending queue
 			friend int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data);

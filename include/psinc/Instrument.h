@@ -53,11 +53,11 @@ namespace psinc
 			/// treated as a regex and, combined with the cameras ability to append the camera
 			/// name to the end of the serial number in the USB descriptor, provides a powerful
 			/// way to reliably connect to a specific camera.
-			virtual void Initialise(uint16_t product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500, const std::set<uint16_t> &vendors = Vendors::All);
+			void Initialise(uint16_t product, std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500, const std::set<uint16_t> &vendors = Vendors::All);
 
 			/// Checks if this instance is currently connected to a physical device
 			/// @return True if a device appears to be connected.
-			virtual bool Connected();
+			virtual bool Connected() const;
 
 			/// Create a custom device instance if you know the index instead of
 			/// using the map of named devices below.
@@ -68,6 +68,9 @@ namespace psinc
 
 			/// Set the timeout for the underlying transport layer
 			void SetTimeout(int timeout);
+
+			/// Returns the USB major version of the connection and 0 if no device is connected
+			uint8_t UsbVersion() const;
 
 
 			/// Retrieve list of all serial numbers for any connected instruments of the given type

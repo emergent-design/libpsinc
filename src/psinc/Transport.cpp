@@ -60,9 +60,15 @@ namespace psinc
 	}
 
 
-	bool Transport::Connected()
+	bool Transport::Connected() const
 	{
 		return this->handle;
+	}
+
+
+	uint8_t Transport::UsbVersion() const
+	{
+		return version;
 	}
 
 
@@ -210,10 +216,12 @@ namespace psinc
 					{
 						if (libusb_claim_interface(this->handle, 0) == 0)
 						{
+							this->version = (descriptor.bcdUSB >> 8) & 0xff;
+
 							Log::Info(
 								"%u: USB (v%d.%d) device claimed - %s",
 								Timestamp::LogTime(),
-								(descriptor.bcdUSB >> 8) & 0xff,
+								this->version,
 								descriptor.bcdUSB & 0xff,
 								this->id);
 							return true;
@@ -282,7 +290,7 @@ namespace psinc
 	{
 		if (this->handle)
 		{
-			this->readBuffer.Dispose();
+			// this->readBuffer.Dispose();
 
 			// Release the device and close the handle
 			libusb_release_interface(this->handle, 0);
@@ -293,6 +301,7 @@ namespace psinc
 			this->disconnect	= true;
 			this->handle		= nullptr;
 			this->id			= "";
+			this->version		= 0;
 		}
 	}
 
@@ -339,33 +348,33 @@ namespace psinc
 	{
 		if (buffer)
 		{
-			if (!write)
-			{
-				this->readBuffer.Resize(this->handle, buffer->Size());
-			}
+			// if (!write)
+			// {
+			// 	this->readBuffer.Resize(this->handle, buffer->Size());
+			// }
 
 			int transferred	= 0;
 			bool result		= false;
 			int err			= write
 				? libusb_bulk_transfer(this->handle, WRITE_PIPE, buffer->Data(), buffer->Size(), &transferred, this->timeout)
-				: libusb_bulk_transfer(this->handle, READ_PIPE, this->readBuffer.Data(), this->readBuffer.Size(), &transferred, this->timeout);
+				: libusb_bulk_transfer(this->handle, READ_PIPE, buffer->Data(), buffer->Size(), &transferred, this->timeout);
+				// : libusb_bulk_transfer(this->handle, READ_PIPE, this->readBuffer.Data(), this->readBuffer.Size(), &transferred, this->timeout);
 
 			if (!err)
 			{
 				result = (write || check) ? transferred == buffer->Size() : true;
 
 
-				if (!write && result)
-				{
-					// When requested, truncate the buffer to the size of data actually received.
-					buffer->Set(this->readBuffer.Data(), truncate ? transferred : this->readBuffer.Size());
-				}
-
-
-				// if (!write && result && truncate)
+				// if (!write && result)
 				// {
-				// 	buffer->Truncate(transferred);
+				// 	// When requested, truncate the buffer to the size of data actually received.
+				// 	buffer->Set(this->readBuffer.Data(), truncate ? transferred : this->readBuffer.Size());
 				// }
+
+				if (!write && result && truncate)
+				{
+					buffer->Truncate(transferred);
+				}
 
 				if (!result)
 				{

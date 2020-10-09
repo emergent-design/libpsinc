@@ -128,6 +128,7 @@ class MainWindow : public QMainWindow
 		bool switchMode		= false;
 		bool restartGrab	= false;
 		bool save			= false;
+        uint8_t usbVersion  = 0;
 
 		Hdr hdrMode			= Hdr::Simple;
 		int rangeStart		= 0;

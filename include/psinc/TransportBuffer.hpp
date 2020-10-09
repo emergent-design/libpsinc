@@ -11,7 +11,7 @@ namespace psinc
 {
 	// A buffer for receiving data at the transport layer. It attempts to
 	// allocate DMA memory first to optimise transfer, but falls back to
-	// allocating normal memory
+	// allocating normal memory. Not used at this time.
 
 	class TransportBuffer
 	{
@@ -36,6 +36,7 @@ namespace psinc
 						delete [] this->data;
 					}
 					this->data				= nullptr;
+					this->handle			= nullptr;
 					this->deviceAllocated	= false;
 					this->size = this->max 	= 0;
 				}
@@ -70,21 +71,6 @@ namespace psinc
 
 				this->size = size;
 			}
-
-
-			// Truncate the buffer to the given size. This allows you to crop a buffer
-			// down without requiring an additional buffer.
-			// bool Truncate(const size_t size)
-			// {
-			// 	if (size < this->size && size > 0)
-			// 	{
-			// 		this->size = size;
-			// 		return true;
-			// 	}
-
-			// 	return false;
-			// }
-
 
 			/// Return the current size of the buffer (not the storage capacity)
 			size_t Size() const { return this->size; }

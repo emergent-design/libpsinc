@@ -39,7 +39,7 @@ namespace psinc
 			/// treated as a regex and, combined with the cameras ability to append the camera
 			/// name to the end of the serial number in the USB descriptor, provides a powerful
 			/// way to reliably connect to a specific camera.
-			virtual void Initialise(std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500, const std::set<uint16_t> &vendors = Vendors::All);
+			void Initialise(std::string serial = "", std::function<void(bool)> onConnection = nullptr, int timeout = 500, const std::set<uint16_t> &vendors = Vendors::All);
 
 			/// Start an asynchronous image grab. The data handler would usually have access
 			/// to an image and will be used to automatically convert the raw data from the
@@ -92,10 +92,10 @@ namespace psinc
 
 			/// When a camera is connected, determine what type it is and then initialise
 			/// the lists of available features and aliases.
-			virtual bool Configure();
+			bool Configure() override;
 
 			// Called from the thread main loop and returns true if the thread is safe to go to sleep.
-			virtual bool Main();
+			bool Main() override;
 
 
 		private:
