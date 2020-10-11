@@ -2,7 +2,7 @@
 
 #include <emergent/Emergent.hpp>
 #include <emergent/struct/Buffer.hpp>
-#include <psinc/TransportBuffer.hpp>
+// #include <psinc/TransportBuffer.hpp>
 #include <libusb-1.0/libusb.h>
 #include <atomic>
 #include <mutex>
