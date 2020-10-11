@@ -3,8 +3,6 @@
 #include <emergent/String.hpp>
 #include <regex>
 
-#include <psinc/TransportBuffer.hpp>
-
 using namespace std;
 using namespace emergent;
 
