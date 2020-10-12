@@ -1,3 +1,9 @@
+libpsinc0 (0.1.33) unstable; urgency=medium
+
+  * Added function to report what USB version is used for a connection.
+
+ -- Dan <dan@dodeca>  Mon, 12 Oct 2020 16:33:20 +0100
+
 libpsinc0 (0.1.32) unstable; urgency=medium
 
   * Patched the windows build for updated toolchain
