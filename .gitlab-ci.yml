@@ -17,6 +17,7 @@ build-check:
 build-bionic:
   image: emergent:bionic
   stage: build
+  rules: [ when: never ]
   before_script:
     - dpkg -i /packages/bionic/oss/libemergent-dev.deb
   script:

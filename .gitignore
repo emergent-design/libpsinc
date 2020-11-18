@@ -23,9 +23,9 @@ Makefile
 bin/
 lib/
 obj/
+build/
 .directory
 .build-*/
-.codelite/
 .vs/
 
 psinc.workspace.*

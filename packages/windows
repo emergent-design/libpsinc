@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 
 # A full iconograph package containing all required dependencies
 dst="iconograph"

@@ -5,12 +5,12 @@ solution "psinc"
 	libdirs			{ "lib" }
 	excludes		{ "**.bak", "**~" }
 
-	configuration "linux"
+	filter "system:linux"
 		toolset "clang"
-	configuration "not vs*"
+	filter "action:not vs*"
 		configurations  { "default" }
 		platforms		"native"
-	configuration "vs*"
+	filter "action:vs*"
 		configurations  { "debug", "release" }
 		platforms		{ "x32", "x64" }
 
@@ -20,23 +20,23 @@ solution "psinc"
 		links				{ "usb-1.0", "freeimage" }
 		files				{ "include/psinc/**h", "src/psinc/**.cpp", "src/psinc-c/**.cpp" }
 
-		configuration "linux"
+		filter "system:linux"
 			symbols				"On"
 			postbuildcommands	"./strip lib/libpsinc.so"
 
-		configuration "windows"
+		filter "system:windows"
 			kind "StaticLib"
 
-		configuration "not vs*"
+		filter "action:not vs*"
 			buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++14", "-O3", "-D_FORTIFY_SOURCE=2" }
 			linkoptions 	{ "-Wl,-soname,libpsinc.so.0" }
 
-		configuration "vs*"
+		filter "action:vs*"
 			kind		"StaticLib"
 			defines		"NOMINMAX"
 			targetname	"psinc_%{cfg.buildcfg}_%{cfg.platform}"
 
-			configuration "debug"
+			filter "configurations:debug"
 				symbols		"On"
-			configuration "release"
+			filter "configurations:release"
 				optimize	"Full"
