@@ -1,16 +1,24 @@
-# configure apt to be noninteractive
-ENV DEBIAN_FRONTEND noninteractive
-ENV DEBCONF_NONINTERACTIVE_SEEN true
-WORKDIR /code
 
 xenial:
 	FROM ubuntu:16.04
+	# configure apt to be noninteractive
+	ENV DEBIAN_FRONTEND noninteractive
+	ENV DEBCONF_NONINTERACTIVE_SEEN true
+	WORKDIR /code
 
 bionic:
 	FROM ubuntu:18.04
+	# configure apt to be noninteractive
+	ENV DEBIAN_FRONTEND noninteractive
+	ENV DEBCONF_NONINTERACTIVE_SEEN true
+	WORKDIR /code
 
 focal:
 	FROM ubuntu:20.04
+	# configure apt to be noninteractive
+	ENV DEBIAN_FRONTEND noninteractive
+	ENV DEBCONF_NONINTERACTIVE_SEEN true
+	WORKDIR /code
 
 image:
 	ARG DISTRIBUTION=bionic
