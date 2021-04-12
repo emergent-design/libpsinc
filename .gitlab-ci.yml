@@ -117,8 +117,8 @@ deploy-packages:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - cd packages
-    - scp *.deb jenkins@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/ubuntu/
-    - scp *.7z jenkins@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/windows/
+    - scp *.deb gitlab@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/ubuntu/
+    - scp *.7z gitlab@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/windows/
 
 deploy-phi:
   image: emergent:deploy
