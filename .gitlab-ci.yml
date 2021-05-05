@@ -44,6 +44,7 @@ package-appimage:
   stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
   script:
     - earthly +appimage
   artifacts:
