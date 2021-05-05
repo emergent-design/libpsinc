@@ -2,166 +2,71 @@ stages:
   - build
   - deploy
 
+
 build-check:
-  image: emergent:xenial
   stage: build
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
-  before_script:
-    - dpkg -i /packages/xenial/oss/libemergent-dev.deb
   script:
-    - premake5 gmake
-    - make -j4
-
-
-build-bionic:
-  image: emergent:bionic
-  stage: build
-  rules: [ when: never ]
-  before_script:
-    - dpkg -i /packages/bionic/oss/libemergent-dev.deb
-  script:
-    - premake5 gmake
-    - make -j16
-    - cp lib/libpsinc.so /packages/bionic/oss/
-    - cp lib/libpsinc.so.dbg /packages/bionic/oss/
-
-package-xenial:
-  image: emergent:xenial
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG
-  before_script:
-    - dpkg -i /packages/xenial/oss/libemergent-dev.deb
-  script:
-    - premake5 gmake
-    - make -j4
-    - cd packages
-    - ./build xenial
-    - mkdir -p /packages/xenial/oss/
-    - cp libpsinc-dev_*.deb /packages/xenial/oss/libpsinc-dev.deb
-    - cp libpsinc0_*.deb /packages/xenial/oss/libpsinc0.deb
-  artifacts:
-    paths:
-      - packages/*.deb
+    - earthly +build
 
 package-bionic:
-  image: emergent:bionic
   stage: build
   rules:
     - if: $CI_COMMIT_TAG
-  before_script:
-    - dpkg -i /packages/bionic/oss/libemergent-dev.deb
   script:
-    - premake5 gmake
-    - make -j4
-    - cd packages
-    - ./build bionic
-    - mkdir -p /packages/bionic/oss/
-    - cp libpsinc-dev_*.deb /packages/bionic/oss/libpsinc-dev.deb
-    - cp libpsinc0_*.deb /packages/bionic/oss/libpsinc0.deb
-
-package-focal:
-  image: emergent:focal
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG
-  before_script:
-    - dpkg -i /packages/focal/oss/libemergent-dev.deb
-  script:
-    - premake5 gmake
-    - make -j4
-    - cd packages
-    - ./build focal
-    - mkdir -p /packages/focal/oss/
-    - cp libpsinc-dev_*.deb /packages/focal/oss/libpsinc-dev.deb
-    - cp libpsinc0_*.deb /packages/focal/oss/libpsinc0.deb
-
-
-package-windows:
-  image: emergent:windows
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG
-  before_script:
-    - dpkg -i /packages/focal/oss/libemergent-dev.deb
-    - ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
-  script:
-    - premake5 --os=windows gmake
-    - make CXX=x86_64-w64-mingw32-g++ -j4
-    - PATH=/opt/qt5-win-x64/bin:$PATH qmake -spec win32-g++ -o iconograph.make iconograph.pro
-    - make -f iconograph.make -j4
-    - cd packages
-    - ./windows
-    - mkdir -p /packages/windows/oss/
-    - cp libpsinc-*.7z /packages/windows/oss/libpsinc.7z
-    # - cp iconograph-*.7z /packages/windows/oss/iconograph.7z
+    - earthly +package
   artifacts:
     paths:
-      - packages/*.7z
+      - build/libpsinc*.deb
+
+package-focal:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - earthly --build-arg DISTRIBUTION=focal +package
+  artifacts:
+    paths:
+      - build/libpsinc*.deb
+
+package-windows:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - earthly +windows
+  artifacts:
+    paths:
+      - build/windows/*.7z
+
+package-appimage:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+  script:
+    - earthly +appimage
+  artifacts:
+    paths:
+      - build/*.AppImage
 
 deploy-packages:
-  image: emergent:deploy
   stage: deploy
   rules:
     - if: $CI_COMMIT_TAG
   dependencies:
-    - package-xenial
+    - package-bionic
+    - package-focal
     - package-windows
-  before_script:
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
   script:
-    - cd packages
-    - scp *.deb gitlab@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/ubuntu/
-    - scp *.7z gitlab@downloads.emergent-design.co.uk:/srv/downloads/libpsinc/windows/
+    - scp build/*.deb $DEPLOY_DOWNLOADS/libpsinc/ubuntu/
+    - scp build/windows/*.7z $DEPLOY_DOWNLOADS/libpsinc/windows/
 
 deploy-phi:
-  image: emergent:deploy
   stage: deploy
   rules:
     - if: $CI_COMMIT_TAG
   needs: [ package-bionic, package-focal ]
-  before_script:
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PHI_KEY" | tr -d '\r' | ssh-add - > /dev/null
-    - echo "$SSH_PHI_KNOWN" > ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
   script:
-    - phi-deploy /packages/bionic/oss/libpsinc0.deb bionic oss
-    - phi-deploy /packages/focal/oss/libpsinc0.deb focal oss
-
-package-appimage:
-  image: emergent:xenial
-  stage: build
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "web"
-  before_script:
-    - dpkg -i /packages/xenial/oss/libemergent-dev.deb
-  script:
-    - premake5 gmake
-    - make -j4
-    - qmake -o iconograph.make CONFIG+=release iconograph.pro
-    - make -f iconograph.make -j4
-    - mkdir -p packages/appdir/usr/bin
-    - mkdir -p packages/appdir/usr/lib
-    - cp bin/iconograph packages/appdir/usr/bin/
-    - cp lib/libpsinc.so packages/appdir/usr/lib/libpsinc.so.0
-    - cd packages
-    # - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-    # - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-    # - ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
-    - curl -sOJL "https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage"
-    - chmod a+x linuxdeployqt-6-x86_64.AppImage
-    - ./linuxdeployqt-6-x86_64.AppImage --appimage-extract
-    - unset QTDIR; unset QT_PLUGIN_PATH; unset LD_LIBRARY_PATH
-    - squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -bundle-non-qt-libs
-    - squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -appimage
-    - cp *.AppImage /packages/xenial/oss/
-  artifacts:
-    paths:
-      - packages/*.AppImage
+    - phi-deploy build/libpsinc0*~bionic_amd64.deb bionic oss
+    - phi-deploy build/libpsinc0*~focal_amd64.deb focal oss

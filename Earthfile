@@ -1,11 +1,3 @@
-
-xenial:
-	FROM ubuntu:16.04
-	# configure apt to be noninteractive
-	ENV DEBIAN_FRONTEND noninteractive
-	ENV DEBCONF_NONINTERACTIVE_SEEN true
-	WORKDIR /code
-
 bionic:
 	FROM ubuntu:18.04
 	# configure apt to be noninteractive
@@ -30,7 +22,7 @@ image:
 deps:
 	FROM +image
 	ARG GITHUB_EMERGENT=github.com/emergent-design
-	COPY $GITHUB_EMERGENT/libemergent+package/libemergent-dev.deb .
+	COPY $GITHUB_EMERGENT/libemergent:v0.0.31+package/libemergent-dev.deb .
 	RUN dpkg -i libemergent-dev.deb
 
 build:
@@ -44,20 +36,16 @@ package:
 	RUN cd packages && ./build $DISTRIBUTION
 	SAVE ARTIFACT packages/libpsinc-dev_*.deb libpsinc-dev.deb
 	SAVE ARTIFACT packages/libpsinc0_*.deb libpsinc0.deb
+	SAVE ARTIFACT packages/libpsinc*.deb AS LOCAL build/
 
 all:
 	BUILD --build-arg DISTRIBUTION=bionic +package
 	BUILD --build-arg DISTRIBUTION=focal +package
 
-#deploy:
-
 
 appimage:
-	FROM --build-arg DISTRIBUTION=xenial +build
-	# Install slightly newer Qt using the kubuntu backports
-	RUN apt-get install -y software-properties-common \
-		&& add-apt-repository -y ppa:kubuntu-ppa/backports && apt-get update \
-		&& apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev
+	FROM --build-arg DISTRIBUTION=bionic +build
+	RUN apt-get update && apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev file
 	COPY --dir resources ui iconograph.pro .
 	RUN qmake -o iconograph.make CONFIG+=release iconograph.pro \
 		&& make -f iconograph.make -j$(nproc)
@@ -65,9 +53,9 @@ appimage:
 		&& cp bin/iconograph packages/appdir/usr/bin/ \
 		&& cp lib/libpsinc.so packages/appdir/usr/lib/libpsinc.so.0
 	RUN cd packages \
-		&& curl -sOJL "https://github.com/probonopd/linuxdeployqt/releases/download/7/linuxdeployqt-7-x86_64.AppImage" \
-		&& chmod a+x linuxdeployqt-7-x86_64.AppImage \
-		&& ./linuxdeployqt-7-x86_64.AppImage --appimage-extract \
+		&& curl -sJL "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage" -o linuxdeployqt.AppImage \
+		&& chmod a+x linuxdeployqt.AppImage \
+		&& ./linuxdeployqt.AppImage --appimage-extract \
 		&& unset QTDIR; unset QT_PLUGIN_PATH; unset LD_LIBRARY_PATH \
 		&& squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -bundle-non-qt-libs \
 		&& squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -appimage
@@ -115,7 +103,7 @@ windows:
 	FROM +mingw
 	# Dependencies
 	ARG GITHUB_EMERGENT=github.com/emergent-design
-	COPY $GITHUB_EMERGENT/libemergent+package/libemergent-dev.deb .
+	COPY $GITHUB_EMERGENT/libemergent:v0.0.31+package/libemergent-dev.deb .
 	RUN dpkg -i libemergent-dev.deb && ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
 	# Build lib
 	COPY --dir include packages src resources ui iconograph.pro premake5.lua .
