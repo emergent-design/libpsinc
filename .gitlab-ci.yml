@@ -57,7 +57,7 @@ deploy-phi:
   needs: [ package-all ]
   script:
     - for REPO in bionic focal; do
-        phi-deploy build/libpsinc0*~$REPO_amd64.deb $REPO oss;
-        phi-deploy build/libpsinc-dev*~$REPO_amd64.deb $REPO oss;
+        phi-deploy build/libpsinc0*~${REPO}_amd64.deb $REPO oss;
+        phi-deploy build/libpsinc-dev*~${REPO}_amd64.deb $REPO oss;
       done
 
