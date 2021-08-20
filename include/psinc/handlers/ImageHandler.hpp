@@ -10,6 +10,14 @@
 
 namespace psinc
 {
+	enum class DecodeMode
+	{
+		Automatic	= 0,	// Automatically determine whether or not to use bayer decoding
+		Invert		= 1,	// Invert the sensor type - so treat bayer as mono and vice versa
+		ForceBayer	= 2,	// Force the sensor to be treated as bayer
+		ForceMono	= 3		// Force the sensor to be treated as mono
+	};
+
 	/// An image specific data handler. This provides the conversion from mono/bayer
 	/// formatted data in the buffer to a greyscale or colour image of the required
 	/// type.
@@ -19,8 +27,8 @@ namespace psinc
 
 			struct Configuration
 			{
+				DecodeMode mode = DecodeMode::Automatic;
 				// bool forceBayer = false;
-				bool invertSensorType = false;
 				// Filter::Configuration filter;
 			};
 
@@ -41,8 +49,8 @@ namespace psinc
 
 			void Initialise(emg::ImageBase<T> &image, bool invertSensorType)
 			{
-				this->image = &image;
-				this->configuration.invertSensorType = invertSensorType;
+				this->image					= &image;
+				this->configuration.mode	= invertSensorType ? DecodeMode::Invert : DecodeMode::Automatic;
 			}
 
 
@@ -57,7 +65,13 @@ namespace psinc
 			bool Process(bool monochrome, bool hdr, emg::Buffer<byte> &data, int width, int height, byte bayerMode) override
 			{
 				// Allow the monochrome flag to be overridden - could have unexpected effects.
-				if (configuration.invertSensorType) monochrome = !monochrome;
+				switch (configuration.mode)
+				{
+					case DecodeMode::Invert: 		monochrome = !monochrome;	break;
+					case DecodeMode::ForceBayer:	monochrome = false;			break;
+					case DecodeMode::ForceMono:		monochrome = true;			break;
+					default:													break;
+				}
 
 				int w = monochrome ? width : width - 4;
 				int h = monochrome ? height : height - 4;
