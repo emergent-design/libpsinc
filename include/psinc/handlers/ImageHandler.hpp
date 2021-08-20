@@ -19,7 +19,8 @@ namespace psinc
 
 			struct Configuration
 			{
-				bool forceBayer = false;
+				// bool forceBayer = false;
+				bool invertSensorType = false;
 				// Filter::Configuration filter;
 			};
 
@@ -38,10 +39,10 @@ namespace psinc
 				this->configuration	= configuration;
 			}
 
-			void Initialise(emg::ImageBase<T> &image, bool forceBayer)
+			void Initialise(emg::ImageBase<T> &image, bool invertSensorType)
 			{
 				this->image = &image;
-				this->configuration.forceBayer = forceBayer;
+				this->configuration.invertSensorType = invertSensorType;
 			}
 
 
@@ -56,7 +57,7 @@ namespace psinc
 			bool Process(bool monochrome, bool hdr, emg::Buffer<byte> &data, int width, int height, byte bayerMode) override
 			{
 				// Allow the monochrome flag to be overridden - could have unexpected effects.
-				if (configuration.forceBayer) monochrome = false;
+				if (configuration.invertSensorType) monochrome = !monochrome;
 
 				int w = monochrome ? width : width - 4;
 				int h = monochrome ? height : height - 4;

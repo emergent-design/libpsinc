@@ -122,11 +122,14 @@ QImage *MainWindow::ConvertWindow()
 {
 	auto roi = this->ui->canvas->Roi();
 
-	if (this->hdrImage.Size() < roi.width() * roi.height()) return nullptr;
+	if (this->hdrImage.Size() < roi.width() * roi.height())
+	{
+		return nullptr;
+	}
 
 	int x, y;
-	int rw			= roi.width();
-	int rh			= roi.height();
+	int rw			= roi.isEmpty() ? this->hdrImage.Width() : roi.width();
+	int rh			= roi.isEmpty() ? this->hdrImage.Height() : roi.height();
 	int width		= this->hdrImage.Width();
 	int size		= rw * rh * 3;
 	int jump		= (width - rw) * 3;
@@ -227,6 +230,8 @@ void MainWindow::onGrab(QImage *image)
 	if (image)
 	{
 		this->ui->canvas->Update(image, this->portrait);
+		this->on_canvas_updateInfo();
+		this->UpdateRegionInfo();
 
 		if (duration_cast<milliseconds>(steady_clock::now() - this->last).count() >= 5000)
 		{
@@ -263,6 +268,109 @@ void MainWindow::onConnection(bool connected)
 
 		this->settings->updateIndex();
 	}
+}
+
+
+void MainWindow::on_canvas_updateInfo()
+{
+	const auto pos = this->ui->canvas->Position();
+
+	const bool hdr		= this->hdrMode == Hdr::Simple;
+	const int width		= hdr ? this->image.Width() : this->hdrImage.Width();
+	const int height	= hdr ? this->image.Height() : this->hdrImage.Height();
+	const int x			= std::max(0, std::min(width-1, pos.x()));
+	const int y			= std::max(0, std::min(height-1, pos.y()));
+	const int offset	= y * width * 3 + x * 3;
+
+	if (!width || !height)
+	{
+		return;
+	}
+
+	const int r	= hdr ? image.Data()[offset] : hdrImage.Data()[offset];
+	const int g = hdr ? image.Data()[offset+1] : hdrImage.Data()[offset+1];
+	const int b = hdr ? image.Data()[offset+2] : hdrImage.Data()[offset+2];
+
+	this->ui->currentX->setValue(x);
+	this->ui->currentY->setValue(y);
+	this->ui->currentR->setValue(r);
+	this->ui->currentG->setValue(g);
+	this->ui->currentB->setValue(b);
+	this->ui->currentV->setValue((r + g + b) / 3);
+}
+
+template <typename T> std::array<int64_t, 7> GetRegionMeans(const Image<T, rgb> &image, const QRect &roi)
+{
+	const int width		= image.Width();
+	const int height	= image.Height();
+
+	if (!width || !height)
+	{
+		return { 0 };
+	}
+
+	const int sx	= roi.x();
+	const int sy	= roi.y();
+	const int jump	= 3 * (width - roi.width());
+	auto sum		= std::array<int64_t, 3>{ 0, 0, 0 };
+	auto bayer		= std::array<int64_t, 4> { 0, 0, 0, 0 };
+	auto tally		= std::array<int, 4> { 0, 0, 0, 0 };
+	T *src			= image + sy * width * 3 + sx * 3;
+
+	for (int y=0; y<roi.height(); y++, src+=jump)
+	{
+		// If the current row in the full image is even or odd then calculate
+		// the appropriate offset in the bayer value array
+		const int offset = 2 * ((sy + y) % 2);
+
+		for (int x=0; x<roi.width(); x++, src+=3)
+		{
+			int value = 0;
+			for (int j=0; j<3; j++)
+			{
+				sum[j] += src[j];
+				value += src[j];
+			}
+
+			// 0 1
+			// 2 3
+			bayer[offset + ((sx + x) % 2)] += value / 3;
+			tally[offset + ((sx + x) % 2)]++;
+		}
+	}
+
+	const int size = roi.width() * roi.height();
+
+	return {
+		sum[0] / size,	// r
+		sum[1] / size,	// g
+		sum[2] / size,	// b
+		tally[0] ? bayer[0] / tally[0] : 0,
+		tally[1] ? bayer[1] / tally[1] : 0,
+		tally[2] ? bayer[2] / tally[2] : 0,
+		tally[3] ? bayer[3] / tally[3] : 0,
+	};
+}
+
+
+void MainWindow::UpdateRegionInfo()
+{
+	const auto roi	= this->ui->canvas->Roi();
+	auto values		= roi.isEmpty()
+			? std::array<int64_t, 7> { 0 }
+			: this->hdrMode == Hdr::Simple
+				? GetRegionMeans(this->image, roi)
+				: GetRegionMeans(this->hdrImage, roi);
+
+	this->ui->regionR->setValue(values[0]);
+	this->ui->regionG->setValue(values[1]);
+	this->ui->regionB->setValue(values[2]);
+	this->ui->regionV->setValue((values[0] + values[1] + values[2]) / 3);
+
+	this->ui->bayer0->setValue(values[3]);
+	this->ui->bayer1->setValue(values[4]);
+	this->ui->bayer2->setValue(values[5]);
+	this->ui->bayer3->setValue(values[6]);
 }
 
 
@@ -333,7 +441,7 @@ void MainWindow::on_gainCheck_toggled(bool checked)			{ camera.aliases[context].
 void MainWindow::on_adcSlider_valueChanged(int value)		{ camera.aliases[context].adcReference->Set(value); }
 void MainWindow::on_compandingCheck_toggled(bool checked)	{ camera.aliases[context].companding->Set(checked); }
 void MainWindow::on_adcReset_clicked()						{ ui->adcSlider->setValue(camera.aliases[context].adcReference->Reset()); }
-void MainWindow::on_colourCheck_toggled(bool checked)		{ handler.Initialise(this->image, checked); }
+void MainWindow::on_invertCheck_toggled(bool checked)		{ handler.Initialise(this->image, checked); }
 void MainWindow::on_portraitCheck_toggled(bool checked)		{ portrait = checked; }
 void MainWindow::on_grabFrame_clicked()						{ if (!this->stream) this->Grab(); }
 void MainWindow::on_framerateSlider_valueChanged(int value)	{ rateLimit = lrint(1000000.0 / value); }
@@ -473,6 +581,8 @@ void MainWindow::on_spinBox_valueChanged(int value)
 }
 
 
+
+
 //void MainWindow::on_lensCheck_toggled(bool checked)
 //{
 //	if (checked)
@@ -497,3 +607,6 @@ void MainWindow::on_spinBox_valueChanged(int value)
 //{
 //	this->ui->lensCheck->setChecked(false);
 //}
+
+
+

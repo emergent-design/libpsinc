@@ -10,6 +10,7 @@ using namespace std;
 
 Canvas::Canvas(QWidget *parent, Qt::WindowFlags f) : QLabel(parent, f)
 {
+	this->setMouseTracking(true);
 }
 
 
@@ -27,7 +28,12 @@ void Canvas::Update(QImage *image, bool portrait)
 
 QRect Canvas::Roi()
 {
-	return this->roi.isEmpty() ? this->buffer.rect() : this->roi;
+	return this->roi; //this->roi.isEmpty() ? this->buffer.rect() : this->roi;
+}
+
+QPoint Canvas::Position()
+{
+	return this->position;
 }
 
 
@@ -92,12 +98,25 @@ void Canvas::paintEvent(QPaintEvent *)
 		painter.setPen(Qt::blue);
 		painter.drawRect(this->transient);
 	}
+
+
 }
 
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
-	this->transient.setBottomRight(event->pos());
+	if (this->mode == Mode::Select && event->buttons() == Qt::LeftButton)
+	{
+		this->transient.setBottomRight(event->pos());
+	}
+
+	auto r = event->pos() - this->rect.topLeft();
+	this->position = QPoint(
+		std::lrint(scale * r.x()),
+		std::lrint(scale * r.y())
+	);
+
+	emit updateInfo();
 }
 
 

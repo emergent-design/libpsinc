@@ -6,15 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1008</width>
-    <height>576</height>
+    <width>1220</width>
+    <height>765</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Iconograph</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_2">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0">
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -42,6 +48,12 @@
     </item>
     <item row="0" column="0">
      <widget class="QFrame" name="toolPanel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -61,6 +73,48 @@
        <property name="bottomMargin">
         <number>2</number>
        </property>
+       <item row="2" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QToolButton" name="selectButton">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/iconograph.qrc">
+           <normaloff>:/select.png</normaloff>:/select.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>18</width>
+           <height>18</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QToolButton" name="zoomButton">
          <property name="focusPolicy">
@@ -93,82 +147,46 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QToolButton" name="selectButton">
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../resources/iconograph.qrc">
-           <normaloff>:/select.png</normaloff>:/select.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>18</width>
-           <height>18</height>
-          </size>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
     </item>
-    <item row="2" column="0" colspan="2">
+    <item row="1" column="0" colspan="2">
      <widget class="QTabWidget" name="tabs">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
-      </property>
-      <property name="tabShape">
-       <enum>QTabWidget::Rounded</enum>
-      </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="settingsTab">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
        </property>
        <attribute name="title">
         <string>Settings</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
         <property name="leftMargin">
          <number>4</number>
         </property>
@@ -181,148 +199,15 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
-        <property name="spacing">
+        <property name="horizontalSpacing">
          <number>4</number>
         </property>
-        <item row="1" column="5">
-         <widget class="QCheckBox" name="portraitCheck">
-          <property name="text">
-           <string>Portrait</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="5" rowspan="2">
-         <widget class="QPushButton" name="saveFrame">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Save Frame</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="gainLabel">
-          <property name="text">
-           <string>Gain</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
+        <property name="verticalSpacing">
+         <number>2</number>
+        </property>
+        <item row="6" column="1">
          <widget class="QSpinBox" name="contextSpin">
           <property name="maximum">
-           <number>1</number>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="modeLabel">
-          <property name="text">
-           <string>Capture Mode</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="exposureLabel">
-          <property name="text">
-           <string>Exposure</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QSpinBox" name="exposureSpin">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1024</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QCheckBox" name="exposureCheck">
-          <property name="text">
-           <string>Auto</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3">
-         <widget class="QCheckBox" name="gainCheck">
-          <property name="text">
-           <string>Auto</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QSpinBox" name="gainSpin">
-          <property name="suffix">
-           <string/>
-          </property>
-          <property name="minimum">
-           <number>16</number>
-          </property>
-          <property name="maximum">
-           <number>64</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QCheckBox" name="flashCheck">
-          <property name="text">
-           <string>Enable</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="flashLabel">
-          <property name="text">
-           <string>Flash</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QSpinBox" name="flashSpin">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>255</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QSlider" name="adcSlider">
-          <property name="maximum">
-           <number>7</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="invertedAppearance">
-           <bool>false</bool>
-          </property>
-          <property name="invertedControls">
-           <bool>false</bool>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::TicksBelow</enum>
-          </property>
-          <property name="tickInterval">
            <number>1</number>
           </property>
          </widget>
@@ -334,13 +219,25 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
-         <widget class="QLabel" name="contextLabel">
-          <property name="text">
-           <string>Context</string>
+        <item row="2" column="1">
+         <widget class="QSlider" name="gainSlider">
+          <property name="minimum">
+           <number>16</number>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <property name="maximum">
+           <number>64</number>
+          </property>
+          <property name="pageStep">
+           <number>8</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::TicksBelow</enum>
+          </property>
+          <property name="tickInterval">
+           <number>1</number>
           </property>
          </widget>
         </item>
@@ -369,56 +266,159 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QSlider" name="gainSlider">
+        <item row="3" column="0">
+         <widget class="QLabel" name="adcLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>ADC Reference</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QCheckBox" name="invertCheck">
+          <property name="text">
+           <string>Invert type (bayer/mono)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="flashLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Flash</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="gainLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Gain</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2" rowspan="2" colspan="2">
+         <widget class="QPushButton" name="grabFrame">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Grab Frame</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QCheckBox" name="portraitCheck">
+          <property name="text">
+           <string>Portrait</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4" rowspan="7">
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QSpinBox" name="framerateSpin">
           <property name="minimum">
-           <number>16</number>
+           <number>1</number>
           </property>
-          <property name="maximum">
-           <number>64</number>
+          <property name="value">
+           <number>25</number>
           </property>
-          <property name="pageStep">
-           <number>8</number>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QSlider" name="framerateSlider">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>25</number>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
+          <property name="invertedAppearance">
+           <bool>false</bool>
+          </property>
+          <property name="invertedControls">
+           <bool>false</bool>
+          </property>
           <property name="tickPosition">
            <enum>QSlider::TicksBelow</enum>
           </property>
-          <property name="tickInterval">
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QSpinBox" name="exposureSpin">
+          <property name="minimum">
            <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>1024</number>
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
-         <widget class="QComboBox" name="modeBox">
-          <item>
-           <property name="text">
-            <string>Normal</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Master</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Slave Rising</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Slave Falling</string>
-           </property>
-          </item>
+        <item row="5" column="5" rowspan="2">
+         <widget class="QPushButton" name="saveFrame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Save Frame</string>
+          </property>
          </widget>
         </item>
-        <item row="3" column="3">
-         <widget class="QPushButton" name="adcReset">
+        <item row="1" column="0">
+         <widget class="QLabel" name="exposureLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
-           <string>Reset</string>
+           <string>Exposure</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -453,18 +453,14 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="adcLabel">
-          <property name="text">
-           <string>ADC Reference</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="0">
          <widget class="QLabel" name="framerateLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Frame Rate Limit</string>
           </property>
@@ -473,52 +469,93 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
-         <widget class="QSlider" name="framerateSlider">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>25</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="invertedAppearance">
-           <bool>false</bool>
-          </property>
-          <property name="invertedControls">
-           <bool>false</bool>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::TicksBelow</enum>
+        <item row="1" column="3">
+         <widget class="QCheckBox" name="exposureCheck">
+          <property name="text">
+           <string>Auto</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="2">
-         <widget class="QSpinBox" name="framerateSpin">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>25</number>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3">
-         <widget class="QCheckBox" name="framerateCheck">
+        <item row="0" column="3">
+         <widget class="QCheckBox" name="flashCheck">
           <property name="text">
            <string>Enable</string>
           </property>
-          <property name="checked">
-           <bool>true</bool>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="contextLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Context</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
-        <item row="2" column="5">
-         <widget class="QCheckBox" name="colourCheck">
+        <item row="3" column="5">
+         <widget class="QCheckBox" name="compandingCheck">
           <property name="text">
-           <string>Force Bayer</string>
+           <string>Companding</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QPushButton" name="adcReset">
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="modeLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Capture Mode</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QSpinBox" name="flashSpin">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>255</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QCheckBox" name="gainCheck">
+          <property name="text">
+           <string>Auto</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QSpinBox" name="gainSpin">
+          <property name="suffix">
+           <string/>
+          </property>
+          <property name="minimum">
+           <number>16</number>
+          </property>
+          <property name="maximum">
+           <number>64</number>
           </property>
          </widget>
         </item>
@@ -532,57 +569,86 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="5">
-         <widget class="QCheckBox" name="compandingCheck">
+        <item row="4" column="3">
+         <widget class="QCheckBox" name="framerateCheck">
           <property name="text">
-           <string>Companding</string>
+           <string>Enable</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="6" column="2" rowspan="2" colspan="2">
-         <widget class="QPushButton" name="grabFrame">
-          <property name="enabled">
+        <item row="5" column="1">
+         <widget class="QComboBox" name="modeBox">
+          <item>
+           <property name="text">
+            <string>Normal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Master</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Slave Rising</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Slave Falling</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSlider" name="adcSlider">
+          <property name="maximum">
+           <number>7</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="invertedAppearance">
            <bool>false</bool>
           </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+          <property name="invertedControls">
+           <bool>false</bool>
           </property>
-          <property name="text">
-           <string>Grab Frame</string>
+          <property name="tickPosition">
+           <enum>QSlider::TicksBelow</enum>
+          </property>
+          <property name="tickInterval">
+           <number>1</number>
           </property>
          </widget>
         </item>
-        <item row="5" column="1" colspan="3">
-         <spacer name="verticalSpacer_2">
+        <item row="7" column="2">
+         <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
+           <enum>QSizePolicy::Minimum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>10</height>
+            <height>0</height>
            </size>
           </property>
          </spacer>
         </item>
-        <item row="0" column="4" rowspan="8">
-         <widget class="Line" name="line_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="advancedTab">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -603,19 +669,25 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
-        <property name="spacing">
+        <property name="horizontalSpacing">
          <number>4</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>2</number>
         </property>
         <item row="0" column="0">
          <widget class="QTableView" name="advancedTable">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="sizeAdjustPolicy">
            <enum>QAbstractScrollArea::AdjustIgnored</enum>
+          </property>
+          <property name="autoScrollMargin">
+           <number>16</number>
           </property>
           <property name="alternatingRowColors">
            <bool>true</bool>
@@ -641,7 +713,7 @@
       </widget>
       <widget class="QWidget" name="expertTab">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -650,18 +722,49 @@
         <string>Expert</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="6" column="3" colspan="2">
-         <widget class="QCheckBox" name="lensCheck">
-          <property name="enabled">
-           <bool>false</bool>
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <property name="horizontalSpacing">
+         <number>4</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>2</number>
+        </property>
+        <item row="0" column="6" rowspan="2">
+         <widget class="QLabel" name="hdrHeading">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
-           <string>Enable</string>
+           <string>HDR</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
           </property>
          </widget>
         </item>
-        <item row="3" column="7">
-         <widget class="QSlider" name="rangeWindowSlider">
+        <item row="2" column="7" colspan="5">
+         <widget class="QSlider" name="rangeStartSlider">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -671,23 +774,14 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimum">
-           <number>256</number>
-          </property>
           <property name="maximum">
-           <number>4096</number>
+           <number>3839</number>
           </property>
           <property name="singleStep">
            <number>32</number>
           </property>
           <property name="pageStep">
            <number>256</number>
-          </property>
-          <property name="value">
-           <number>4096</number>
-          </property>
-          <property name="tracking">
-           <bool>true</bool>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -700,26 +794,231 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0" rowspan="2">
-         <widget class="QLabel" name="registerHeading">
+        <item row="8" column="0">
+         <widget class="QLabel" name="lensLabel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>24</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <pointsize>10</pointsize>
             <weight>75</weight>
-            <italic>false</italic>
             <bold>true</bold>
-            <underline>false</underline>
            </font>
           </property>
           <property name="text">
-           <string>Registers</string>
+           <string>Lens Correction</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
           </property>
          </widget>
         </item>
-        <item row="6" column="7">
+        <item row="4" column="7" colspan="6">
+         <widget class="QPushButton" name="saveHdrButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Save HDR</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QSpinBox" name="addressBox">
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="displayIntegerBase">
+           <number>16</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QSpinBox" name="widthRegionBox">
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+          <property name="value">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="7" colspan="5">
+         <widget class="QComboBox" name="hdrModeBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <item>
+           <property name="text">
+            <string>Simple</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Range</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Window</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="3" column="12">
+         <widget class="QSpinBox" name="rangeWindowBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimum">
+           <number>256</number>
+          </property>
+          <property name="maximum">
+           <number>4096</number>
+          </property>
+          <property name="singleStep">
+           <number>32</number>
+          </property>
+          <property name="value">
+           <number>4096</number>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1" colspan="2">
+         <widget class="QDoubleSpinBox" name="lensBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimum">
+           <double>-1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>-0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="6">
+         <widget class="QLabel" name="rangeStartLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Range Start</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="xRegionBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" rowspan="2">
+         <widget class="QLabel" name="regionLabel">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Sensor Region</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QSpinBox" name="heightRegionBox">
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+          <property name="value">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="12">
+         <widget class="QLabel" name="bitShiftLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Bit shift (simple)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="2">
+         <widget class="QPushButton" name="getButton">
+          <property name="text">
+           <string>Get</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="9">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="5" rowspan="9">
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="7">
          <widget class="QComboBox" name="resetBox">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -764,422 +1063,7 @@
           </item>
          </widget>
         </item>
-        <item row="5" column="6" colspan="4">
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="9">
-         <widget class="QSpinBox" name="bitShiftBox">
-          <property name="maximum">
-           <number>15</number>
-          </property>
-          <property name="value">
-           <number>8</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="6" rowspan="2">
-         <widget class="QLabel" name="hdrHeading">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>HDR</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="2">
-         <widget class="QSpinBox" name="addressBox">
-          <property name="maximum">
-           <number>65535</number>
-          </property>
-          <property name="value">
-           <number>0</number>
-          </property>
-          <property name="displayIntegerBase">
-           <number>16</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="2">
-         <widget class="QPushButton" name="getButton">
-          <property name="text">
-           <string>Get</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3" colspan="2">
-         <widget class="QPushButton" name="setButton">
-          <property name="text">
-           <string>Set</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3" colspan="2">
-         <widget class="QSpinBox" name="valueBox">
-          <property name="maximum">
-           <number>65535</number>
-          </property>
-          <property name="displayIntegerBase">
-           <number>16</number>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="lensLabel">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Lens Correction</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1" colspan="2">
-         <widget class="QDoubleSpinBox" name="lensBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="minimum">
-           <double>-1.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>-0.100000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1" colspan="4">
-         <widget class="QPushButton" name="regionButton">
-          <property name="text">
-           <string>Apply</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="4">
-         <widget class="QSpinBox" name="heightRegionBox">
-          <property name="minimum">
-           <number>-1</number>
-          </property>
-          <property name="maximum">
-           <number>2048</number>
-          </property>
-          <property name="value">
-           <number>-1</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QSpinBox" name="yRegionBox">
-          <property name="maximum">
-           <number>2048</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="9">
-         <widget class="QLabel" name="bitShiftLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Bit shift (simple)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3">
-         <widget class="QSpinBox" name="widthRegionBox">
-          <property name="minimum">
-           <number>-1</number>
-          </property>
-          <property name="maximum">
-           <number>2048</number>
-          </property>
-          <property name="value">
-           <number>-1</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QSpinBox" name="xRegionBox">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximum">
-           <number>2048</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" rowspan="2">
-         <widget class="QLabel" name="regionLabel">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Sensor Region</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="6">
-         <widget class="QLabel" name="rangeStartLabel">
-          <property name="text">
-           <string>Range Start</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="6">
-         <widget class="QLabel" name="resetHeading">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Reset</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLabel" name="addressLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Register Address (hex)</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="9">
-         <widget class="QSpinBox" name="rangeStartBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>3839</number>
-          </property>
-          <property name="singleStep">
-           <number>32</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="6">
-         <widget class="QLabel" name="rangeWindowLabel">
-          <property name="text">
-           <string>Range Window</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="7">
-         <widget class="QSlider" name="rangeStartSlider">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximum">
-           <number>3839</number>
-          </property>
-          <property name="singleStep">
-           <number>32</number>
-          </property>
-          <property name="pageStep">
-           <number>256</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::TicksBelow</enum>
-          </property>
-          <property name="tickInterval">
-           <number>256</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="9">
-         <widget class="QSpinBox" name="rangeWindowBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="minimum">
-           <number>256</number>
-          </property>
-          <property name="maximum">
-           <number>4096</number>
-          </property>
-          <property name="singleStep">
-           <number>32</number>
-          </property>
-          <property name="value">
-           <number>4096</number>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="9">
-         <widget class="QPushButton" name="resetButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Reset</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3" colspan="2">
-         <widget class="QLabel" name="valueLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Register Value (hex)</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="7">
-         <widget class="QLabel" name="hdrModeLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Mode</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="7">
-         <widget class="QComboBox" name="hdrModeBox">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <item>
-           <property name="text">
-            <string>Simple</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Range</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Window</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="4" column="7" colspan="3">
-         <widget class="QPushButton" name="saveHdrButton">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Save HDR</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="6">
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="5" rowspan="8">
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="9">
+        <item row="8" column="12">
          <widget class="QSpinBox" name="spinBox">
           <property name="minimum">
            <number>10</number>
@@ -1195,7 +1079,110 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="6" colspan="2">
+        <item row="8" column="3" colspan="2">
+         <widget class="QCheckBox" name="lensCheck">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Enable</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QSpinBox" name="yRegionBox">
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="7" colspan="5">
+         <widget class="QSlider" name="rangeWindowSlider">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimum">
+           <number>256</number>
+          </property>
+          <property name="maximum">
+           <number>4096</number>
+          </property>
+          <property name="singleStep">
+           <number>32</number>
+          </property>
+          <property name="pageStep">
+           <number>256</number>
+          </property>
+          <property name="value">
+           <number>4096</number>
+          </property>
+          <property name="tracking">
+           <bool>true</bool>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::TicksBelow</enum>
+          </property>
+          <property name="tickInterval">
+           <number>256</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3" colspan="2">
+         <widget class="QPushButton" name="setButton">
+          <property name="text">
+           <string>Set</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLabel" name="addressLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Register Address (hex)</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="8">
+         <widget class="QPushButton" name="resetButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="12">
+         <widget class="QSpinBox" name="bitShiftBox">
+          <property name="maximum">
+           <number>15</number>
+          </property>
+          <property name="value">
+           <number>8</number>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="10" colspan="2">
          <widget class="QLabel" name="timeoutHeading">
           <property name="font">
            <font>
@@ -1212,6 +1199,698 @@
           </property>
          </widget>
         </item>
+        <item row="3" column="6">
+         <widget class="QLabel" name="rangeWindowLabel">
+          <property name="text">
+           <string>Range Window</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" colspan="2">
+         <widget class="QSpinBox" name="valueBox">
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="displayIntegerBase">
+           <number>16</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3" colspan="2">
+         <widget class="QLabel" name="valueLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Register Value (hex)</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" rowspan="2">
+         <widget class="QLabel" name="registerHeading">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+            <underline>false</underline>
+           </font>
+          </property>
+          <property name="text">
+           <string>Registers</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="12">
+         <widget class="QSpinBox" name="rangeStartBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>3839</number>
+          </property>
+          <property name="singleStep">
+           <number>32</number>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="7">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="1" colspan="4">
+         <widget class="QPushButton" name="regionButton">
+          <property name="text">
+           <string>Apply</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="6">
+         <widget class="QLabel" name="resetHeading">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Reset</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="7" colspan="5">
+         <widget class="QLabel" name="hdrModeLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Mode</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="6" colspan="7">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="infoTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Info</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <property name="horizontalSpacing">
+         <number>4</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>2</number>
+        </property>
+        <item row="1" column="4">
+         <widget class="QLabel" name="label_8">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>R</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="7">
+         <widget class="QLabel" name="label_15">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>2</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QSpinBox" name="currentV">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="readOnly">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4" colspan="2">
+         <widget class="QLabel" name="label_7">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+            <underline>false</underline>
+           </font>
+          </property>
+          <property name="text">
+           <string>Selected Region Mean</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="currentX">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="frame">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>9999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QSpinBox" name="regionG">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QSpinBox" name="currentG">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QSpinBox" name="currentB">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="6" rowspan="7">
+         <widget class="Line" name="line_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>X</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>B</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="8">
+         <widget class="QSpinBox" name="bayer2">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QLabel" name="label_9">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>G</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QLabel" name="label_11">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>B</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>R</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="9">
+         <widget class="QSpinBox" name="bayer1">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Y</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4">
+         <widget class="QLabel" name="label_12">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>V</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="7" colspan="3">
+         <widget class="QLabel" name="label_13">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+            <underline>false</underline>
+           </font>
+          </property>
+          <property name="text">
+           <string>Selected Region Mean Bayer Values</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="8">
+         <widget class="QSpinBox" name="bayer0">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="8">
+         <widget class="QLabel" name="label_18">
+          <property name="text">
+           <string>A</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="5">
+         <widget class="QSpinBox" name="regionV">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="7">
+         <widget class="QLabel" name="label_14">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>1</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" rowspan="7">
+         <widget class="Line" name="line_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="9">
+         <widget class="QSpinBox" name="bayer3">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="5">
+         <widget class="QSpinBox" name="regionB">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="currentR">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>G</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="9">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>B</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>V</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="currentY">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>9999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="currentLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+            <underline>false</underline>
+           </font>
+          </property>
+          <property name="text">
+           <string>Current</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QSpinBox" name="regionR">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>65536</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="7" rowspan="3" colspan="3">
+         <widget class="QLabel" name="descriptionLabel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;These values only make sense if you are using a bayer sensor forced to monochrome mode in the settings. Given the selected region of interest it will provide an average value of each pixel in the bayer matrix. So if the bayer is &lt;span style=&quot; font-style:italic;&quot;&gt;RGaGbB&lt;/span&gt; then &lt;span style=&quot; font-weight:600;&quot;&gt;A1&lt;/span&gt; will be the average &lt;span style=&quot; font-style:italic;&quot;&gt;R&lt;/span&gt;, &lt;span style=&quot; font-weight:600;&quot;&gt;A2&lt;/span&gt; the average &lt;span style=&quot; font-style:italic;&quot;&gt;Ga&lt;/span&gt; and so on.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::AutoText</enum>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignJustify|Qt::AlignTop</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -1223,7 +1902,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1008</width>
+     <width>1220</width>
      <height>23</height>
     </rect>
    </property>

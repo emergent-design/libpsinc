@@ -31,6 +31,8 @@ class MainWindow : public QMainWindow
 		void onGrab(QImage *image);
 		void onForceRestart();
 
+		void on_canvas_updateInfo();
+
 		void on_flashSlider_valueChanged(int value);
 		void on_flashCheck_toggled(bool checked);
 		void on_exposureSlider_valueChanged(int value);
@@ -39,7 +41,7 @@ class MainWindow : public QMainWindow
 		void on_gainCheck_toggled(bool checked);
 		void on_adcSlider_valueChanged(int value);
 		void on_adcReset_clicked();
-		void on_colourCheck_toggled(bool checked);
+		void on_invertCheck_toggled(bool checked);
 		void on_portraitCheck_toggled(bool checked);
 		void on_compandingCheck_toggled(bool checked);
 		void on_streamCheck_toggled(bool checked);
@@ -73,7 +75,8 @@ class MainWindow : public QMainWindow
 
 		void on_saveFrame_clicked();
 
-	signals:
+
+signals:
 
 		void connectionChanged(bool connected);
 		void imageGrabbed(QImage *image);
@@ -90,6 +93,7 @@ class MainWindow : public QMainWindow
 
 
 		void Grab();
+		void UpdateRegionInfo();
 		void UpdateSlider(QSlider *slider, QSpinBox *spin, std::string alias);
 		void UpdateCheck(QCheckBox *check, std::string alias);
 

@@ -23,10 +23,13 @@ class Canvas : public QLabel
 
 		void Update(QImage *image, bool portrait);
 		QRect Roi();
+		QPoint Position();
 
 
 		void SetMode(Mode mode);
 
+	signals:
+		void updateInfo();
 
 	protected slots:
 
@@ -48,6 +51,8 @@ class Canvas : public QLabel
 		QPoint offset	= { 0, 0 };
 		double minScale	= 0.0;
 		double zoom		= -1;	// <0 = fill canvas
+
+		QPoint position = { 0, 0 };
 
 		Mode mode		= Mode::Zoom;
 };

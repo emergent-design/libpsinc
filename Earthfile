@@ -44,9 +44,10 @@ all:
 
 
 appimage:
-	FROM --build-arg DISTRIBUTION=bionic +build
+	FROM --build-arg DISTRIBUTION=bionic +deps
 	RUN apt-get update && apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev file
-	COPY --dir resources ui iconograph.pro .
+	COPY --dir include packages src premake5.lua strip resources ui iconograph.pro .
+	RUN premake5 gmake && make -j$(nproc)
 	RUN qmake -o iconograph.make CONFIG+=release iconograph.pro \
 		&& make -f iconograph.make -j$(nproc)
 	RUN mkdir -p packages/appdir/usr/bin packages/appdir/usr/lib \
