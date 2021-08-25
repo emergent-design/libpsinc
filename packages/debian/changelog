@@ -1,3 +1,10 @@
+libpsinc0 (0.1.36) unstable; urgency=medium
+
+  * Configuration of ImageHandler now supports different sensor type overrides.
+  * New info tab in Iconograph showing pixel values and selected region means.
+
+ -- Dan <dan@dodeca>  Wed, 25 Aug 2021 14:47:40 +0100
+
 libpsinc0 (0.1.35) unstable; urgency=medium
 
   * Update to the deployment process
