@@ -76,6 +76,8 @@ class MainWindow : public QMainWindow
 		void on_saveFrame_clicked();
 
 
+		void on_faultResetButton_clicked();
+
 signals:
 
 		void connectionChanged(bool connected);
@@ -89,6 +91,12 @@ signals:
 			Simple,
 			Range,
 			Window
+		};
+
+		struct FlashFault
+		{
+			int frames	= 0;
+			int faults	= 0;
 		};
 
 
@@ -143,4 +151,6 @@ signals:
 
 		long rateLimit		= 40000;
 		bool rateEnabled	= true;
+
+		FlashFault flashFault;
 };

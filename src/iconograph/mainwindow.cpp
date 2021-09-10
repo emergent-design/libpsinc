@@ -362,15 +362,36 @@ void MainWindow::UpdateRegionInfo()
 				? GetRegionMeans(this->image, roi)
 				: GetRegionMeans(this->hdrImage, roi);
 
+	const int intensity = (values[0] + values[1] + values[2]) / 3;
+
 	this->ui->regionR->setValue(values[0]);
 	this->ui->regionG->setValue(values[1]);
 	this->ui->regionB->setValue(values[2]);
-	this->ui->regionV->setValue((values[0] + values[1] + values[2]) / 3);
+	this->ui->regionV->setValue(intensity);
 
 	this->ui->bayer0->setValue(values[3]);
 	this->ui->bayer1->setValue(values[4]);
 	this->ui->bayer2->setValue(values[5]);
 	this->ui->bayer3->setValue(values[6]);
+
+	// Update flash fault stats
+	const int threshold = this->ui->faultThreshold->value();
+
+	if (threshold)
+	{
+		this->flashFault.frames++;
+		if (intensity < threshold)
+		{
+			this->flashFault.faults++;
+		}
+	}
+	else
+	{
+		this->flashFault.frames = this->flashFault.faults = 0;
+	}
+
+	this->ui->frameCountTotal->display(this->flashFault.frames);
+	this->ui->frameCountFault->display(this->flashFault.faults);
 }
 
 
@@ -581,6 +602,10 @@ void MainWindow::on_spinBox_valueChanged(int value)
 }
 
 
+void MainWindow::on_faultResetButton_clicked()
+{
+	this->flashFault.frames = this->flashFault.faults = 0;
+}
 
 
 //void MainWindow::on_lensCheck_toggled(bool checked)
@@ -607,6 +632,8 @@ void MainWindow::on_spinBox_valueChanged(int value)
 //{
 //	this->ui->lensCheck->setChecked(false);
 //}
+
+
 
 
 
