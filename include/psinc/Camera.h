@@ -1,6 +1,7 @@
 #pragma once
 
 #include <psinc/Instrument.h>
+#include <psinc/Properties.hpp>
 #include <psinc/handlers/DataHandler.hpp>
 #include <psinc/driver/Feature.h>
 #include <psinc/driver/Aliases.h>
@@ -62,6 +63,11 @@ namespace psinc
 			/// Multiple contexts allow sets of features to be configured and rapidly
 			/// switched between.
 			bool SetContext(byte context);
+
+
+			/// Set common properties such as exposure and colour balance for a specific
+			/// context.
+			bool SetProperties(byte context, const Properties &properties);
 
 			/// Helper function to configure which part of the sensor to use
 			/// for image capture regardless of chip type (since chips define
@@ -174,5 +180,9 @@ namespace psinc
 
 			// A lock used for ensuring that changes to the window do not occur whilst grabbing an image
 			std::mutex window;
+
+			// Maximum exposure range when converting a normalised exposure property to an integer feature value
+			// The full range of exposure is not usually necessary since active lighting is most commonly used.
+			static const int MAX_EXPOSURE = 1024;
 	};
 }

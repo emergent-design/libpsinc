@@ -285,8 +285,50 @@ namespace psinc
 	}
 
 
+	bool Camera::SetProperties(byte context, const Properties &properties)
+	{
+		if (context >= this->contextCount)
+		{
+			return false;
+		}
+
+		lock_guard lock(this->window);
+
+		auto &alias			= this->aliases[0];
+		const int exposure	= std::lrint(properties.exposure * MAX_EXPOSURE);
+		const int gain		= std::lrint(properties.gain * std::max(1, alias.gain->Maximum() - alias.gain->Minimum()));
+		bool result			=
+			   alias.exposure->Set(alias.exposure->Minimum() + exposure)
+			&& alias.gain->Set(alias.gain->Minimum() + gain);
+
+		// Only the mt9 supports channel gains
+		if (this->chip == "mt9")
+		{
+			static auto set = [](auto &features, const string &name, const char *suffix, const double value) {
+				return features[name + "_gain_int" + suffix].Set((int)value)
+					&& features[name + "_gain_frac" + suffix].Set((int)((value - (int)value) / 0.03125));
+			};
+
+			result =
+				   set(this->features, "red",		context ? "_cb" : "", properties.red)
+				&& set(this->features, "green1",	context ? "_cb" : "", properties.green)
+				&& set(this->features, "green2",	context ? "_cb" : "", properties.green)
+				&& set(this->features, "blue",		context ? "_cb" : "", properties.blue);
+		}
+
+		this->SetFlash(properties.flash);
+
+		return result;
+	}
+
+
 	bool Camera::SetWindow(byte context, int x, int y, int width, int height)
 	{
+		if (context >= this->contextCount)
+		{
+			return false;
+		}
+
 		lock_guard<mutex> lock(this->window);
 
 		auto &alias	= this->aliases[context];

@@ -1,3 +1,10 @@
+libpsinc0 (0.1.37) unstable; urgency=medium
+
+  * Added a Properties structure and helper function to set common feature values.
+  * Build is now c++17 
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Fri, 08 Apr 2022 16:19:53 +0100
+
 libpsinc0 (0.1.36) unstable; urgency=medium
 
   * Configuration of ImageHandler now supports different sensor type overrides.

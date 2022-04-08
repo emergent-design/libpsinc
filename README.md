@@ -1,7 +1,7 @@
 libpsinc
 ========
 
-libpsinc is a cross-platform acquisition library for the [Perception-SI Ltd](http://www.psi-ltd.com) range of cameras. It provides a C++14 implementation that we test on Linux and Windows, but are unable to support Mac (it may work, but we have no way of checking). The core functionality is also wrapped by a C API allowing for easier interop with languages such as C#. An example
+libpsinc is a cross-platform acquisition library for the [Perception-SI Ltd](http://www.psi-ltd.com) range of cameras. It provides a C++17 implementation that we test on Linux and Windows, but are unable to support Mac (it may work, but we have no way of checking). The core functionality is also wrapped by a C API allowing for easier interop with languages such as C#. An example
 C# wrapper library has also been included that should work with both .NET and mono.
 
 libpsinc relies upon [libusb](http://libusb.info/); see the libpsinc [installation instructions](https://github.com/emergent-design/libpsinc/wiki/Installation) for your platform.
@@ -15,7 +15,7 @@ libpsinc is freely available under the terms of the [MIT License](http://opensou
 
 ```
 This software is based on libpsinc (https://github.com/emergent-design/libpsinc).
-Libpsinc is Copyright (C) 2014-2016 Emergent Design
+Libpsinc is Copyright (C) 2014-2022 Emergent Design
 ```
 
 
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-Both of the above examples can be compiled using a suitable version of Clang/GCC with the options ```-std=c++14 -lpsinc -lfreeimage -lpthread```
+Both of the above examples can be compiled using a suitable version of Clang/GCC with the options ```-std=c++17 -lpsinc -lfreeimage -lpthread```
 
 
 ## Features ##
