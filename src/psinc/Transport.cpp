@@ -3,11 +3,10 @@
 #include <emergent/String.hpp>
 #include <regex>
 
-using namespace std;
-using namespace emergent;
-
 #define WRITE_PIPE	0x03
 #define READ_PIPE	0x81
+
+using std::string;
 
 
 namespace psinc
@@ -33,7 +32,7 @@ namespace psinc
 	}
 
 
-	bool Transport::Initialise(const std::set<uint16_t> &vendors, uint16_t product, string serial, std::function<void(bool)> onConnection, int timeout)
+	bool Transport::Initialise(const std::set<uint16_t> &vendors, uint16_t product, std::string serial, std::function<void(bool)> onConnection, int timeout)
 	{
 		this->vendors		= vendors;
 		this->product		= product;
@@ -46,7 +45,7 @@ namespace psinc
 			libusb_hotplug_deregister_callback(this->context, this->hotplug);
 			this->registered = false;
 		}
-		else Log::Info("USB hotplug not supported on this platform, running in legacy mode");
+		else emg::Log::Info("USB hotplug not supported on this platform, running in legacy mode");
 
 		return true;
 	}
@@ -127,7 +126,7 @@ namespace psinc
 
 			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, LIBUSB_HOTPLUG_MATCH_ANY, this->product, LIBUSB_HOTPLUG_MATCH_ANY, &OnHotplug, this, &this->hotplug))
 			{
-				Log::Error("Unable to register USB hotplug callback");
+				emg::Log::Error("Unable to register USB hotplug callback");
 				return;
 			}
 
@@ -155,9 +154,9 @@ namespace psinc
 
 		libusb_get_string_descriptor_ascii(device, index, data, 128);
 
-		this->id = String::trim(reinterpret_cast<char *>(data), ' ');
+		this->id = emg::String::trim(reinterpret_cast<char *>(data), ' ');
 
-		return this->serial.empty() ? true : regex_match(this->id, regex(this->serial));
+		return this->serial.empty() ? true : regex_match(this->id, std::regex(this->serial));
 	}
 
 
@@ -196,7 +195,7 @@ namespace psinc
 
 	bool Transport::Claim(libusb_device *device)
 	{
-		lock_guard<mutex> lock(this->cs);
+		std::lock_guard lock(this->cs);
 
 		libusb_device_descriptor descriptor;
 
@@ -216,9 +215,9 @@ namespace psinc
 						{
 							this->version = (descriptor.bcdUSB >> 8) & 0xff;
 
-							Log::Info(
+							emg::Log::Info(
 								"%u: USB (v%d.%d) device claimed - %s",
-								Timestamp::LogTime(),
+								emg::Timestamp::LogTime(),
 								this->version,
 								descriptor.bcdUSB & 0xff,
 								this->id);
@@ -238,9 +237,9 @@ namespace psinc
 	}
 
 
-	map<string, string> Transport::List(const std::set<uint16_t> &vendors, uint16_t product)
+	std::map<string, string> Transport::List(const std::set<uint16_t> &vendors, uint16_t product)
 	{
-		map<string, string> result;
+		std::map<string, string> result;
 
 		unsigned char data[128];
 		libusb_device **list;
@@ -258,7 +257,7 @@ namespace psinc
 				if (libusb_open(*device, &handle) == 0)
 				{
 					libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 128);
-					string serial = String::trim(reinterpret_cast<char *>(data), ' ');
+					string serial = emg::String::trim(reinterpret_cast<char *>(data), ' ');
 
 					libusb_get_string_descriptor_ascii(handle, descriptor.iProduct, data, 128);
 					result[serial] = reinterpret_cast<char *>(data);
@@ -278,7 +277,7 @@ namespace psinc
 
 	void Transport::Disconnect()
 	{
-		lock_guard<mutex> lock(this->cs);
+		std::lock_guard lock(this->cs);
 
 		this->Release();
 	}
@@ -294,7 +293,7 @@ namespace psinc
 			libusb_release_interface(this->handle, 0);
 			libusb_close(this->handle);
 
-			Log::Info("%u: USB deviced released - %s", Timestamp::LogTime(), this->id);
+			emg::Log::Info("%u: USB deviced released - %s", emg::Timestamp::LogTime(), this->id);
 
 			this->disconnect	= true;
 			this->handle		= nullptr;
@@ -307,7 +306,7 @@ namespace psinc
 
 	bool Transport::Reset(bool control)
 	{
-		lock_guard<mutex> lock(this->cs);
+		std::lock_guard lock(this->cs);
 
 		if (this->handle)
 		{
@@ -326,7 +325,7 @@ namespace psinc
 				// and must be cleaned up.
 				this->Release();
 
-				Log::Error("Problem resetting USB device, handle has been released");
+				emg::Log::Error("Problem resetting USB device, handle has been released");
 			}
 		}
 
@@ -334,15 +333,15 @@ namespace psinc
 	}
 
 
-	bool Transport::Transfer(Buffer<byte> *send, Buffer<byte> *receive, atomic<bool> &waiting, bool check, bool truncate)
+	bool Transport::Transfer(emg::Buffer<byte> *send, emg::Buffer<byte> *receive, std::atomic<bool> &waiting, bool check, bool truncate)
 	{
-		lock_guard<mutex> lock(this->cs);
+		std::lock_guard lock(this->cs);
 
 		return this->handle ? this->Transfer(send, true, check, false) && (waiting = true) && this->Transfer(receive, false, check, truncate) : false;
 	}
 
 
-	bool Transport::Transfer(Buffer<byte> *buffer, bool write, bool check, bool truncate)
+	bool Transport::Transfer(emg::Buffer<byte> *buffer, bool write, bool check, bool truncate)
 	{
 		if (buffer)
 		{
@@ -376,9 +375,9 @@ namespace psinc
 
 				if (!result)
 				{
-					Log::Error(
+					emg::Log::Error(
 						"%u: USB device %s - Incomplete transfer when %s (%d of %d bytes)",
-						Timestamp::LogTime(),
+						emg::Timestamp::LogTime(),
 						this->id,
 						write ? "writing" : "reading",
 						transferred,
@@ -388,12 +387,12 @@ namespace psinc
 			}
 			else if (this->legacy && (err == LIBUSB_ERROR_NO_DEVICE || err == LIBUSB_ERROR_IO))
 			{
-				Log::Error("%u: USB device %s - Device has been disconnected", Timestamp::LogTime(), this->id);
+				emg::Log::Error("%u: USB device %s - Device has been disconnected", emg::Timestamp::LogTime(), this->id);
 				this->Release();
 			}
 			else
 			{
-				Log::Error("%u: USB device %s - %s (%d) when %s (%d bytes transferred)", Timestamp::LogTime(), this->id, libusb_error_name(err), err, write ? "writing" : "reading", transferred);
+				emg::Log::Error("%u: USB device %s - %s (%d) when %s (%d bytes transferred)", emg::Timestamp::LogTime(), this->id, libusb_error_name(err), err, write ? "writing" : "reading", transferred);
 			}
 
 			return result;

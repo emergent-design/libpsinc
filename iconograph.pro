@@ -1,8 +1,6 @@
-QT       += core gui
-QMAKE_CXXFLAGS += -std=c++14
+QT += core gui widgets
 QMAKE_MAKEFILE = iconograph.make
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+#QMAKE_CXXFLAGS += -std=c++17	# only required for 18.04 builds
 
 TARGET = iconograph
 TEMPLATE = app
@@ -13,7 +11,7 @@ HEADERS += include/iconograph/*.h
 RESOURCES += resources/*.qrc
 FORMS   += ui/*.ui
 LIBS    += -Llib -lpsinc -lfreeimage -lusb-1.0
-CONFIG  += rtti
+CONFIG  += rtti c++17
 
 DESTDIR = bin
 OBJECTS_DIR = bin/.obj

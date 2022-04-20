@@ -5,8 +5,6 @@
 #include <iostream>
 #include <cmath>
 
-using namespace std;
-
 
 Canvas::Canvas(QWidget *parent, Qt::WindowFlags f) : QLabel(parent, f)
 {
@@ -63,7 +61,7 @@ void Canvas::paintEvent(QPaintEvent *)
 		int ch			= this->height();
 		int iw			= this->buffer.width();
 		int ih			= this->buffer.height();
-		this->minScale	= min(1.0, min((double)cw / (double)iw, (double)ch / (double)ih));
+		this->minScale	= std::min(1.0, std::min((double)cw / (double)iw, (double)ch / (double)ih));
 
 		if (this->zoom < 0 || this->mode != Mode::Zoom)
 		{

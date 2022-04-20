@@ -7,16 +7,14 @@
 
 #define REFRESH_ATTEMPTS 3
 
-using namespace std;
-using namespace pugi;
-using namespace emergent;
-
+using std::string;
+using namespace std::chrono_literals;
 
 namespace psinc
 {
 	Camera::Camera() : Instrument()
 	{
-		this->send = Buffer<byte>({
+		this->send = emg::Buffer<byte>({
 			0x00, 0x00, 0x00, 0x00, 0x00, 	// Header
 			0x00, 0x00, 0x00, 0x00, 0x00,	// Command here
 			0xff							// Terminator
@@ -24,7 +22,7 @@ namespace psinc
 	}
 
 
-	void Camera::Initialise(string serial, std::function<void(bool)> onConnection, int timeout, const set<uint16_t> &vendors)
+	void Camera::Initialise(string serial, std::function<void(bool)> onConnection, int timeout, const std::set<uint16_t> &vendors)
 	{
 		Instrument::Initialise(Type::Camera, serial, onConnection, timeout, vendors);
 	}
@@ -47,7 +45,7 @@ namespace psinc
 					stream = this->callback(false);
 
 					// Sleep the thread to avoid ramping up processor usage if in streaming mode.
-					this_thread::sleep_for(chrono::milliseconds(100));
+					std::this_thread::sleep_for(100ms);
 				}
 			}
 
@@ -86,7 +84,7 @@ namespace psinc
 		this->features.clear();
 		this->registers.clear();
 
-		xml_document doc;
+		pugi::xml_document doc;
 		auto xml			= chip::v024;
 		auto description	= this->CustomDevice(0xff).Read(); //this->devicePool[0xff].Read();
 
@@ -111,7 +109,7 @@ namespace psinc
 	}
 
 
-	bool Camera::Configure(xml_node xml)
+	bool Camera::Configure(pugi::xml_node xml)
 	{
 		this->chip			= xml.attribute("chip").as_string();
 		this->contextCount	= xml.attribute("contexts").as_int(1);
@@ -169,12 +167,12 @@ namespace psinc
 
 	bool Camera::RefreshRegisters()
 	{
-		atomic<bool> waiting(false);
+		std::atomic<bool> waiting(false);
 
 		byte minPage = 255;
 		byte maxPage = 0;
-		Buffer<byte> data(512);
-		Buffer<byte> command = {
+		emg::Buffer<byte> data(512);
+		emg::Buffer<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,							// Header
 			Commands::ReadRegisterPage, 0x00, 0x00, 0x00, 0x00, 	// Command
 			0xff 													// Terminator
@@ -182,8 +180,8 @@ namespace psinc
 
 		for (auto &r : this->registers)
 		{
-			minPage = min(minPage, r.second.Page());
-			maxPage = max(maxPage, r.second.Page());
+			minPage = std::min(minPage, r.second.Page());
+			maxPage = std::max(maxPage, r.second.Page());
 		}
 
 		for (byte page = minPage; page <= maxPage; page++)
@@ -199,10 +197,13 @@ namespace psinc
 						if (r.second.Page() == page) r.second.Refresh(data);
 					}
 
-					Log::Info("%u: Successfully refreshed registers for page %d", Timestamp::LogTime(), page);
+					emg::Log::Info("%u: Successfully refreshed registers for page %d", emg::Timestamp::LogTime(), page);
 					break;
 				}
-				else Log::Error("%u: Failed to refresh registers for page %d", Timestamp::LogTime(), page);
+				else
+				{
+					emg::Log::Error("%u: Failed to refresh registers for page %d", emg::Timestamp::LogTime(), page);
+				}
 			}
 		}
 
@@ -217,9 +218,9 @@ namespace psinc
 
 	bool Camera::SetRegister(int address, int value)
 	{
-		atomic<bool> waiting(false);
+		std::atomic<bool> waiting(false);
 
-		Buffer<byte> data = {
+		emg::Buffer<byte> data = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 			// Header
 			Commands::WriteRegister, 				// Command
 			(byte)(address & 0xff),
@@ -235,9 +236,9 @@ namespace psinc
 
 	int Camera::GetRegister(int address)
 	{
-		atomic<bool> waiting(false);
-		Buffer<byte> receive(5);
-		Buffer<byte> command = {
+		std::atomic<bool> waiting(false);
+		emg::Buffer<byte> receive(5);
+		emg::Buffer<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,																	// Header
 			0x03, 0x00, 0x00, 0x00, 0x00, 																	// Flush command
 			Commands::QueueRegister, (byte)(address & 0xff), (byte)((address >> 8) & 0xff), 0x00, 0x00, 	// Command
@@ -292,7 +293,7 @@ namespace psinc
 			return false;
 		}
 
-		lock_guard lock(this->window);
+		std::lock_guard lock(this->window);
 
 		auto &alias			= this->aliases[0];
 		const int exposure	= std::lrint(properties.exposure * MAX_EXPOSURE);
@@ -329,7 +330,7 @@ namespace psinc
 			return false;
 		}
 
-		lock_guard<mutex> lock(this->window);
+		std::lock_guard lock(this->window);
 
 		auto &alias	= this->aliases[context];
 		int mx		= alias.columnStart->Minimum();
@@ -359,7 +360,7 @@ namespace psinc
 
 	bool Camera::Capture(DataHandler *handler, Mode mode, int flash)
 	{
-		lock_guard<mutex> lock(this->window);
+		std::lock_guard lock(this->window);
 
 		int width	= 0;
 		int height	= 0;

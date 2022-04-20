@@ -3,9 +3,7 @@
 
 #include <emergent/Emergent.hpp>
 #include <libusb-1.0/libusb.h>
-
-
-#include <iostream>
+// #include <iostream>
 
 namespace psinc
 {

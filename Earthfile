@@ -1,20 +1,20 @@
+VERSION 0.6
+
 bionic:
 	FROM ubuntu:18.04
-	# configure apt to be noninteractive
-	ENV DEBIAN_FRONTEND noninteractive
-	ENV DEBCONF_NONINTERACTIVE_SEEN true
-	WORKDIR /code
 
 focal:
 	FROM ubuntu:20.04
-	# configure apt to be noninteractive
-	ENV DEBIAN_FRONTEND noninteractive
-	ENV DEBCONF_NONINTERACTIVE_SEEN true
-	WORKDIR /code
+
+jammy:
+	FROM ubuntu:22.04
 
 image:
 	ARG DISTRIBUTION=bionic
 	FROM +$DISTRIBUTION
+	ENV DEBIAN_FRONTEND noninteractive
+	ENV DEBCONF_NONINTERACTIVE_SEEN true
+	WORKDIR /code
 	RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl build-essential clang fakeroot chrpath
 	RUN curl -L https://github.com/premake/premake-core/releases/download/v5.0.0-alpha15/premake-5.0.0-alpha15-linux.tar.gz | tar -xz -C /usr/bin/
 	RUN apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev
@@ -64,24 +64,26 @@ appimage:
 
 
 mingw:
-	FROM --build-arg DISTRIBUTION=focal +image
-	RUN apt-get install -y --no-install-recommends mingw-w64 p7zip-full unzip git
+	FROM --build-arg DISTRIBUTION=jammy +image
+	RUN apt-get install -y --no-install-recommends mingw-w64 p7zip-full unzip git cmake
 	RUN update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix \
    		&& update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
 
    	# Build Qt
-   	RUN git clone git://code.qt.io/qt/qt5.git && cd qt5 && git checkout 5.6 && ./init-repository
+   	RUN git clone git://code.qt.io/qt/qt5.git && cd qt5 && git checkout 5.15 && ./init-repository --module-subset=essential
+   	# Fix missing include
+   	RUN sed -i "/^QT_BEGIN_NAMESPACE/i #include <limits>" qt5/qtbase/src/corelib/text/qbytearraymatcher.h
+
 	RUN cd qt5 && ./configure -make libs -nomake examples -nomake tests -device-option \
 			CROSS_COMPILE=x86_64-w64-mingw32- -xplatform win32-g++ \
 			-qt-zlib -qt-libpng -qt-freetype -qt-harfbuzz -qt-pcre \
-			-no-glib -no-icu -no-iconv -no-dbus -no-qml-debug \
+			-no-glib -no-icu -no-iconv -no-dbus -no-opengl \
 			-skip qt3d -skip qtactiveqt -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdeclarative \
-			-skip qtdoc -skip qtdocgallery -skip qtenginio -skip qtfeedback -skip qtgraphicaleffects -skip qtlocation \
-			-skip qtmacextras -skip qtmultimedia -skip qtpim -skip qtpurchasing -skip qtqa -skip qtquick1 \
-			-skip qtquickcontrols -skip qtquickcontrols2 -skip qtrepotools -skip qtscript -skip qtsensors \
-			-skip qtserialbus -skip qtsvg -skip qtsystems -skip qttools -skip qttranslations -skip qtwayland \
-			-skip qtwebchannel -skip qtwebengine -skip qtwebkit -skip qtwebkit-examples -skip qtwebsockets \
-			-skip qtwebview -skip qtwinextras -skip qtx11extras -skip qtxmlpatterns \
+			-skip qtdoc -skip qtdocgallery -skip qtfeedback -skip qtgraphicaleffects -skip qtlocation -skip qtmacextras \
+			-skip qtmultimedia -skip qtpim -skip qtpurchasing -skip qtqa -skip qtquickcontrols -skip qtquickcontrols2 \
+			-skip qtrepotools -skip qtscript -skip qtsensors -skip qtserialbus -skip qtsvg -skip qtsystems -skip qttools \
+			-skip qttranslations -skip qtwayland  -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwebview \
+			-skip qtwinextras -skip qtx11extras -skip qtxmlpatterns \
 			-opensource -confirm-license -release -prefix /opt/qt5-win-x64 \
 		&& make -j"$(nproc)" && make install && cd .. && rm -rf qt5
 
@@ -104,7 +106,7 @@ windows:
 	FROM +mingw
 	# Dependencies
 	ARG GITHUB_EMERGENT=github.com/emergent-design
-	COPY $GITHUB_EMERGENT/libemergent:v0.0.31+package/libemergent-dev.deb .
+	COPY $GITHUB_EMERGENT/libemergent:v0.0.37+package/libemergent-dev.deb .
 	RUN dpkg -i libemergent-dev.deb && ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
 	# Build lib
 	COPY --dir include packages src resources ui iconograph.pro premake5.lua .

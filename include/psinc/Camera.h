@@ -15,6 +15,8 @@
 
 namespace psinc
 {
+	using emg::byte;
+
 	/// The primary interface to the capture library
 	class Camera : public Instrument
 	{

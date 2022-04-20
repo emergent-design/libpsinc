@@ -6,22 +6,25 @@
 #include <iostream>
 
 
-using namespace std;
-using namespace std::chrono;
-using namespace psinc;
-using namespace emergent;
+//using namespace std;
+//using namespace std::chrono;
+//using namespace psinc;
+//using namespace emergent;
 //using namespace ent;
+using std::string;
+using emg::byte;
+using emg::Log;
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
 	#ifdef __linux__
-		Log::Initialise({ unique_ptr<logger::Sink>(new logger::Console()) });
+		Log::Initialise({ std::unique_ptr<emg::logger::Sink>(new emg::logger::Console()) });
 	#else
-    	Log::Initialise({ unique_ptr<logger::Sink>(new logger::LogFile("iconograph.log")) });
+		Log::Initialise({ std::unique_ptr<emg::logger::Sink>(new emg::logger::LogFile("iconograph.log")) });
 	#endif
 
-	Log::Verbosity(Severity::Info);
+	Log::Verbosity(emg::Severity::Info);
 
 	connect(this, SIGNAL(connectionChanged(bool)), this, SLOT(onConnection(bool)));
 	connect(this, SIGNAL(imageGrabbed(QImage*)), this, SLOT(onGrab(QImage*)));
@@ -108,9 +111,9 @@ QImage *MainWindow::ConvertRange(int start, int window)
 		for (x=0; x<width; x++)
 		{
 			// mt9 camera uses the upper 12-bits so bitshift the value first
-			*dst++ = Maths::clamp<byte>((256 * ((*src++ >> 4) - start)) / window);
-			*dst++ = Maths::clamp<byte>((256 * ((*src++ >> 4) - start)) / window);
-			*dst++ = Maths::clamp<byte>((256 * ((*src++ >> 4)- start)) / window);
+			*dst++ = emg::Maths::clamp<byte>((256 * ((*src++ >> 4) - start)) / window);
+			*dst++ = emg::Maths::clamp<byte>((256 * ((*src++ >> 4) - start)) / window);
+			*dst++ = emg::Maths::clamp<byte>((256 * ((*src++ >> 4)- start)) / window);
 		}
 	}
 
@@ -171,8 +174,9 @@ QImage *MainWindow::ConvertWindow()
 
 void MainWindow::Grab()
 {
-	auto *handler = this->hdrMode == Hdr::Simple ? (DataHandler *)&this->handler : (DataHandler *)&this->hdrHandler;
-
+	auto *handler = this->hdrMode == Hdr::Simple
+			? (psinc::DataHandler *)&this->handler
+			: (psinc::DataHandler *)&this->hdrHandler;
 
 	this->camera.GrabImage(this->mode, *handler, [&](bool status) {
 
@@ -182,11 +186,11 @@ void MainWindow::Grab()
 			{
 				if (this->hdrMode == Hdr::Simple)
 				{
-					this->image.Save(String::format("grab_%s.png", emg::Timestamp::FNow()));
+					this->image.Save(emg::String::format("grab_%s.png", emg::Timestamp::FNow()));
 				}
 				else
 				{
-					this->hdrImage.Save(String::format("grab_hdr_%s.png", emg::Timestamp::FNow()));
+					this->hdrImage.Save(emg::String::format("grab_hdr_%s.png", emg::Timestamp::FNow()));
 				}
 				this->save = false;
 			}
@@ -206,11 +210,11 @@ void MainWindow::Grab()
 
 		if (this->stream && this->rateEnabled)
 		{
-			this_thread::sleep_for(microseconds(std::max(0l,
-				this->rateLimit - (long)duration_cast<microseconds>(steady_clock::now() - this->rateLast).count()
+			std::this_thread::sleep_for(std::chrono::microseconds(std::max(0l,
+				this->rateLimit - (long)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - this->rateLast).count()
 			)));
 
-			this->rateLast = steady_clock::now();
+			this->rateLast = std::chrono::steady_clock::now();
 		}
 
 		return this->stream;
@@ -233,15 +237,15 @@ void MainWindow::onGrab(QImage *image)
 		this->on_canvas_updateInfo();
 		this->UpdateRegionInfo();
 
-		if (duration_cast<milliseconds>(steady_clock::now() - this->last).count() >= 5000)
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - this->last).count() >= 5000)
 		{
-			this->ui->status->showMessage(QString::fromStdString(String::format(
+			this->ui->status->showMessage(QString::fromStdString(emg::String::format(
                 "Camera connected - USB%d  - %.1f fps - %d dropped",
                 this->usbVersion, 0.2 * this->frameCount, this->droppedCount
 			)));
 
 			this->frameCount	= 0;
-			this->last			= steady_clock::now();
+			this->last			= std::chrono::steady_clock::now();
 		}
 		else this->frameCount++;
 
@@ -299,7 +303,7 @@ void MainWindow::on_canvas_updateInfo()
 	this->ui->currentV->setValue((r + g + b) / 3);
 }
 
-template <typename T> std::array<int64_t, 7> GetRegionMeans(const Image<T, rgb> &image, const QRect &roi)
+template <typename T> std::array<int64_t, 7> GetRegionMeans(const emg::Image<T, emg::rgb> &image, const QRect &roi)
 {
 	const int width		= image.Width();
 	const int height	= image.Height();
@@ -480,7 +484,7 @@ void MainWindow::on_streamCheck_toggled(bool checked)
 
 void MainWindow::on_modeBox_currentIndexChanged(int index)
 {
-	this->mode = (Camera::Mode)index;
+	this->mode = (psinc::Camera::Mode)index;
 
 	if (this->stream) this->ui->streamCheck->toggle();
 }
@@ -585,13 +589,13 @@ void MainWindow::on_resetButton_clicked()
 {
 	switch (this->ui->resetBox->currentIndex())
 	{
-		case 0:	this->camera.Reset(ResetLevel::Connection);							break;
-		case 1:	this->camera.Reset(ResetLevel::Control);							break;
-		case 2:	this->camera.Reset(ResetLevel::Command);							break;
-		case 3:	this->camera.Reset(ResetLevel::Communications);						break;
-		case 4:	this->camera.Reset(ResetLevel::Imaging);		this->UpdateUi();	break;
-		case 5:	this->camera.Reset(ResetLevel::ImagingSoft);	this->UpdateUi();	break;
-		case 6:	this->camera.Reset(ResetLevel::Io);									break;
+		case 0:	this->camera.Reset(psinc::ResetLevel::Connection);						break;
+		case 1:	this->camera.Reset(psinc::ResetLevel::Control);							break;
+		case 2:	this->camera.Reset(psinc::ResetLevel::Command);							break;
+		case 3:	this->camera.Reset(psinc::ResetLevel::Communications);					break;
+		case 4:	this->camera.Reset(psinc::ResetLevel::Imaging);		this->UpdateUi();	break;
+		case 5:	this->camera.Reset(psinc::ResetLevel::ImagingSoft);	this->UpdateUi();	break;
+		case 6:	this->camera.Reset(psinc::ResetLevel::Io);								break;
 	}
 }
 

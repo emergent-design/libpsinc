@@ -4,14 +4,14 @@
 #include <emergent/logger/Logger.hpp>
 #include <future>
 
-using namespace std;
-using namespace emergent;
+using std::string;
+using namespace std::chrono_literals;
 
 
 namespace psinc
 {
-	const set<uint16_t> Instrument::Vendors::All = { 0x2dd8, 0x0525 };
-	const set<uint16_t> Instrument::Vendors::PSI = { 0x2dd8 };
+	const std::set<uint16_t> Instrument::Vendors::All = { 0x2dd8, 0x0525 };
+	const std::set<uint16_t> Instrument::Vendors::PSI = { 0x2dd8 };
 
 
 	Instrument::~Instrument()
@@ -40,13 +40,13 @@ namespace psinc
 	}
 
 
-	map<string, string> Instrument::List(uint16_t product, const set<uint16_t> &vendors)
+	std::map<string, string> Instrument::List(uint16_t product, const std::set<uint16_t> &vendors)
 	{
 		return Transport::List(vendors, product);
 	}
 
 
-	void Instrument::Initialise(uint16_t product, string serial, std::function<void(bool)> onConnection, int timeout, const set<uint16_t> &vendors)
+	void Instrument::Initialise(uint16_t product, string serial, std::function<void(bool)> onConnection, int timeout, const std::set<uint16_t> &vendors)
 	{
 		this->onConnection = onConnection;
 
@@ -96,7 +96,7 @@ namespace psinc
 		if (!this->initialised)
 		{
 			this->run			= true;
-			this->_thread		= thread(&Instrument::Entry, this);
+			this->_thread		= std::thread(&Instrument::Entry, this);
 			this->initialised	= true;
 		}
 	}
@@ -104,7 +104,7 @@ namespace psinc
 
 	void Instrument::Entry()
 	{
-		unique_lock<mutex> lock(this->cs);
+		std::unique_lock lock(this->cs);
 
 		while (this->run)
 		{
@@ -144,8 +144,8 @@ namespace psinc
 			default:						break;
 		}
 
-		atomic<bool> waiting(false);
-		Buffer<byte> command = {
+		std::atomic<bool> waiting(false);
+		emg::Buffer<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,						// Header
 			Commands::ResetChip, (byte)level, 0x00, 0x00, 0x00,	// Command
 			0xff												// Terminator
@@ -154,12 +154,12 @@ namespace psinc
 		if (level == ResetLevel::Imaging || level == ResetLevel::ImagingSoft)
 		{
 			// Do not allow image grabbing during this reset operation
-			lock_guard<mutex> lock(this->cs);
+			std::lock_guard lock(this->cs);
 
 			if (this->transport.Transfer(&command, nullptr, waiting))
 			{
 				// Give the imaging chip a chance to recover
-				this_thread::sleep_for(500ms);
+				std::this_thread::sleep_for(500ms);
 
 				// If just the imaging chip is being reset then the a camera will need
 				// to refresh registers, since this is at instrument level then a full
