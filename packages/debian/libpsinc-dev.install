@@ -1,0 +1,3 @@
+#!/usr/bin/dh-exec
+
+../include/psinc usr/include/

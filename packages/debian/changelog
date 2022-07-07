@@ -1,3 +1,10 @@
+libpsinc0 (0.1.38) unstable; urgency=medium
+
+  * New package building plus support for ubuntu 22.04 and arm64
+  * Earthfile now uses pre-built emergent deb
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Thu, 07 Jul 2022 17:29:34 +0100
+
 libpsinc0 (0.1.37) unstable; urgency=medium
 
   * Added a Properties structure and helper function to set common feature values.
@@ -10,25 +17,25 @@ libpsinc0 (0.1.36) unstable; urgency=medium
   * Configuration of ImageHandler now supports different sensor type overrides.
   * New info tab in Iconograph showing pixel values and selected region means.
 
- -- Dan <dan@dodeca>  Wed, 25 Aug 2021 14:47:40 +0100
+ -- Dan <dan@emergent-design.co.uk>  Wed, 25 Aug 2021 14:47:40 +0100
 
 libpsinc0 (0.1.35) unstable; urgency=medium
 
   * Update to the deployment process
 
- -- Dan <dan@dodeca>  Tue, 11 May 2021 22:34:08 +0100
+ -- Dan <dan@emergent-design.co.uk>  Tue, 11 May 2021 22:34:08 +0100
 
 libpsinc0 (0.1.34) unstable; urgency=medium
 
   * Switch to earthly build process
 
- -- Dan <dan@dodeca>  Wed, 05 May 2021 16:26:03 +0100
+ -- Dan <dan@emergent-design.co.uk>  Wed, 05 May 2021 16:26:03 +0100
 
 libpsinc0 (0.1.33) unstable; urgency=medium
 
   * Added function to report what USB version is used for a connection.
 
- -- Dan <dan@dodeca>  Mon, 12 Oct 2020 16:33:20 +0100
+ -- Dan <dan@emergent-design.co.uk>  Mon, 12 Oct 2020 16:33:20 +0100
 
 libpsinc0 (0.1.32) unstable; urgency=medium
 

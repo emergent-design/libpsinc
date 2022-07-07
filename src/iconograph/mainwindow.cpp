@@ -217,6 +217,10 @@ void MainWindow::Grab()
 			this->rateLast = std::chrono::steady_clock::now();
 		}
 
+		// Switch contexts each frame
+//		this->context = this->context ? 0 : 1;
+//		this->camera.SetContext(this->context);
+
 		return this->stream;
 	});
 }

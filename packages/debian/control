@@ -1,0 +1,22 @@
+Source: libpsinc0
+Section: libs
+Priority: optional
+Build-Depends: build-essential, debhelper (>= 9), dh-exec
+Maintainer: Dan Parnham <dan@emergent-design.co.uk>
+Homepage: https://github.com/emergent-design/libpsinc
+
+Package: libpsinc0
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Native driver for the PSI camera range
+ A C++ driver for the PSI camera range that uses libusb 1.0
+ for the communications.
+
+Package: libpsinc-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}, libpsinc0 (= ${binary:Version}), libusb-1.0-0-dev
+Description: Development headers for libpsinc
+ A C++ driver for the PSI camera range that uses libusb 1.0
+ for the communications.

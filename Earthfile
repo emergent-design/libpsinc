@@ -10,20 +10,25 @@ jammy:
 	FROM ubuntu:22.04
 
 image:
+	ARG TARGETARCH
 	ARG DISTRIBUTION=bionic
+	ARG PREMAKE=5.0.0-alpha16
+
 	FROM +$DISTRIBUTION
 	ENV DEBIAN_FRONTEND noninteractive
 	ENV DEBCONF_NONINTERACTIVE_SEEN true
 	WORKDIR /code
-	RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl build-essential clang fakeroot chrpath
-	RUN curl -L https://github.com/premake/premake-core/releases/download/v5.0.0-alpha15/premake-5.0.0-alpha15-linux.tar.gz | tar -xz -C /usr/bin/
+	RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl build-essential clang fakeroot chrpath dh-exec
+	RUN curl -Ls -o premake.deb https://github.com/emergent-design/premake-pkg/releases/download/v$PREMAKE/premake_$PREMAKE-0ubuntu1_$TARGETARCH.deb \
+		&& dpkg -i premake.deb
 	RUN apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev
 
 deps:
+	ARG EMERGENT=0.0.39
+
 	FROM +image
-	ARG GITHUB_EMERGENT=github.com/emergent-design
-	COPY $GITHUB_EMERGENT/libemergent:v0.0.31+package/libemergent-dev.deb .
-	RUN dpkg -i libemergent-dev.deb
+	RUN curl -Ls -o libemergent-dev.deb https://github.com/emergent-design/libemergent/releases/download/v$EMERGENT/libemergent-dev_${EMERGENT}_all.deb \
+		&& dpkg -i libemergent-dev.deb
 
 build:
 	FROM +deps
@@ -33,14 +38,15 @@ build:
 package:
 	FROM +build
 	ARG DISTRIBUTION=bionic
-	RUN cd packages && ./build $DISTRIBUTION
-	SAVE ARTIFACT packages/libpsinc-dev_*.deb libpsinc-dev.deb
-	SAVE ARTIFACT packages/libpsinc0_*.deb libpsinc0.deb
-	SAVE ARTIFACT packages/libpsinc*.deb AS LOCAL build/
+	RUN cd packages && dpkg-buildpackage -b -uc -us
+	# SAVE ARTIFACT libpsinc-dev_*.deb libpsinc-dev.deb
+	# SAVE ARTIFACT libpsinc0_*.deb libpsinc0.deb
+	SAVE ARTIFACT libpsinc*.deb AS LOCAL build/
 
 all:
-	BUILD --build-arg DISTRIBUTION=bionic +package
-	BUILD --build-arg DISTRIBUTION=focal +package
+	BUILD --platform=linux/amd64 --platform=linux/arm64 +package --DISTRIBUTION=bionic
+	BUILD --platform=linux/amd64 --platform=linux/arm64 +package --DISTRIBUTION=focal
+	BUILD --platform=linux/amd64 --platform=linux/arm64 +package --DISTRIBUTION=jammy
 
 
 appimage:

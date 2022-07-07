@@ -72,7 +72,10 @@ namespace psinc
 			}
 		this->cs.unlock();
 
-		if (result) this->condition.notify_one();
+		if (result)
+		{
+			this->condition.notify_one();
+		}
 
 		return result;
 	}

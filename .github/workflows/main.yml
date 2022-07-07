@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - uses: earthly/actions/setup-earthly@v1
+        with:
+          version: v0.6.0
+
+      - uses: actions/checkout@v2
+
+      - name: Run build
+        run: earthly +all
+        run: earthly +appimage
+        run: earthly +windows
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/**.deb
+            build/**.AppImage
+            build/windows/**.7z
