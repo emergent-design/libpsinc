@@ -69,29 +69,14 @@ appimage:
 	SAVE ARTIFACT packages/Iconograph*.AppImage AS LOCAL build/
 
 
-mingw:
-	FROM --build-arg DISTRIBUTION=jammy +deps
-	RUN apt-get update && apt-get install -y --no-install-recommends mingw-w64 p7zip-full unzip git cmake
-	RUN update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix \
-   		&& update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+windows:
+	ARG EMERGENT=0.0.39
+	ARG PREMAKE=5.0.0-alpha16
+	# FROM DOCKERFILE packages/
+	FROM teadriven/essential-qt-mingw:5.15
+	WORKDIR /code
 
-   	# Build Qt
-   	RUN git clone git://code.qt.io/qt/qt5.git && cd qt5 && git checkout 5.15 && ./init-repository --module-subset=essential
-   	# Fix missing include
-   	RUN sed -i "/^QT_BEGIN_NAMESPACE/i #include <limits>" qt5/qtbase/src/corelib/text/qbytearraymatcher.h
-
-	RUN cd qt5 && ./configure -make libs -nomake examples -nomake tests -device-option \
-			CROSS_COMPILE=x86_64-w64-mingw32- -xplatform win32-g++ \
-			-qt-zlib -qt-libpng -qt-freetype -qt-harfbuzz -qt-pcre \
-			-no-glib -no-icu -no-iconv -no-dbus -no-opengl \
-			-skip qt3d -skip qtactiveqt -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdeclarative \
-			-skip qtdoc -skip qtdocgallery -skip qtfeedback -skip qtgraphicaleffects -skip qtlocation -skip qtmacextras \
-			-skip qtmultimedia -skip qtpim -skip qtpurchasing -skip qtqa -skip qtquickcontrols -skip qtquickcontrols2 \
-			-skip qtrepotools -skip qtscript -skip qtsensors -skip qtserialbus -skip qtsvg -skip qtsystems -skip qttools \
-			-skip qttranslations -skip qtwayland  -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwebview \
-			-skip qtwinextras -skip qtx11extras -skip qtxmlpatterns \
-			-opensource -confirm-license -release -prefix /opt/qt5-win-x64 \
-		&& make -j"$(nproc)" && make install && cd .. && rm -rf qt5
+	RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl p7zip-full unzip
 
 	# Install libusb
 	RUN mkdir libusb && cd libusb \
@@ -108,13 +93,18 @@ mingw:
 		&& cp FreeImage/Dist/x64/FreeImage.dll /usr/x86_64-w64-mingw32/lib/freeimage.dll \
 		&& rm -rf FreeImage && rm FreeImage.zip
 
-windows:
-	FROM +mingw
-	# Dependencies
-	RUN ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
+	# Install other dependencies
+	RUN curl -Ls -o premake.deb https://github.com/emergent-design/premake-pkg/releases/download/v$PREMAKE/premake_$PREMAKE-0ubuntu1_amd64.deb \
+		&& dpkg -i premake.deb
+
+	RUN curl -Ls -o libemergent-dev.deb https://github.com/emergent-design/libemergent/releases/download/v$EMERGENT/libemergent-dev_${EMERGENT}_all.deb \
+		&& dpkg -i libemergent-dev.deb \
+		&& ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
+
 	# Build lib
 	COPY --dir include packages src resources ui iconograph.pro premake5.lua .
 	RUN premake5 --os=windows gmake && make CXX=x86_64-w64-mingw32-g++ -j$(nproc)
+
 	# Build iconograph
 	RUN PATH=/opt/qt5-win-x64/bin:$PATH qmake -spec win32-g++ -o iconograph.make iconograph.pro
 	RUN make -f iconograph.make -j$(nproc)
