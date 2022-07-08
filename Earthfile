@@ -70,8 +70,8 @@ appimage:
 
 
 mingw:
-	FROM --build-arg DISTRIBUTION=jammy +image
-	RUN apt-get install -y --no-install-recommends mingw-w64 p7zip-full unzip git cmake
+	FROM --build-arg DISTRIBUTION=jammy +deps
+	RUN apt-get update && apt-get install -y --no-install-recommends mingw-w64 p7zip-full unzip git cmake
 	RUN update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix \
    		&& update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
 
@@ -111,9 +111,7 @@ mingw:
 windows:
 	FROM +mingw
 	# Dependencies
-	ARG GITHUB_EMERGENT=github.com/emergent-design
-	COPY $GITHUB_EMERGENT/libemergent:v0.0.37+package/libemergent-dev.deb .
-	RUN dpkg -i libemergent-dev.deb && ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
+	RUN ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
 	# Build lib
 	COPY --dir include packages src resources ui iconograph.pro premake5.lua .
 	RUN premake5 --os=windows gmake && make CXX=x86_64-w64-mingw32-g++ -j$(nproc)
