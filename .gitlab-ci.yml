@@ -20,26 +20,27 @@ package-all:
     paths:
       - build/libpsinc*.deb
 
-package-windows:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - earthly +windows
-  artifacts:
-    paths:
-      - build/windows/*.7z
+# These are built by the github action anyway - so do we need them here?
+# package-windows:
+#   stage: build
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "web"
+#   script:
+#     - earthly +windows
+#   artifacts:
+#     paths:
+#       - build/windows/*.7z
 
-package-appimage:
-  stage: build
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "web"
-      when: manual
-  script:
-    - earthly +appimage
-  artifacts:
-    paths:
-      - build/*.AppImage
+# package-appimage:
+#   stage: build
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "web"
+#       when: manual
+#   script:
+#     - earthly +appimage
+#   artifacts:
+#     paths:
+#       - build/*.AppImage
 
 # deploy-packages:
 #   stage: deploy
