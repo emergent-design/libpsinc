@@ -43,11 +43,13 @@ package:
 	# SAVE ARTIFACT libpsinc0_*.deb libpsinc0.deb
 	SAVE ARTIFACT libpsinc*.deb AS LOCAL build/
 
-all:
-	BUILD --platform=linux/amd64 --platform=linux/arm64 +package --DISTRIBUTION=bionic
-	BUILD --platform=linux/amd64 --platform=linux/arm64 +package --DISTRIBUTION=focal
-	BUILD --platform=linux/amd64 --platform=linux/arm64 +package --DISTRIBUTION=jammy
+all-dists:
+	BUILD +package --DISTRIBUTION=bionic
+	BUILD +package --DISTRIBUTION=focal
+	BUILD +package --DISTRIBUTION=jammy
 
+all:
+	BUILD --platform=linux/amd64 --platform=linux/arm64 +all-dists
 
 appimage:
 	FROM --build-arg DISTRIBUTION=bionic +deps
@@ -80,14 +82,14 @@ windows:
 
 	# Install libusb
 	RUN mkdir libusb && cd libusb \
-		&& curl -L https://github.com/libusb/libusb/releases/download/v1.0.23/libusb-1.0.23.7z --output libusb.7z \
+		&& curl -Ls https://github.com/libusb/libusb/releases/download/v1.0.23/libusb-1.0.23.7z --output libusb.7z \
 		&& p7zip -d libusb.7z \
 		&& cp -r include/libusb-1.0 /usr/x86_64-w64-mingw32/include/ \
 		&& cp MinGW64/dll/libusb-1.0.dll /usr/x86_64-w64-mingw32/lib/ \
 		&& cd .. && rm -rf libusb
 
 	# Install freeimage
-	RUN curl -L https://downloads.sourceforge.net/project/freeimage/Binary%20Distribution/3.18.0/FreeImage3180Win32Win64.zip --output FreeImage.zip \
+	RUN curl -Ls https://downloads.sourceforge.net/project/freeimage/Binary%20Distribution/3.18.0/FreeImage3180Win32Win64.zip --output FreeImage.zip \
 		&& unzip FreeImage.zip \
 		&& cp FreeImage/Dist/x64/FreeImage.h /usr/x86_64-w64-mingw32/include/ \
 		&& cp FreeImage/Dist/x64/FreeImage.dll /usr/x86_64-w64-mingw32/lib/freeimage.dll \
