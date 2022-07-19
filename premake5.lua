@@ -21,8 +21,7 @@ solution "psinc"
 		files				{ "include/psinc/**h", "src/psinc/**.cpp", "src/psinc-c/**.cpp" }
 
 		filter "system:linux"
-			symbols				"On"
-			postbuildcommands	"./strip lib/libpsinc.so"
+			symbols	"On"
 
 		filter "system:windows"
 			kind "StaticLib"

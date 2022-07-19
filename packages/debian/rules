@@ -19,7 +19,7 @@ binary:
 	dh_installchangelogs
 	dh_compress
 	dh_fixperms
-	dh_strip
+	dh_strip --dbg-package=libpsinc-dbg
 	dh_makeshlibs
 	dh_shlibdeps
 	dh_installdeb

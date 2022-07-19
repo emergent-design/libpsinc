@@ -32,15 +32,13 @@ deps:
 
 build:
 	FROM +deps
-	COPY --dir include packages src premake5.lua strip .
+	COPY --dir include packages src premake5.lua .
 	RUN premake5 gmake && make -j$(nproc)
 
 package:
 	FROM +build
 	ARG DISTRIBUTION=bionic
 	RUN cd packages && dpkg-buildpackage -b -uc -us
-	# SAVE ARTIFACT libpsinc-dev_*.deb libpsinc-dev.deb
-	# SAVE ARTIFACT libpsinc0_*.deb libpsinc0.deb
 	SAVE ARTIFACT libpsinc*.deb AS LOCAL build/
 
 all-dists:
@@ -54,7 +52,7 @@ all:
 appimage:
 	FROM --build-arg DISTRIBUTION=bionic +deps
 	RUN apt-get update && apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev file
-	COPY --dir include packages src premake5.lua strip resources ui iconograph.pro .
+	COPY --dir include packages src premake5.lua resources ui iconograph.pro .
 	RUN premake5 gmake && make -j$(nproc)
 	RUN qmake -o iconograph.make CONFIG+=release iconograph.pro \
 		&& make -f iconograph.make -j$(nproc)

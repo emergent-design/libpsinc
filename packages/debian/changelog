@@ -1,3 +1,10 @@
+libpsinc0 (0.1.39) unstable; urgency=medium
+
+  * Fix missing udev rules in new package
+  * Added debug package
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 19 Jul 2022 18:22:42 +0100
+
 libpsinc0 (0.1.38) unstable; urgency=medium
 
   * New package building plus support for ubuntu 22.04 and arm64
@@ -81,7 +88,7 @@ libpsinc0 (0.1.26) unstable; urgency=medium
 
   * Check path exists before attempting to find the canonical path in the Flash helper.
 
- -- Dan <dan@kryten>  Sat, 16 Mar 2019 11:17:01 +0000
+ -- Dan <dan@emergent-design.co.uk>  Sat, 16 Mar 2019 11:17:01 +0000
 
 libpsinc0 (0.1.25) unstable; urgency=medium
 
@@ -123,20 +130,20 @@ libpsinc0 (0.1.20) unstable; urgency=medium
   * Fix issue where the handle gets overwritten when trying to claim other 
     pending devices after having successfully claimed the device of interest.
 
- -- Dan <dan@kryten>  Sat, 07 Jul 2018 18:33:05 +0100
+ -- Dan <dan@emergent-design.co.uk>  Sat, 07 Jul 2018 18:33:05 +0100
 
 libpsinc0 (0.1.19) unstable; urgency=medium
 
   * Workaround for issue with accessing device descriptors from connection 
     callback in the transport layer.
 
- -- Dan <dan@kryten>  Thu, 05 Jul 2018 18:01:05 +0100
+ -- Dan <dan@emergent-design.co.uk>  Thu, 05 Jul 2018 18:01:05 +0100
 
 libpsinc0 (0.1.18) unstable; urgency=medium
 
   * Fixes for the Flash helper
 
- -- Dan <dan@kryten>  Wed, 04 Jul 2018 21:17:01 +0100
+ -- Dan <dan@emergent-design.co.uk>  Wed, 04 Jul 2018 21:17:01 +0100
 
 libpsinc0 (0.1.17) unstable; urgency=medium
 
@@ -322,7 +329,7 @@ libpsinc0 (0.0.8) unstable; urgency=medium
 
   * Separate critical section required for hotplugging. 
 
- -- Dan <dan@queeg>  Wed, 28 May 2014 15:02:03 +0100
+ -- Dan <dan@emergent-design.co.uk>  Wed, 28 May 2014 15:02:03 +0100
 
 libpsinc0 (0.0.7) unstable; urgency=medium
 
@@ -330,45 +337,45 @@ libpsinc0 (0.0.7) unstable; urgency=medium
     a deadlock by queueing the hotplugged devices and then handling
     them on the transport thread. 
 
- -- Dan <dan@queeg>  Tue, 27 May 2014 15:38:21 +0100
+ -- Dan <dan@emergent-design.co.uk>  Tue, 27 May 2014 15:38:21 +0100
 
 libpsinc0 (0.0.6) unstable; urgency=medium
 
   * Disabled the critical section in the hotplug transport since I'm not 
     sure it's required but it is causing a deadlock 
 
- -- Dan <dan@queeg>  Wed, 21 May 2014 17:26:21 +0100
+ -- Dan <dan@emergent-design.co.uk>  Wed, 21 May 2014 17:26:21 +0100
 
 libpsinc0 (0.0.5) unstable; urgency=medium
 
   * Updated the hotplug transport to use libusb event locking. 
 
- -- Dan <dan@queeg>  Wed, 21 May 2014 16:57:36 +0100
+ -- Dan <dan@emergent-design.co.uk>  Wed, 21 May 2014 16:57:36 +0100
 
 libpsinc0 (0.0.4) unstable; urgency=medium
 
   * Patched the hotplug transport destructor.
 
- -- Dan <dan@queeg>  Sat, 10 May 2014 12:09:10 +0100
+ -- Dan <dan@emergent-design.co.uk>  Sat, 10 May 2014 12:09:10 +0100
 
 libpsinc0 (0.0.3) unstable; urgency=medium
 
   * Moved the hotplug registration to the polling function so that any immediate
     connections will be handled on the polling thread as expected.
 
- -- Dan <dan@queeg>  Fri, 09 May 2014 11:31:05 +0100
+ -- Dan <dan@emergent-design.co.uk>  Fri, 09 May 2014 11:31:05 +0100
 
 libpsinc0 (0.0.2) unstable; urgency=medium
 
   * Added new counter device to the camera type.
 
- -- Dan <dan@queeg>  Thu, 08 May 2014 15:12:50 +0100
+ -- Dan <dan@emergent-design.co.uk>  Thu, 08 May 2014 15:12:50 +0100
 
 libpsinc0 (0.0.1) unstable; urgency=medium
 
   * Added Instrument implementation based on a prototype hotplug transport.
 
- -- Dan <dan@queeg>  Fri, 02 May 2014 17:11:28 +0100
+ -- Dan <dan@emergent-design.co.uk>  Fri, 02 May 2014 17:11:28 +0100
 
 libpsinc0 (0.0.0) unstable; urgency=low
 

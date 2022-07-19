@@ -20,3 +20,13 @@ Depends: ${misc:Depends}, libpsinc0 (= ${binary:Version}), libusb-1.0-0-dev
 Description: Development headers for libpsinc
  A C++ driver for the PSI camera range that uses libusb 1.0
  for the communications.
+
+Package: libpsinc-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Depends: libpsinc0 (= ${binary:Version})
+Description: Native driver for the PSI camera range
+ A C++ driver for the PSI camera range that uses libusb 1.0
+ for the communications.
+ This package contains the debug symbols.

@@ -8,7 +8,7 @@ on:
 
 jobs:
   debs-amd64:
-    name: Build debs
+    name: Build amd64 debs
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,7 @@ jobs:
 
 
   debs-arm64:
-    name: Build debs
+    name: Build arm64 debs
     runs-on: ubuntu-latest
 
     steps:

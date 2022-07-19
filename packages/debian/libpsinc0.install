@@ -1,3 +1,4 @@
 #!/usr/bin/dh-exec
 
 ../lib/libpsinc.so => usr/lib/${DEB_HOST_MULTIARCH}/libpsinc.so.${DEB_VERSION}
+40-camera.rules lib/udev/rules.d/
