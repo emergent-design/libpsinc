@@ -1,3 +1,9 @@
+libpsinc0 (0.1.40) unstable; urgency=medium
+
+  * Patch to the Flash helper to permit re-connections.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Mon, 12 Sep 2022 13:05:02 +0100
+
 libpsinc0 (0.1.39) unstable; urgency=medium
 
   * Fix missing udev rules in new package
