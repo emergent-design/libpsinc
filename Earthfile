@@ -42,9 +42,7 @@ package:
 	SAVE ARTIFACT libpsinc*.deb AS LOCAL build/
 
 all-dists:
-	BUILD +package --DISTRIBUTION=bionic
-	BUILD +package --DISTRIBUTION=focal
-	BUILD +package --DISTRIBUTION=jammy
+	BUILD +package --DISTRIBUTION=bionic --DISTRIBUTION=focal --DISTRIBUTION=jammy
 
 all:
 	BUILD --platform=linux/amd64 --platform=linux/arm64 +all-dists
