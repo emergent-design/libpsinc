@@ -1,3 +1,9 @@
+libpsinc0 (0.1.41) unstable; urgency=medium
+
+  * Patch the patch so that it compiles.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Mon, 12 Sep 2022 14:25:45 +0100
+
 libpsinc0 (0.1.40) unstable; urgency=medium
 
   * Patch to the Flash helper to permit re-connections.
