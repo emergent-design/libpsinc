@@ -12,7 +12,7 @@
 
 namespace psinc::flash
 {
-	using fs = emg::fs;
+	namespace fs = emg::fs;
 	using namespace std::chrono;
 
 	// A helper class for communicating with PSI flash driver units over RS485. A binary that uses this header
@@ -440,7 +440,7 @@ namespace psinc::flash
 				{
 					#ifdef __linux__
 						const auto canonical = fs::exists(this->connection)
-							? fs::canonical(this->connection)
+							? fs::canonical(this->connection).string()
 							: this->connection;
 					#else
 						const auto canonical = this->connection;
