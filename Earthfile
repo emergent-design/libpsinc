@@ -39,12 +39,15 @@ package:
 	FROM +build
 	ARG DISTRIBUTION=bionic
 	RUN cd packages && dpkg-buildpackage -b -uc -us
-	SAVE ARTIFACT libpsinc*.deb AS LOCAL build/
+	SAVE ARTIFACT libpsinc*.deb AS LOCAL build/$DISTRIBUTION/
 
 all-dists:
 	BUILD +package --DISTRIBUTION=bionic --DISTRIBUTION=focal --DISTRIBUTION=jammy
 
-all:
+check:
+	BUILD +build
+
+psinc-all:
 	BUILD --platform=linux/amd64 --platform=linux/arm64 +all-dists
 
 appimage:

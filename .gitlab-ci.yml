@@ -1,24 +1,19 @@
-stages:
-  - build
-  - deploy
+include:
+  - project: 'core/common'
+    file: '/templates/ci.yml'
 
+variables:
+  COMPONENT: oss
 
-build-check:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-  script:
-    - earthly +build
+package-psinc:
+  extends: [ .build-packages ]
+  variables: { MODULE: psinc, MATCH: /^v.*$/ }
 
-package-all:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - earthly +all
-  artifacts:
-    paths:
-      - build/libpsinc*.deb
+deploy-psinc:
+  needs: [ package-psinc ]
+  extends: [ .deploy-packages ]
+  variables: { MODULE: psinc, MATCH: /^v.*$/  }
+
 
 # These are built by the github action anyway - so do we need them here?
 # package-windows:
@@ -50,16 +45,3 @@ package-all:
 #   script:
 #     - scp build/*.deb $DEPLOY_DOWNLOADS/libpsinc/ubuntu/
 #     - scp build/windows/*.7z $DEPLOY_DOWNLOADS/libpsinc/windows/
-
-deploy-phi:
-  stage: deploy
-  rules:
-    - if: $CI_COMMIT_TAG
-  needs: [ package-all ]
-  script:
-    - for REPO in bionic focal jammy; do
-        for ARCH in amd64 arm64; do
-          phi-deploy build/libpsinc0*~${REPO}_${ARCH}.deb $REPO oss;
-          phi-deploy build/libpsinc-dev*~${REPO}_${ARCH}.deb $REPO oss;
-        done
-      done

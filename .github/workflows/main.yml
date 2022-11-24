@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          path: build/**.deb
+          path: build/**/*.deb
 
 
   debs-arm64:
@@ -49,7 +49,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          path: build/**.deb
+          path: build/**/*.deb
 
 
   appimage:
