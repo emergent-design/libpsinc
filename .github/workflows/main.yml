@@ -105,6 +105,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifact/**.deb
+            artifact/**/**.deb
             artifact/**.AppImage
             artifact/**.7z
