@@ -17,7 +17,7 @@ class Canvas : public QLabel
 			Select
 		};
 
-		Canvas(QWidget *parent = 0, Qt::WindowFlags f = 0);
+		Canvas(QWidget *parent = 0, Qt::WindowFlags f = {});
 //		~Canvas() {}
 
 

@@ -7,7 +7,6 @@
 #include <emergent/image/Image.hpp>
 
 
-
 namespace psinc
 {
 	enum class DecodeMode
@@ -28,8 +27,6 @@ namespace psinc
 			struct Configuration
 			{
 				DecodeMode mode = DecodeMode::Automatic;
-				// bool forceBayer = false;
-				// Filter::Configuration filter;
 			};
 
 			ImageHandler() {}
@@ -62,7 +59,7 @@ namespace psinc
 			}
 
 
-			bool Process(bool monochrome, bool hdr, emg::Buffer<byte> &data, int width, int height, byte bayerMode) override
+			bool Process(bool monochrome, const bool hdr, const std::vector<byte> &data, const int width, const int height, const byte bayerMode) override
 			{
 				// Allow the monochrome flag to be overridden - could have unexpected effects.
 				switch (configuration.mode)
@@ -73,25 +70,25 @@ namespace psinc
 					default:													break;
 				}
 
-				int w = monochrome ? width : width - 4;
-				int h = monochrome ? height : height - 4;
+				const int w = monochrome ? width : width - 4;
+				const int h = monochrome ? height : height - 4;
 
-				if (w > 0 && h > 0 && data.Size() == width * height * (hdr ? 2 : 1))
+				if (w > 0 && h > 0 && data.size() == width * height * (hdr ? 2 : 1))
 				{
-					int depth = this->image->Depth();
+					const byte depth = this->image->Depth();
 					this->image->Resize(w, h);
 
 					if (hdr)
 					{
-						if (monochrome)			Monochrome::Decode((uint16_t *)data.Data(), this->image->Data(), width, height, depth, this->shiftBits);
-						else if (depth == 3)	Bayer::Colour((uint16_t *)data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
-						else					Bayer::Grey((uint16_t *)data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
+						if (monochrome)			Monochrome::Decode((uint16_t *)data.data(), this->image->Data(), width, height, depth, this->shiftBits);
+						else if (depth == 3)	Bayer::Colour((uint16_t *)data.data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
+						else					Bayer::Grey((uint16_t *)data.data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
 					}
 					else
 					{
-						if (monochrome)			Monochrome::Decode(data.Data(), this->image->Data(), width, height, depth, this->shiftBits);
-						else if (depth == 3)	Bayer::Colour(data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
-						else					Bayer::Grey(data.Data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
+						if (monochrome)			Monochrome::Decode(data.data(), this->image->Data(), width, height, depth, this->shiftBits);
+						else if (depth == 3)	Bayer::Colour(data.data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
+						else					Bayer::Grey(data.data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
 					}
 
 					// Filter::Process(this->configuration.filter, *this->image);

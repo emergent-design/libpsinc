@@ -14,11 +14,11 @@ namespace psinc
 {
 	Camera::Camera() : Instrument()
 	{
-		this->send = emg::Buffer<byte>({
+		this->send = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 	// Header
 			0x00, 0x00, 0x00, 0x00, 0x00,	// Command here
 			0xff							// Terminator
-		});
+		};
 	}
 
 
@@ -88,10 +88,10 @@ namespace psinc
 		this->registers.clear();
 
 		pugi::xml_document doc;
-		auto xml			= chip::v024;
-		auto description	= this->CustomDevice(0xff).Read(); //this->devicePool[0xff].Read();
+		auto xml				= chip::v024;
+		const auto description	= this->CustomDevice(0xff).Read(); //this->devicePool[0xff].Read();
 
-		if (description.Size())
+		if (description.size())
 		{
 			int header = description[0];
 
@@ -174,8 +174,8 @@ namespace psinc
 
 		byte minPage = 255;
 		byte maxPage = 0;
-		emg::Buffer<byte> data(512);
-		emg::Buffer<byte> command = {
+		std::vector<byte> data(512);
+		std::vector<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,							// Header
 			Commands::ReadRegisterPage, 0x00, 0x00, 0x00, 0x00, 	// Command
 			0xff 													// Terminator
@@ -223,7 +223,7 @@ namespace psinc
 	{
 		std::atomic<bool> waiting(false);
 
-		emg::Buffer<byte> data = {
+		std::vector<byte> data = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 			// Header
 			Commands::WriteRegister, 				// Command
 			(byte)(address & 0xff),
@@ -240,8 +240,8 @@ namespace psinc
 	int Camera::GetRegister(int address)
 	{
 		std::atomic<bool> waiting(false);
-		emg::Buffer<byte> receive(5);
-		emg::Buffer<byte> command = {
+		std::vector<byte> receive(5);
+		std::vector<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,																	// Header
 			0x03, 0x00, 0x00, 0x00, 0x00, 																	// Flush command
 			Commands::QueueRegister, (byte)(address & 0xff), (byte)((address >> 8) & 0xff), 0x00, 0x00, 	// Command
@@ -384,7 +384,7 @@ namespace psinc
 
 		if (size)
 		{
-			this->receive.Resize(size);
+			this->receive.resize(size);
 
 			switch (mode)
 			{

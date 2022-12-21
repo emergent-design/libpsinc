@@ -1,3 +1,9 @@
+libpsinc0 (0.1.42) unstable; urgency=medium
+
+  * Replace soon to be deprecated emg::Buffer<> with std::vector<>
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Wed, 21 Dec 2022 11:51:14 +0000
+
 libpsinc0 (0.1.41) unstable; urgency=medium
 
   * Patch the patch so that it compiles.

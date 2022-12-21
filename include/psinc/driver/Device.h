@@ -58,7 +58,7 @@ namespace psinc
 
 
 			/// Write the binary data to the device
-			bool Write(const emg::Buffer<byte> &buffer);
+			bool Write(const std::vector<byte> &buffer);
 
 
 			/// Write the binary data to the device
@@ -70,12 +70,12 @@ namespace psinc
 
 
 			/// Read binary data from the device
-			emg::Buffer<byte> Read();
+			std::vector<byte> Read();
 
 
 			/// Read binary data from the device into the supplied buffer. The buffer size
 			/// is used to determine how much data can be received from the device
-			bool Read(emg::Buffer<byte> &buffer);
+			bool Read(std::vector<byte> &buffer);
 
 
 			/// Set the channel for this device. Will return the channel information including

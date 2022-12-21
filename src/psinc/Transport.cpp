@@ -93,10 +93,6 @@ namespace psinc
 			if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED && !this->handle)
 			{
 				this->pending.push(device);
-				// if (this->Claim(device) && this->onConnection)
-				// {
-				// 	this->onConnection(true);
-				// }
 			}
 		}
 	}
@@ -333,15 +329,19 @@ namespace psinc
 	}
 
 
-	bool Transport::Transfer(emg::Buffer<byte> *send, emg::Buffer<byte> *receive, std::atomic<bool> &waiting, bool check, bool truncate)
+	bool Transport::Transfer(std::vector<byte> *send, std::vector<byte> *receive, std::atomic<bool> &waiting, bool check, bool truncate)
 	{
 		std::lock_guard lock(this->cs);
 
-		return this->handle ? this->Transfer(send, true, check, false) && (waiting = true) && this->Transfer(receive, false, check, truncate) : false;
+		return this->handle
+			? this->Transfer(send, true, check, false)
+				&& (waiting = true)
+				&& this->Transfer(receive, false, check, truncate)
+			: false;
 	}
 
 
-	bool Transport::Transfer(emg::Buffer<byte> *buffer, bool write, bool check, bool truncate)
+	bool Transport::Transfer(std::vector<byte> *buffer, bool write, bool check, bool truncate)
 	{
 		if (buffer)
 		{
@@ -353,13 +353,13 @@ namespace psinc
 			int transferred	= 0;
 			bool result		= false;
 			int err			= write
-				? libusb_bulk_transfer(this->handle, WRITE_PIPE, buffer->Data(), buffer->Size(), &transferred, this->timeout)
-				: libusb_bulk_transfer(this->handle, READ_PIPE, buffer->Data(), buffer->Size(), &transferred, this->timeout);
+				? libusb_bulk_transfer(this->handle, WRITE_PIPE, buffer->data(), buffer->size(), &transferred, this->timeout)
+				: libusb_bulk_transfer(this->handle, READ_PIPE, buffer->data(), buffer->size(), &transferred, this->timeout);
 				// : libusb_bulk_transfer(this->handle, READ_PIPE, this->readBuffer.Data(), this->readBuffer.Size(), &transferred, this->timeout);
 
 			if (!err)
 			{
-				result = (write || check) ? transferred == buffer->Size() : true;
+				result = (write || check) ? transferred == buffer->size() : true;
 
 
 				// if (!write && result)
@@ -370,7 +370,7 @@ namespace psinc
 
 				if (!write && result && truncate)
 				{
-					buffer->Truncate(transferred);
+					buffer->resize(transferred);
 				}
 
 				if (!result)
@@ -381,7 +381,7 @@ namespace psinc
 						this->id,
 						write ? "writing" : "reading",
 						transferred,
-						buffer->Size()
+						buffer->size()
 					);
 				}
 			}

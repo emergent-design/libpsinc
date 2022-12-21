@@ -52,14 +52,14 @@ extern "C"
 
 		// Perhaps we need some sort of buffer view to handle this case without
 		// unnecessary memory allocation and copying.
-		Buffer<emg::byte> data(size);
+		std::vector<emg::byte> data(size);
 
 		if (c->devices.count(device))
 		{
 			if (c->devices[device].Read(data))
 			{
-				used = data.Size();
-				memcpy(buffer, data.Data(), used);
+				used = data.size();
+				memcpy(buffer, data.data(), used);
 				return PSINC_OK;
 			}
 			else return PSINC_CAMERA_IO_ERROR;

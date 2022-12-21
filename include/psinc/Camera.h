@@ -136,10 +136,10 @@ namespace psinc
 
 			/// Byte buffer containing the packet to be transmitted to the actual device
 			/// this class represents.
-			emg::Buffer<byte> send;
+			std::vector<byte> send;
 
 			/// Byte buffer used to receive data from the device during a capture.
-			emg::Buffer<byte> receive;
+			std::vector<byte> receive;
 
 
 			/// Image capture complete callback

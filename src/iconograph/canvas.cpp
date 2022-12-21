@@ -161,15 +161,18 @@ void Canvas::wheelEvent(QWheelEvent *event)
 			this->offset	= this->rect.topLeft();
 		}
 
-		// Origin of zoom in image space
-		double x		= (event->x() - this->offset.x()) / this->zoom;
-		double y		= (event->y() - this->offset.y()) / this->zoom;
+		const auto position = event->position();
 
-		double step		= event->delta() < 0 ? -0.05 : 0.05;
+		// Origin of zoom in image space
+		const double x	= (position.x() - this->offset.x()) / this->zoom;
+		const double y	= (position.y() - this->offset.y()) / this->zoom;
+
+//		double step		= event->delta() < 0 ? -0.05 : 0.05;
+		double step		= event->angleDelta().y() < 0 ? -0.05 : 0.05;
 		this->zoom		= std::max(this->minScale, std::min(1.0, this->zoom + step));
 		this->offset	= {
-			(int)lrint(event->x() - this->zoom * x),
-			(int)lrint(event->y() - this->zoom * y)
+			(int)lrint(position.x() - this->zoom * x),
+			(int)lrint(position.y() - this->zoom * y)
 		};
 	}
 }

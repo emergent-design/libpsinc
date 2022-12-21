@@ -55,7 +55,7 @@ namespace psinc
 
 		if (this->value != updated)
 		{
-			Buffer<byte> data = {
+			std::vector<byte> data = {
 				0x00, 0x00, 0x00, 0x00, 0x00, 			// Header
 				Commands::WriteRegister, 				// Command
 				(byte)(this->address & 0xff),
@@ -85,9 +85,12 @@ namespace psinc
 
 		if (this->value != updated)
 		{
-			Buffer<byte> data = {
+			std::vector<byte> data = {
 				0x00, 0x00, 0x00, 0x00, 0x00,
-				Commands::WriteBit, (byte)(this->address & 0xff), (byte)((this->address >> 8) & 0xff), (byte)offset, (byte)((value ? 1 : 0)),
+				Commands::WriteBit,
+				(byte)(this->address & 0xff),
+				(byte)((this->address >> 8) & 0xff),
+				(byte)offset, (byte)((value ? 1 : 0)),
 				0xff
 			};
 
@@ -106,8 +109,8 @@ namespace psinc
 	bool Register::Refresh()
 	{
 		atomic<bool> waiting(false);
-		Buffer<byte> receive(5);
-		Buffer<byte> command = {
+		std::vector<byte> receive(5, 0);
+		std::vector<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,																				// Header
 			0x03, 0x00, 0x00, 0x00, 0x00, 																				// Flush command
 			Commands::QueueRegister, (byte)(this->address & 0xff), (byte)((this->address >> 8) & 0xff), 0x00, 0x00, 	// Command
@@ -125,9 +128,9 @@ namespace psinc
 	}
 
 
-	void Register::Refresh(Buffer<byte> &data)
+	void Register::Refresh(std::vector<byte> &data)
 	{
-		if (this->offset < data.Size() - 1)
+		if (this->offset < data.size() - 1)
 		{
 			this->value = (data[this->offset] << 8) + data[this->offset + 1];
 		}

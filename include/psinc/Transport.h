@@ -1,7 +1,6 @@
 #pragma once
 
 #include <emergent/Emergent.hpp>
-#include <emergent/struct/Buffer.hpp>
 // #include <psinc/TransportBuffer.hpp>
 #include <libusb-1.0/libusb.h>
 #include <atomic>
@@ -46,7 +45,7 @@ namespace psinc
 
 
 			/// Transfer packets to and from the actual device
-			bool Transfer(emg::Buffer<byte> *send, emg::Buffer<byte> *receive, std::atomic<bool> &waiting, bool check = true, bool truncate = false);
+			bool Transfer(std::vector<byte> *send, std::vector<byte> *receive, std::atomic<bool> &waiting, bool check = true, bool truncate = false);
 
 
 			/// Reset the connection to the actual device.
@@ -93,7 +92,7 @@ namespace psinc
 
 
 			/// Tranfer the given data to the device (write) or from the device (!write)
-			bool Transfer(emg::Buffer<byte> *buffer, bool write, bool check, bool truncate);
+			bool Transfer(std::vector<byte> *buffer, bool write, bool check, bool truncate);
 
 
 			/// Releases the device.

@@ -123,7 +123,7 @@ signals:
 
 		psinc::ImageHandler<uint16_t> hdrHandler;
 		emg::Image<uint16_t, emg::rgb> hdrImage;
-		emg::Buffer<int> histogram;
+		std::array<int, 4096> histogram;
 
 
 //		bool lensCorrect	= false;

@@ -2,9 +2,16 @@
 #include <psinc/Camera.h>
 #include <psinc/handlers/ImageHandler.hpp>
 
-using namespace std;
-using namespace emg;
-using namespace psinc;
+// using namespace std;
+// using namespace emg;
+// using namespace psinc;
+using namespace std::chrono_literals;
+
+using psinc::Camera;
+using psinc::ImageHandler;
+using emg::Image;
+using emg::byte;
+
 
 void CaptureMonoImage(Camera &camera, ImageHandler<byte> &handler)
 {
@@ -31,7 +38,10 @@ void CaptureMonoImage(Camera &camera, ImageHandler<byte> &handler)
 	// Need to make sure we've finished grabbing before re-using the camera
 	// or exiting the program (as the grab call is asynchronous and we're 
 	// calling it from a trivial single-thread application)
-	while (camera.Grabbing()) this_thread::sleep_for(1ms);
+	while (camera.Grabbing())
+	{
+		std::this_thread::sleep_for(1ms);
+	}
 
 }
 
@@ -61,7 +71,10 @@ void CaptureColourImage(Camera &camera, ImageHandler<byte> &handler)
 	// Need to make sure we've finished grabbing before re-using the camera
 	// or exiting the program (as the grab call is asynchronous and we're 
 	// calling it from a trivial single-thread application)
-	while (camera.Grabbing()) this_thread::sleep_for(1ms);
+	while (camera.Grabbing())
+	{
+		std::this_thread::sleep_for(1ms);
+	}
 }
 
 
@@ -90,7 +103,11 @@ void CaptureHdrMonoImage(Camera &camera, ImageHandler<uint16_t> &handler)
 	// Need to make sure we've finished grabbing before re-using the camera
 	// or exiting the program (as the grab call is asynchronous and we're 
 	// calling it from a trivial single-thread application)
-	while (camera.Grabbing()) this_thread::sleep_for(1ms);
+	while (camera.Grabbing())
+	{
+		std::this_thread::sleep_for(1ms);
+	}
+
 }
 
 
@@ -119,14 +136,17 @@ void CaptureHdrColourImage(Camera &camera, ImageHandler<uint16_t> &handler)
 	// Need to make sure we've finished grabbing before re-using the camera
 	// or exiting the program (as the grab call is asynchronous and we're 
 	// calling it from a trivial single-thread application)
-	while (camera.Grabbing()) this_thread::sleep_for(1ms);
+	while (camera.Grabbing())
+	{
+		std::this_thread::sleep_for(1ms);
+	}
 }
 
 
 int main(int argc, char *argv[])
 {
-	cout << "This test application connects to the first camera it finds" << endl;
-	cout << "and captures various types of image" << endl;
+	std::cout << "This test application connects to the first camera it finds\n";
+	std::cout << "and captures various types of image\n";
 
 	Camera camera;
 
@@ -144,7 +164,10 @@ int main(int argc, char *argv[])
 	// thread like this - using the callback function as shown
 	// in https://github.com/emergent-design/libpsinc/wiki#camera
 	// is a better idea.
-	while (!camera.Connected()) this_thread::sleep_for(1ms);
+	while (!camera.Connected())
+	{
+		std::this_thread::sleep_for(1ms);
+	}
         
 	//Use the camera and normal image handler for byte images
 	CaptureMonoImage(camera, handler);

@@ -57,10 +57,10 @@ namespace psinc
 			}
 
 
-			static inline void Clamp(int value, uint16_t*, uint16_t *dst, const uint16_t)	{ *dst = value > 65535 ? 65535 : value < 0 ? 0 : value; }
-			static inline void Clamp(int value, uint16_t*, byte *dst, const uint16_t shift)	{ value = value >> shift; *dst = value > 255 ? 255 : value < 0 ? 0 : value; }
-			static inline void Clamp(int value, byte*, uint16_t *dst, const uint16_t)		{ *dst = value < 0 ? 0 : value; }
-			static inline void Clamp(int value, byte*, byte *dst, const uint16_t)			{ *dst = value > 255 ? 255 : value < 0 ? 0 : value; }
+			static inline void Clamp(int value, const uint16_t*, uint16_t *dst, const uint16_t)		{ *dst = value > 65535 ? 65535 : value < 0 ? 0 : value; }
+			static inline void Clamp(int value, const uint16_t*, byte *dst, const uint16_t shift)	{ value = value >> shift; *dst = value > 255 ? 255 : value < 0 ? 0 : value; }
+			static inline void Clamp(int value, const byte*, uint16_t *dst, const uint16_t)			{ *dst = value < 0 ? 0 : value; }
+			static inline void Clamp(int value, const byte*, byte *dst, const uint16_t)				{ *dst = value > 255 ? 255 : value < 0 ? 0 : value; }
 
 
 			// Even row

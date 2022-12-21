@@ -138,8 +138,7 @@ QImage *MainWindow::ConvertWindow()
 	int jump		= (width - rw) * 3;
 	uint16_t *src	= this->hdrImage + roi.top() * width * 3 + roi.left() * 3;
 
-	this->histogram.Resize(4096);
-	this->histogram.Clear();
+	this->histogram.fill(0);
 
 	for (y=0; y<rh; y++, src+=jump)
 	{
@@ -323,7 +322,7 @@ template <typename T> std::array<int64_t, 7> GetRegionMeans(const emg::Image<T, 
 	auto sum		= std::array<int64_t, 3>{ 0, 0, 0 };
 	auto bayer		= std::array<int64_t, 4> { 0, 0, 0, 0 };
 	auto tally		= std::array<int, 4> { 0, 0, 0, 0 };
-	T *src			= image + sy * width * 3 + sx * 3;
+	auto *src		= image + sy * width * 3 + sx * 3;
 
 	for (int y=0; y<roi.height(); y++, src+=jump)
 	{

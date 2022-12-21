@@ -145,7 +145,7 @@ namespace psinc
 		}
 
 		std::atomic<bool> waiting(false);
-		emg::Buffer<byte> command = {
+		std::vector<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,						// Header
 			Commands::ResetChip, (byte)level, 0x00, 0x00, 0x00,	// Command
 			0xff												// Terminator

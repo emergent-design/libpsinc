@@ -12,7 +12,7 @@ namespace psinc
 		public:
 
 			// Refer to parent documentation
-			bool Process(bool monochrome, bool hdr, emg::Buffer<emg::byte> &data, int width, int height, emg::byte bayerMode) override
+			bool Process(bool monochrome, const bool hdr, const std::vector<emg::byte> &data, const int width, const int height, const emg::byte bayerMode) override
 			{
 				return true;
 			}

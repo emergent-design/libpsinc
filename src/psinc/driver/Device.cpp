@@ -35,7 +35,7 @@ namespace psinc
 	bool Device::Initialise(byte configuration)
 	{
 		atomic<bool> waiting(false);
-		Buffer<byte> data = {
+		std::vector<byte> data = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 										// Header
 			Commands::InitialiseDevice, this->index, configuration, 0x00, 0x00,	// Command
 			0xff																// Terminator
@@ -51,9 +51,9 @@ namespace psinc
 	}
 
 
-	bool Device::Write(const Buffer<byte> &buffer)
+	bool Device::Write(const std::vector<byte> &buffer)
 	{
-		return this->Write(buffer.Data(), buffer.Size());
+		return this->Write(buffer.data(), buffer.size());
 	}
 
 
@@ -70,10 +70,10 @@ namespace psinc
 			(byte)((size >> 16) & 0xff),
 		};
 
-		Buffer<byte> data(11 + size);
+		std::vector<byte> data(11 + size);
 
-		memcpy(data.Data(), command, 10);
-		memcpy(data.Data() + 10, buffer, size);
+		memcpy(data.data(), command, 10);
+		memcpy(data.data() + 10, buffer, size);
 		data[size+10] = 0xff;					// Terminator
 
 		return this->transport ? this->transport->Transfer(&data, nullptr, waiting) : false;
@@ -83,7 +83,7 @@ namespace psinc
 	bool Device::Write(byte value)
 	{
 		atomic<bool> waiting(false);
-		Buffer<byte> data = {
+		std::vector<byte> data = {
 			0x00, 0x00, 0x00, 0x00, 0x00, 							// Header
 			Commands::WriteDevice, this->index, value, 0x00, 0x00,	// Command
 			0xff													// Terminator
@@ -93,14 +93,14 @@ namespace psinc
 	}
 
 
-	Buffer<byte> Device::Read()
+	std::vector<byte> Device::Read()
 	{
 		if (this->direction != Direction::Output)
 		{
 			atomic<bool> waiting(false);
-			Buffer<byte> receive(READ_BUFFER);
-			receive = 0;
-			Buffer<byte> command = {
+			std::vector<byte> receive(READ_BUFFER, 0);
+
+			std::vector<byte> command = {
 				0x00, 0x00, 0x00, 0x00, 0x00,							// Header
 				0x03, 0x00, 0x00, 0x00, 0x00, 							// Flush command
 				Commands::QueueDevice, this->index, 0x00, 0x00, 0x00, 	// Command
@@ -113,7 +113,8 @@ namespace psinc
 
 				if (receive[0] == 0x00 && receive[1] == this->index && length > 0 && length < READ_BUFFER - 4)
 				{
-					return Buffer<byte>(receive.Data() + 4, length);
+					// return Buffer<byte>(receive.Data() + 4, length);
+					return { receive.begin() + 4, receive.begin() + 4 + length };
 				}
 			}
 		}
@@ -122,16 +123,16 @@ namespace psinc
 	}
 
 
-	bool Device::Read(emg::Buffer<byte> &buffer)
+	bool Device::Read(std::vector<byte> &buffer)
 	{
 		if (this->direction != Direction::Output)
 		{
 			atomic<bool> waiting(false);
 
-			buffer		= 0;
-			int size	= buffer.Size();
+			std::fill(buffer.begin(), buffer.end(), 0);
+			const auto size	= buffer.size();
 
-			Buffer<byte> command = {
+			std::vector<byte> command = {
 				0x00, 0x00, 0x00, 0x00, 0x00, 	// Header
 				Commands::ReadBlock, 			// Command
 				this->index,
@@ -163,8 +164,8 @@ namespace psinc
 	Device::Channel Device::ManageChannel(byte mode, byte low, byte high)
 	{
 		atomic<bool> waiting(false);
-		Buffer<byte> receive = { 0, 0, 0, 0 };
-		Buffer<byte> command = {
+		std::vector<byte> receive = { 0, 0, 0, 0 };
+		std::vector<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,						// Header
 			Commands::Channel, this->index, mode, low, high,	// Command
 			0xff
@@ -186,14 +187,12 @@ namespace psinc
 	{
 		Information result;
 		atomic<bool> waiting(false);
-		Buffer<byte> receive(13);
-		Buffer<byte> command = {
+		std::vector<byte> receive(13, 0);
+		std::vector<byte> command = {
 			0x00, 0x00, 0x00, 0x00, 0x00,					// Header
 			Commands::Query, this->index, 0x00, 0x00, 0x00,	// Command
 			0xff
 		};
-
-		receive = 0;
 
 		if (transport && this->transport->Transfer(&command, &receive, waiting))
 		{
