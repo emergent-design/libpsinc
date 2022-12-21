@@ -69,7 +69,7 @@ namespace psinc
 	}
 
 
-	int LIBUSB_CALL OnHotplug(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *data)
+	int LIBUSB_CALL OnHotplug(libusb_context *, libusb_device *device, libusb_hotplug_event event, void *data)
 	{
 		reinterpret_cast<Transport *>(data)->Pending(device, event);
 		return 0;
@@ -359,7 +359,7 @@ namespace psinc
 
 			if (!err)
 			{
-				result = (write || check) ? transferred == buffer->size() : true;
+				result = (write || check) ? transferred == (int)buffer->size() : true;
 
 
 				// if (!write && result)

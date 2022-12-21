@@ -39,7 +39,7 @@ namespace psinc
 			/// When performing a full refresh of all registers, the values are returned
 			/// in page blocks and this is used to update a particular register from that
 			/// data block.
-			void Refresh(std::vector<byte> &data);
+			void Refresh(const std::vector<byte> &data);
 
 
 			/// Returns the address of this particular register

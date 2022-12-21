@@ -73,7 +73,7 @@ namespace psinc
 				const int w = monochrome ? width : width - 4;
 				const int h = monochrome ? height : height - 4;
 
-				if (w > 0 && h > 0 && data.size() == width * height * (hdr ? 2 : 1))
+				if (w > 0 && h > 0 && (int)data.size() == width * height * (hdr ? 2 : 1))
 				{
 					const byte depth = this->image->Depth();
 					this->image->Resize(w, h);

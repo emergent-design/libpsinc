@@ -27,7 +27,7 @@ solution "psinc"
 			kind "StaticLib"
 
 		filter "action:not vs*"
-			buildoptions	{ "-Wall", "-Wno-sign-compare", "-std=c++17", "-O3", "-D_FORTIFY_SOURCE=2" }
+			buildoptions	{ "-Wall", "-Wextra", "-Wpedantic", "-std=c++17", "-O3", "-D_FORTIFY_SOURCE=2" }
 			linkoptions 	{ "-Wl,-soname,libpsinc.so.0" }
 
 		filter "action:vs*"

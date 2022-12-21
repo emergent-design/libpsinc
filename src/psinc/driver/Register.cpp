@@ -128,9 +128,9 @@ namespace psinc
 	}
 
 
-	void Register::Refresh(std::vector<byte> &data)
+	void Register::Refresh(const std::vector<byte> &data)
 	{
-		if (this->offset < data.size() - 1)
+		if (this->offset < (int)data.size() - 1)
 		{
 			this->value = (data[this->offset] << 8) + data[this->offset + 1];
 		}
