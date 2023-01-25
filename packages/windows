@@ -22,7 +22,7 @@ cp /opt/qt5-win-x64/bin/Qt5Gui.dll $dst/
 cp /opt/qt5-win-x64/bin/Qt5Widgets.dll $dst/
 cp /opt/qt5-win-x64/plugins/platforms/qwindows.dll $dst/platforms/
 cp /opt/qt5-win-x64/plugins/styles/qwindowsvistastyle.dll $dst/styles/
-cp ../bin/iconograph.exe $dst/
+cp ../iconograph/bin/iconograph.exe $dst/
 
 7z a $dst-`cat version`.7z $dst
 rm -r $dst

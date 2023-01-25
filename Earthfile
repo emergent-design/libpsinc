@@ -53,12 +53,12 @@ psinc-all:
 appimage:
 	FROM --build-arg DISTRIBUTION=bionic +deps
 	RUN apt-get update && apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev file
-	COPY --dir include packages src premake5.lua resources ui iconograph.pro .
+	COPY --dir iconograph include packages src premake5.lua .
 	RUN premake5 gmake && make -j$(nproc)
-	RUN qmake -o iconograph.make CONFIG+=release iconograph.pro \
-		&& make -f iconograph.make -j$(nproc)
+	RUN cd iconograph qmake CONFIG+=release iconograph.pro \
+		&& make -j$(nproc)
 	RUN mkdir -p packages/appdir/usr/bin packages/appdir/usr/lib \
-		&& cp bin/iconograph packages/appdir/usr/bin/ \
+		&& cp iconograph/bin/iconograph packages/appdir/usr/bin/ \
 		&& cp lib/libpsinc.so packages/appdir/usr/lib/libpsinc.so.0
 	RUN cd packages \
 		&& curl -sJL "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage" -o linuxdeployqt.AppImage \
@@ -103,11 +103,13 @@ windows:
 		&& ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
 
 	# Build lib
-	COPY --dir include packages src resources ui iconograph.pro premake5.lua .
+	COPY --dir include packages src iconograph premake5.lua .
 	RUN premake5 --os=windows gmake && make CXX=x86_64-w64-mingw32-g++ -j$(nproc)
 
 	# Build iconograph
-	RUN PATH=/opt/qt5-win-x64/bin:$PATH qmake -spec win32-g++ -o iconograph.make iconograph.pro
-	RUN make -f iconograph.make -j$(nproc)
+	RUN cd iconograph \
+		&& PATH=/opt/qt5-win-x64/bin:$PATH qmake -spec win32-g++ iconograph.pro \
+		&& make -j$(nproc)
+	# RUN make -f iconograph.make -j$(nproc)
 	RUN cd packages && ./windows
 	SAVE ARTIFACT packages/*.7z AS LOCAL build/windows/
