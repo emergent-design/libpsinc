@@ -24,7 +24,7 @@ image:
 	RUN apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev
 
 deps:
-	ARG EMERGENT=0.0.39
+	ARG EMERGENT=0.1.3
 
 	FROM +image
 	RUN curl -Ls -o libemergent-dev.deb https://github.com/emergent-design/libemergent/releases/download/v$EMERGENT/libemergent-dev_${EMERGENT}_all.deb \
@@ -52,7 +52,7 @@ psinc-all:
 
 appimage:
 	FROM --build-arg DISTRIBUTION=bionic +deps
-	RUN apt-get update && apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev file
+	RUN apt-get update && apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev file libtbb-dev
 	COPY --dir iconograph include packages src premake5.lua .
 	RUN premake5 gmake && make -j$(nproc)
 	RUN cd iconograph qmake CONFIG+=release iconograph.pro \
@@ -71,7 +71,8 @@ appimage:
 
 
 windows:
-	ARG EMERGENT=0.0.39
+	# ARG EMERGENT=0.0.39
+	ARG EMERGENT=0.1.3
 	ARG PREMAKE=5.0.0-alpha16
 	# FROM DOCKERFILE packages/
 	FROM teadriven/essential-qt-mingw:5.15

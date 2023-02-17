@@ -380,7 +380,7 @@ namespace psinc
 			height	= alias.height->Get();
 		}
 
-		int size = width * height * (this->hdr ? 2 : 1);
+		const size_t size = width * height * (this->hdr ? 2 : 1);
 
 		if (size)
 		{

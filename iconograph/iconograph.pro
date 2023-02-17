@@ -9,7 +9,7 @@ SOURCES += src/*.cpp
 HEADERS += include/*.h
 RESOURCES += resources/*.qrc
 FORMS   += ui/*.ui
-LIBS    += -L../lib -lpsinc -lfreeimage -lusb-1.0
+LIBS    += -L../lib -lpsinc -lfreeimage -lusb-1.0 -ltbb
 CONFIG  += rtti c++17
 
 DESTDIR = bin

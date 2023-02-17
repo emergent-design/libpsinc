@@ -173,7 +173,7 @@ namespace psinc
 			//		1: GB,RG
 			//		2: GR,BG
 			//		3: BG,GR
-			template <typename T, typename U> static void Colour(T *src, U *dst, int width, int height, byte bayerMode, uint16_t shift)
+			template <typename T, typename U> static bool Colour(T *src, U *dst, int width, int height, byte bayerMode, uint16_t shift)
 			{
 				#if !defined(_MSC_VER)
 					// This function tends to be called repeatedly, so to avoid the overhead of thread construction when using std::async
@@ -183,7 +183,10 @@ namespace psinc
 				#endif
 
 				// If there are not an even number of rows and columns then do not convert
-				if (width % 2 || height % 2) return;
+				if (width % 2 || height % 2)
+				{
+					return false;
+				}
 
 				int dw	= width - 4;
 				int dh	= height - 4;
@@ -211,6 +214,8 @@ namespace psinc
 				}
 
 				f.wait();
+
+				return true;
 			}
 
 
@@ -230,10 +235,13 @@ namespace psinc
 
 			// Decode data from a bayer sensor to a greyscale image
 			// Bayer mode offsets (see above)
-			template <typename T, typename U> static void Grey(T *src, U *dst, int width, int height, byte bayerMode, uint16_t shift)
+			template <typename T, typename U> static bool Grey(T *src, U *dst, int width, int height, byte bayerMode, uint16_t shift)
 			{
 				// If there are not an even number of rows and columns then do not convert
-				if (width % 2 || height % 2) return;
+				if (width % 2 || height % 2)
+				{
+					return false;
+				}
 
 				int x, y;
 				int w2	= width * 2;
@@ -277,6 +285,8 @@ namespace psinc
 						src += 4;
 					}
 				}
+
+				return true;
 			}
 
 	};

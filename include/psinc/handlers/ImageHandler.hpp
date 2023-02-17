@@ -1,10 +1,14 @@
 #pragma once
 
 #include <psinc/handlers/DataHandler.hpp>
-#include <psinc/handlers/helpers/Bayer.hpp>
 #include <psinc/handlers/helpers/Monochrome.hpp>
-// #include <psinc/handlers/helpers/Filter.hpp>
 #include <emergent/image/Image.hpp>
+
+#if __has_include(<execution>)
+	#include <psinc/handlers/helpers/Demosaic.hpp>
+#else
+	#include <psinc/handlers/helpers/Bayer.hpp>
+#endif
 
 
 namespace psinc
@@ -59,8 +63,13 @@ namespace psinc
 			}
 
 
-			bool Process(bool monochrome, const bool hdr, const std::vector<byte> &data, const int width, const int height, const byte bayerMode) override
+			bool Process(bool monochrome, const bool hdr, const std::vector<byte> &data, const size_t width, const size_t height, const byte bayerMode) override
 			{
+				if (!this->image)
+				{
+					return false;
+				}
+
 				// Allow the monochrome flag to be overridden - could have unexpected effects.
 				switch (configuration.mode)
 				{
@@ -70,33 +79,45 @@ namespace psinc
 					default:													break;
 				}
 
-				const int w = monochrome ? width : width - 4;
-				const int h = monochrome ? height : height - 4;
-
-				if (w > 0 && h > 0 && (int)data.size() == width * height * (hdr ? 2 : 1))
+				if (data.size() != width * height * (hdr ? 2 : 1))
 				{
-					const byte depth = this->image->Depth();
-					this->image->Resize(w, h);
-
-					if (hdr)
-					{
-						if (monochrome)			Monochrome::Decode((uint16_t *)data.data(), this->image->Data(), width, height, depth, this->shiftBits);
-						else if (depth == 3)	Bayer::Colour((uint16_t *)data.data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
-						else					Bayer::Grey((uint16_t *)data.data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
-					}
-					else
-					{
-						if (monochrome)			Monochrome::Decode(data.data(), this->image->Data(), width, height, depth, this->shiftBits);
-						else if (depth == 3)	Bayer::Colour(data.data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
-						else					Bayer::Grey(data.data(), this->image->Data(), width, height, bayerMode, this->shiftBits);
-					}
-
-					// Filter::Process(this->configuration.filter, *this->image);
-
-					return true;
+					return false;
 				}
 
-				return false;
+				if (monochrome)
+				{
+					this->image->Resize(width, height);
+
+					return hdr
+						? Monochrome::Decode((uint16_t *)data.data(), this->image->Data(), width, height, this->image->Depth(), this->shiftBits)
+						: Monochrome::Decode(data.data(), this->image->Data(), width, height, this->image->Depth(), this->shiftBits);
+				}
+
+				#if __has_include(<execution>)	// newer compilers only
+
+					this->image->Resize(width, height);
+
+					return hdr
+						? bayer::Demosaic<uint16_t, T>::Decode(bayerMode, (uint16_t *)data.data(), width, height, image->Depth(), image->Data(), shiftBits)
+						: bayer::Demosaic<uint8_t, T>::Decode(bayerMode, data.data(), width, height, image->Depth(), image->Data(), shiftBits);
+
+				#else
+					const int w = monochrome ? width : width - 4;
+					const int h = monochrome ? height : height - 4;
+
+					this->image->Resize(w, h);
+
+					if (this->image->Depth() == 3)
+					{
+						return hdr
+							? Bayer::Colour((uint16_t *)data.data(), image->Data(), width, height, bayerMode, shiftBits)
+							: Bayer::Colour(data.data(), image->Data(), width, height, bayerMode, shiftBits);
+					}
+
+					return hdr
+						? Bayer::Grey((uint16_t *)data.data(), image->Data(), width, height, bayerMode, shiftBits)
+						: Bayer::Grey(data.data(), image->Data(), width, height, bayerMode, shiftBits);
+				#endif
 			}
 
 		protected:
