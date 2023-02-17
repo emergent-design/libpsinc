@@ -21,7 +21,7 @@ image:
 	RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl build-essential clang fakeroot chrpath dh-exec
 	RUN curl -Ls -o premake.deb https://github.com/emergent-design/premake-pkg/releases/download/v$PREMAKE/premake_$PREMAKE-0ubuntu1_$TARGETARCH.deb \
 		&& dpkg -i premake.deb
-	RUN apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev
+	RUN apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev libtbb-dev
 
 deps:
 	ARG EMERGENT=0.1.3
