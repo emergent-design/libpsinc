@@ -9,7 +9,7 @@ SOURCES += src/*.cpp
 HEADERS += include/*.h
 RESOURCES += resources/*.qrc
 FORMS   += ui/*.ui
-LIBS    += -L../lib -lpsinc -lfreeimage -lusb-1.0 -ltbb
+LIBS    += -L../lib -lpsinc -lfreeimage -lusb-1.0
 CONFIG  += rtti c++17
 
 DESTDIR = bin
@@ -17,3 +17,8 @@ OBJECTS_DIR = bin/.obj
 MOC_DIR = bin/.moc
 RCC_DIR = bin/.rcc
 UI_DIR = bin/.ui
+
+# Parallelisation now supported on windows builds yet
+linux {
+    LIBS += -ltbb
+}
