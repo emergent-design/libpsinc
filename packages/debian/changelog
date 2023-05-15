@@ -1,3 +1,12 @@
+libpsinc0 (0.2.0) unstable; urgency=medium
+
+  * New demosaicing algorithm to reduce artefacts found with the existing 
+bayer decoder such as zippering around coloured edges.
+  * Parallelisation for both the new demosaic and original monochrome decoding 
+algorithms. 
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Mon, 15 May 2023 13:39:14 +0100
+
 libpsinc0 (0.1.42) unstable; urgency=medium
 
   * Replace soon to be deprecated emg::Buffer<> with std::vector<>
