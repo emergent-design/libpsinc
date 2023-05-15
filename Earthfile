@@ -55,7 +55,8 @@ appimage:
 	RUN apt-get update && apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev file libtbb-dev
 	COPY --dir iconograph include packages src premake5.lua .
 	RUN premake5 gmake && make -j$(nproc)
-	RUN cd iconograph qmake CONFIG+=release iconograph.pro \
+	RUN cd iconograph \
+		&& qmake CONFIG+=release iconograph.pro \
 		&& make -j$(nproc)
 	RUN mkdir -p packages/appdir/usr/bin packages/appdir/usr/lib \
 		&& cp iconograph/bin/iconograph packages/appdir/usr/bin/ \
