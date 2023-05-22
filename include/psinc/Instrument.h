@@ -74,7 +74,7 @@ namespace psinc
 
 
 			/// Retrieve list of all serial numbers for any connected instruments of the given type
-			static std::map<std::string, std::string> List(uint16_t product = Type::Camera, const std::set<uint16_t> &vendors = Vendors::All);
+			static std::map<std::string, Transport::Info> List(uint16_t product = Type::Camera, const std::set<uint16_t> &vendors = Vendors::All);
 
 
 			/// A map of available devices that can be controlled by (or are part of)

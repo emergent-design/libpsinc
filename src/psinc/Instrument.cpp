@@ -40,7 +40,7 @@ namespace psinc
 	}
 
 
-	std::map<string, string> Instrument::List(uint16_t product, const std::set<uint16_t> &vendors)
+	std::map<string, Transport::Info> Instrument::List(uint16_t product, const std::set<uint16_t> &vendors)
 	{
 		return Transport::List(vendors, product);
 	}
@@ -104,6 +104,30 @@ namespace psinc
 
 	void Instrument::Entry()
 	{
+		// if (pthread_setschedprio(this->_thread.native_handle(), 20)) //sched_get_priority_max(SCHED_FIFO)))
+		// 	{
+		// 		emg::Log::Warning("Failed to set thread priority for transport layer: %s", strerror(errno));
+		// 	}
+
+		// int policy;
+		// sched_param param;
+		// param.sched_priority = 80; //sched_get_priority_max(SCHED_FIFO);
+
+		// if (pthread_setschedparam(this->_thread.native_handle(), SCHED_FIFO, &param))
+		// {
+		// 	emg::Log::Warning("Failed to set thread priority for transport layer: %s", strerror(errno));
+		// }
+
+		// // std::cout << "max: " << sched_get_priority_max(SCHED_OTHER) << '\n';
+
+		// if (pthread_getschedparam(this->_thread.native_handle(), &policy, &param))
+		// {
+		// 	std::cout << "error getting schedule params: " << errno << '\n';
+		// }
+
+		// std::cout << "priority set to: " << param.sched_priority << " and policy = " << policy << '\n';
+
+
 		std::unique_lock lock(this->cs);
 
 		while (this->run)

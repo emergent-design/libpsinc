@@ -56,12 +56,12 @@ namespace psinc
 
 					if (data)
 					{
-						std::cout << "+" << std::flush;
+						// std::cout << "+" << std::flush;
 						this->deviceAllocated = true;
 					}
 					else
 					{
-						std::cout << "-" << std::flush;
+						// std::cout << "-" << std::flush;
 						// Log::Warning("Failed to allocate device memory");
 						this->data = new uint8_t[size];
 					}

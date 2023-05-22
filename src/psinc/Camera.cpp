@@ -10,6 +10,7 @@
 using std::string;
 using namespace std::chrono_literals;
 
+
 namespace psinc
 {
 	Camera::Camera() : Instrument()

@@ -23,6 +23,15 @@ namespace psinc
 	{
 		public:
 
+			// USB device information
+			struct Info
+			{
+				std::string description;	// product description
+				std::string version;		// USB version
+				std::string address;		// [bus]:[port]:[address]
+			};
+
+
 			Transport();
 			virtual ~Transport();
 
@@ -63,7 +72,7 @@ namespace psinc
 
 			/// Return a list of serial numbers and product descriptions for all
 			/// connected devices that match the given product ID.
-			static std::map<std::string, std::string> List(const std::set<uint16_t> &vendors, uint16_t product);
+			static std::map<std::string, Info> List(const std::set<uint16_t> &vendors, uint16_t product);
 
 
 		private:

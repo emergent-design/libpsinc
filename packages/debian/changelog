@@ -1,3 +1,9 @@
+libpsinc0 (0.2.1) unstable; urgency=medium
+
+  * Listing of USB devices now returns more information in a structure.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Mon, 22 May 2023 15:37:13 +0100
+
 libpsinc0 (0.2.0) unstable; urgency=medium
 
   * New demosaicing algorithm to reduce artefacts found with the existing 

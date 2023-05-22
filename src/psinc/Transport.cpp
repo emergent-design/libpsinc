@@ -9,6 +9,8 @@
 using std::string;
 
 
+// #include <emergent/Timer.hpp>
+
 namespace psinc
 {
 	Transport::Transport()
@@ -233,9 +235,9 @@ namespace psinc
 	}
 
 
-	std::map<string, string> Transport::List(const std::set<uint16_t> &vendors, uint16_t product)
+	std::map<string, Transport::Info> Transport::List(const std::set<uint16_t> &vendors, uint16_t product)
 	{
-		std::map<string, string> result;
+		std::map<string, Info> result;
 
 		unsigned char data[128];
 		libusb_device **list;
@@ -256,7 +258,20 @@ namespace psinc
 					string serial = emg::String::trim(reinterpret_cast<char *>(data), ' ');
 
 					libusb_get_string_descriptor_ascii(handle, descriptor.iProduct, data, 128);
-					result[serial] = reinterpret_cast<char *>(data);
+					result[serial] = {
+						reinterpret_cast<char *>(data),
+						emg::String::format(
+							"v%d.%d",
+							(descriptor.bcdUSB >> 8) & 0xff,
+							descriptor.bcdUSB & 0xff
+						),
+						emg::String::format(
+							"%d:%d:%d",
+							libusb_get_bus_number(*device),
+							libusb_get_port_number(*device),
+							libusb_get_device_address(*device)
+						)
+					};
 
 					libusb_close(handle);
 				}
@@ -347,8 +362,10 @@ namespace psinc
 		{
 			// if (!write)
 			// {
-			// 	this->readBuffer.Resize(this->handle, buffer->Size());
+			// 	this->readBuffer.Resize(this->handle, buffer->size());
 			// }
+
+			// emg::Timer timer;
 
 			int transferred	= 0;
 			bool result		= false;
@@ -356,6 +373,8 @@ namespace psinc
 				? libusb_bulk_transfer(this->handle, WRITE_PIPE, buffer->data(), buffer->size(), &transferred, this->timeout)
 				: libusb_bulk_transfer(this->handle, READ_PIPE, buffer->data(), buffer->size(), &transferred, this->timeout);
 				// : libusb_bulk_transfer(this->handle, READ_PIPE, this->readBuffer.Data(), this->readBuffer.Size(), &transferred, this->timeout);
+
+			// const auto time = timer.MicroElapsed();
 
 			if (!err)
 			{
@@ -365,7 +384,9 @@ namespace psinc
 				// if (!write && result)
 				// {
 				// 	// When requested, truncate the buffer to the size of data actually received.
-				// 	buffer->Set(this->readBuffer.Data(), truncate ? transferred : this->readBuffer.Size());
+				// 	// buffer->assign(this->readBuffer.Data(), truncate ? transferred : this->readBuffer.Size());
+				// 	// buffer->assign(this->readBuffer.Data(), this->readBuffer.Data() + (truncate ? transferred : this->readBuffer.Size()));
+				// 	std::memcpy(buffer->data(), this->readBuffer.Data(), truncate ? transferred : this->readBuffer.Size());
 				// }
 
 				if (!write && result && truncate)
@@ -392,6 +413,7 @@ namespace psinc
 			}
 			else
 			{
+				// std::cout << "time spent transferring: " << time << "us\n";
 				emg::Log::Error("%u: USB device %s - %s (%d) when %s (%d bytes transferred)", emg::Timestamp::LogTime(), this->id, libusb_error_name(err), err, write ? "writing" : "reading", transferred);
 			}
 
