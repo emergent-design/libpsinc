@@ -4,11 +4,11 @@
 #include <psinc/handlers/helpers/Monochrome.hpp>
 #include <emergent/image/Image.hpp>
 
-#if __has_include(<execution>)
-	#include <psinc/handlers/helpers/Demosaic.hpp>
-#else
+// #if __has_include(<execution>)
+// 	#include <psinc/handlers/helpers/Demosaic.hpp>
+// #else
 	#include <psinc/handlers/helpers/Bayer.hpp>
-#endif
+// #endif
 
 
 namespace psinc
@@ -93,15 +93,14 @@ namespace psinc
 						: Monochrome::Decode(data.data(), this->image->Data(), width, height, this->image->Depth(), this->shiftBits);
 				}
 
-				#if __has_include(<execution>)	// newer compilers only
+				// #if __has_include(<execution>)	// newer compilers only
+				// 	this->image->Resize(width, height);
 
-					this->image->Resize(width, height);
+				// 	return hdr
+				// 		? bayer::Demosaic<uint16_t, T>::Decode(bayerMode, (uint16_t *)data.data(), width, height, image->Depth(), image->Data(), shiftBits)
+				// 		: bayer::Demosaic<uint8_t, T>::Decode(bayerMode, data.data(), width, height, image->Depth(), image->Data(), shiftBits);
 
-					return hdr
-						? bayer::Demosaic<uint16_t, T>::Decode(bayerMode, (uint16_t *)data.data(), width, height, image->Depth(), image->Data(), shiftBits)
-						: bayer::Demosaic<uint8_t, T>::Decode(bayerMode, data.data(), width, height, image->Depth(), image->Data(), shiftBits);
-
-				#else
+				// #else
 					const int w = monochrome ? width : width - 4;
 					const int h = monochrome ? height : height - 4;
 
@@ -117,7 +116,7 @@ namespace psinc
 					return hdr
 						? Bayer::Grey((uint16_t *)data.data(), image->Data(), width, height, bayerMode, shiftBits)
 						: Bayer::Grey(data.data(), image->Data(), width, height, bayerMode, shiftBits);
-				#endif
+				// #endif
 			}
 
 		protected:

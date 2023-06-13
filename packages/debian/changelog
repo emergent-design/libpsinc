@@ -1,3 +1,10 @@
+libpsinc0 (0.2.3) unstable; urgency=medium
+
+  * Temporarily disabled the new parallelised algorithms due to the effect
+    on the OS/processor handling of USB which can cause camera timeouts.
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Tue, 13 Jun 2023 13:43:43 +0100
+
 libpsinc0 (0.2.1) unstable; urgency=medium
 
   * Listing of USB devices now returns more information in a structure.
