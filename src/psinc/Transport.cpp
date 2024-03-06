@@ -2,6 +2,7 @@
 #include <emergent/logger/Logger.hpp>
 #include <emergent/String.hpp>
 #include <regex>
+// #include <cstring>
 
 #define WRITE_PIPE	0x03
 #define READ_PIPE	0x81

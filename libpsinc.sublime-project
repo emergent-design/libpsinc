@@ -2,7 +2,7 @@
 	"folders":
 	[
 		{
-			"path": "/",
+			"path": ".",
 			"follow_symlinks": true,
 			"file_exclude_patterns": [ "*~", "*.make", "Makefile" ],
 			"folder_exclude_patterns": [ ".git", "bin", "lib", "obj" ]

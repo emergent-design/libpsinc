@@ -41,6 +41,8 @@ namespace psinc
 			}
 
 
+
+
 			// If the device handle has changed then the memory needs
 			// re-allocating. If the size is larger than max then the
 			// memory needs re-allocating.

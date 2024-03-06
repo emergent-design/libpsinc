@@ -19,6 +19,6 @@ RCC_DIR = bin/.rcc
 UI_DIR = bin/.ui
 
 # Parallelisation now supported on windows builds yet
-linux {
-    LIBS += -ltbb
-}
+#linux {
+#    LIBS += -ltbb
+#}

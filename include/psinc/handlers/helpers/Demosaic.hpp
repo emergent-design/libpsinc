@@ -124,7 +124,7 @@ namespace psinc::bayer
 				PopulateGreen(cfa, src, width, height, dst);		// times[1] = timer.MicroElapsed(); timer.Reset();
 				PopulateRedBlue(cfa, dst, width, height);			// times[2] = timer.MicroElapsed(); timer.Reset();
 				PopulateRedBlueAtGreen(cfa, dst, width, height);	// times[3] = timer.MicroElapsed(); timer.Reset();
-				InterpolateBorder(cfa, 3, dst, width, height);		// times[4] = timer.MicroElapsed(); timer.Reset();
+				InterpolateBorder(cfa, 4, dst, width, height);		// times[4] = timer.MicroElapsed(); timer.Reset();
 
 				// for (size_t i=0; i<times.size(); i++)
 				// {
