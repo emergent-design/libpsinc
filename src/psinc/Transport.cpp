@@ -37,6 +37,8 @@ namespace psinc
 
 	bool Transport::Initialise(const std::set<uint16_t> &vendors, uint16_t product, std::string serial, std::function<void(bool)> onConnection, int timeout)
 	{
+		this->Disconnect();
+
 		this->vendors		= vendors;
 		this->product		= product;
 		this->serial		= serial;
