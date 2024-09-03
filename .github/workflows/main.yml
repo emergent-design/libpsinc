@@ -96,7 +96,7 @@ jobs:
     needs: [ debs-amd64, debs-arm64, appimage, windows ]
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
 
       - name: List artifacts
         run: ls -R
