@@ -3,11 +3,14 @@ VERSION 0.6
 bionic:
 	FROM ubuntu:18.04
 
-focal:
-	FROM ubuntu:20.04
+# focal:
+# 	FROM ubuntu:20.04
 
 jammy:
 	FROM ubuntu:22.04
+
+noble:
+	FROM ubuntu:24.04
 
 image:
 	ARG TARGETARCH
@@ -24,7 +27,7 @@ image:
 	RUN apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev libtbb-dev
 
 deps:
-	ARG EMERGENT=0.1.3
+	ARG EMERGENT=0.1.10
 
 	FROM +image
 	RUN curl -Ls -o libemergent-dev.deb https://github.com/emergent-design/libemergent/releases/download/v$EMERGENT/libemergent-dev_${EMERGENT}_all.deb \
@@ -42,7 +45,7 @@ package:
 	SAVE ARTIFACT libpsinc*.deb AS LOCAL build/$DISTRIBUTION/
 
 all-dists:
-	BUILD +package --DISTRIBUTION=bionic --DISTRIBUTION=focal --DISTRIBUTION=jammy
+	BUILD +package --DISTRIBUTION=bionic --DISTRIBUTION=jammy --DISTRIBUTION=noble
 
 check:
 	BUILD +build

@@ -1,3 +1,12 @@
+libpsinc0 (0.2.4) unstable; urgency=medium
+
+  * Fix missing register value for mt9
+  * Border fix for the new demosaic algorithm
+  * Added 24.04 (noble) builds
+  * Force disconnect on instrument re-initialisation
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Mon, 09 Jun 2025 13:15:43 +0100
+
 libpsinc0 (0.2.3) unstable; urgency=medium
 
   * Temporarily disabled the new parallelised algorithms due to the effect
