@@ -27,6 +27,7 @@ build/
 .directory
 .build-*/
 .vs/
+.cache/
 
 psinc.workspace.*
 compilation.db
