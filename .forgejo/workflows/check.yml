@@ -1,0 +1,18 @@
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+
+jobs:
+    build:
+      name: build check
+      runs-on: amd64
+
+      steps:
+
+        - uses: actions/checkout@v4
+          with:
+            persist-credentials: false
+
+        - name: "Launch earthly"
+          run: earthly +check

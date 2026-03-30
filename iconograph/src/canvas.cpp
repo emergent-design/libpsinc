@@ -2,7 +2,7 @@
 
 #include <QPainter>
 #include <QMouseEvent>
-#include <iostream>
+// #include <iostream>
 #include <cmath>
 
 
@@ -161,12 +161,12 @@ void Canvas::wheelEvent(QWheelEvent *event)
 			this->offset	= this->rect.topLeft();
 		}
 
-//		const auto position = event->position();
+		const auto position = event->position();
 
 		// Origin of zoom in image space
-		const double x		= (event->x() - this->offset.x()) / this->zoom;
-		const double y		= (event->y() - this->offset.y()) / this->zoom;
-		const double step	= event->delta() < 0 ? -0.05 : 0.05;
+		const double x		= (position.x() - this->offset.x()) / this->zoom;
+		const double y		= (position.y() - this->offset.y()) / this->zoom;
+		const double step	= event->pixelDelta().y() < 0 ? -0.05 : 0.05;
 
 		// Use these when only building for jammy or later
 //		const double x	= (position.x() - this->offset.x()) / this->zoom;

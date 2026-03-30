@@ -1,10 +1,4 @@
-VERSION 0.6
-
-bionic:
-	FROM ubuntu:18.04
-
-# focal:
-# 	FROM ubuntu:20.04
+VERSION 0.8
 
 jammy:
 	FROM ubuntu:22.04
@@ -12,40 +6,38 @@ jammy:
 noble:
 	FROM ubuntu:24.04
 
+trixie:
+	FROM debian:trixie
+
 image:
-	ARG TARGETARCH
-	ARG DISTRIBUTION=bionic
-	ARG PREMAKE=5.0.0-alpha16
+	ARG DISTRIBUTION=noble
 
 	FROM +$DISTRIBUTION
 	ENV DEBIAN_FRONTEND noninteractive
 	ENV DEBCONF_NONINTERACTIVE_SEEN true
 	WORKDIR /code
-	RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl build-essential clang fakeroot chrpath dh-exec
-	RUN curl -Ls -o premake.deb https://github.com/emergent-design/premake-pkg/releases/download/v$PREMAKE/premake_$PREMAKE-0ubuntu1_$TARGETARCH.deb \
-		&& dpkg -i premake.deb
-	RUN apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev libtbb-dev
 
-deps:
-	ARG EMERGENT=0.1.10
+	RUN apt-get -q update && apt-get install -y --no-install-recommends ca-certificates curl build-essential cmake clang fakeroot chrpath dh-exec
 
-	FROM +image
-	RUN curl -Ls -o libemergent-dev.deb https://github.com/emergent-design/libemergent/releases/download/v$EMERGENT/libemergent-dev_${EMERGENT}_all.deb \
-		&& dpkg -i libemergent-dev.deb
+	RUN curl -so /usr/share/keyrings/emergent.gpg https://apt.emergent-design.co.uk/emergent.gpg \
+		&& echo "deb [signed-by=/usr/share/keyrings/emergent.gpg] https://apt.emergent-design.co.uk/public $DISTRIBUTION main" > /etc/apt/sources.list.d/emergent.list
+
+	RUN apt-get -q update && apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev libtbb-dev libemergent-dev
 
 build:
-	FROM +deps
-	COPY --dir include packages src premake5.lua .
-	RUN premake5 gmake && make -j$(nproc)
+	FROM +image
+	COPY --dir include packages src CMakeLists.txt .
+	RUN cmake -B build \
+		&& make -j8 -C build
 
 package:
+	ARG DISTRIBUTION=noble
 	FROM +build
-	ARG DISTRIBUTION=bionic
 	RUN cd packages && dpkg-buildpackage -b -uc -us
-	SAVE ARTIFACT libpsinc*.deb AS LOCAL build/$DISTRIBUTION/
+	SAVE ARTIFACT --keep-ts libpsinc*.deb AS LOCAL build/$DISTRIBUTION/
 
 all-dists:
-	BUILD +package --DISTRIBUTION=bionic --DISTRIBUTION=jammy --DISTRIBUTION=noble
+	BUILD +package --DISTRIBUTION=noble --DISTRIBUTION=trixie
 
 check:
 	BUILD +build
@@ -54,26 +46,29 @@ psinc-all:
 	BUILD --platform=linux/amd64 --platform=linux/arm64 +all-dists
 
 appimage:
-	FROM --build-arg DISTRIBUTION=bionic +deps
-	RUN apt-get update && apt-get install -y --no-install-recommends qtbase5-dev qt5-default libqt5serialport5-dev file libtbb-dev
-	COPY --dir iconograph include packages src premake5.lua .
-	RUN premake5 gmake && make -j$(nproc)
+	FROM +build --DISTRIBUTION=noble
+	RUN apt-get update && apt-get install -y --no-install-recommends qt6-base-dev
+
+	COPY --dir iconograph/include iconograph/resources iconograph/src iconograph/ui iconograph/CMakeLists.txt ./iconograph
+
 	RUN cd iconograph \
-		&& qmake CONFIG+=release iconograph.pro \
-		&& make -j$(nproc)
+		&& cmake -B build \
+		&& make -j8 -C build
+
 	RUN mkdir -p packages/appdir/usr/bin packages/appdir/usr/lib \
-		&& cp iconograph/bin/iconograph packages/appdir/usr/bin/ \
-		&& cp lib/libpsinc.so packages/appdir/usr/lib/libpsinc.so.0
+		&& cp iconograph/build/iconograph packages/appdir/usr/bin/ \
+		&& cp build/libpsinc.so.0 packages/appdir/usr/lib/libpsinc.so.0
+
 	RUN cd packages \
-		&& curl -sJL "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage" -o linuxdeployqt.AppImage \
-		&& chmod a+x linuxdeployqt.AppImage \
-		&& ./linuxdeployqt.AppImage --appimage-extract \
-		&& unset QTDIR; unset QT_PLUGIN_PATH; unset LD_LIBRARY_PATH \
-		&& squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -bundle-non-qt-libs \
-		&& squashfs-root/usr/bin/linuxdeployqt appdir/usr/share/applications/iconograph.desktop -appimage
-	SAVE ARTIFACT packages/Iconograph*.AppImage AS LOCAL build/
+		&& curl -sJL "https://github.com/probonopd/go-appimage/releases/download/continuous/appimagetool-940-x86_64.AppImage" -o appimagetool.AppImage \
+		&& chmod a+x appimagetool.AppImage \
+		&& ./appimagetool.AppImage --appimage-extract \
+		&& ARCH=x86_64 ./squashfs-root/usr/bin/appimagetool -s deploy appdir/usr/share/applications/iconograph.desktop \
+		&& ARCH=x86_64 VERSION=$(cat version) ./squashfs-root/usr/bin/appimagetool ./appdir
 
+	SAVE ARTIFACT --keep-ts packages/Iconograph*.AppImage AS LOCAL build/
 
+# The following will be broken since the switch to cmake - to be addressed at a later date
 windows:
 	# ARG EMERGENT=0.0.39
 	ARG EMERGENT=0.1.3
@@ -117,4 +112,4 @@ windows:
 		&& make -j$(nproc)
 	# RUN make -f iconograph.make -j$(nproc)
 	RUN cd packages && ./windows
-	SAVE ARTIFACT packages/*.7z AS LOCAL build/windows/
+	SAVE ARTIFACT --keep-ts packages/*.7z AS LOCAL build/windows/
