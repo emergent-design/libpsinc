@@ -68,22 +68,24 @@ appimage:
 
 	SAVE ARTIFACT --keep-ts packages/Iconograph*.AppImage AS LOCAL build/
 
-# The following will be broken since the switch to cmake - to be addressed at a later date
 windows:
-	# ARG EMERGENT=0.0.39
-	ARG EMERGENT=0.1.3
-	ARG PREMAKE=5.0.0-alpha16
-	# FROM DOCKERFILE packages/
-	FROM teadriven/essential-qt-mingw:5.15
+	FROM teadriven/essential-qt-mingw:6.11
+	# FROM DOCKERFILE packages/docker-qt6/
+
 	WORKDIR /code
 
-	RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl p7zip-full unzip
+	RUN curl -so /usr/share/keyrings/emergent.gpg https://apt.emergent-design.co.uk/emergent.gpg \
+		&& echo "deb [signed-by=/usr/share/keyrings/emergent.gpg] https://apt.emergent-design.co.uk/public noble main" > /etc/apt/sources.list.d/emergent.list \
+		&& apt-get -q update \
+		&& apt-get install -y --no-install-recommends libemergent-dev p7zip-full unzip \
+		&& ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
 
 	# Install libusb
 	RUN mkdir libusb && cd libusb \
-		&& curl -Ls https://github.com/libusb/libusb/releases/download/v1.0.23/libusb-1.0.23.7z --output libusb.7z \
+		&& curl -Ls https://github.com/libusb/libusb/releases/download/v1.0.29/libusb-1.0.29.7z --output libusb.7z \
 		&& p7zip -d libusb.7z \
-		&& cp -r include/libusb-1.0 /usr/x86_64-w64-mingw32/include/ \
+		&& mkdir -p /usr/x86_64-w64-mingw32/include/libusb-1.0 \
+		&& cp -r include/libusb.h /usr/x86_64-w64-mingw32/include/libusb-1.0/ \
 		&& cp MinGW64/dll/libusb-1.0.dll /usr/x86_64-w64-mingw32/lib/ \
 		&& cd .. && rm -rf libusb
 
@@ -94,22 +96,18 @@ windows:
 		&& cp FreeImage/Dist/x64/FreeImage.dll /usr/x86_64-w64-mingw32/lib/freeimage.dll \
 		&& rm -rf FreeImage && rm FreeImage.zip
 
-	# Install other dependencies
-	RUN curl -Ls -o premake.deb https://github.com/emergent-design/premake-pkg/releases/download/v$PREMAKE/premake_$PREMAKE-0ubuntu1_amd64.deb \
-		&& dpkg -i premake.deb
 
-	RUN curl -Ls -o libemergent-dev.deb https://github.com/emergent-design/libemergent/releases/download/v$EMERGENT/libemergent-dev_${EMERGENT}_all.deb \
-		&& dpkg -i libemergent-dev.deb \
-		&& ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
+	COPY --dir packages include src CMakeLists.txt .
+	COPY --dir iconograph/include iconograph/resources iconograph/src iconograph/ui iconograph/CMakeLists.txt ./iconograph
 
-	# Build lib
-	COPY --dir include packages src iconograph premake5.lua .
-	RUN premake5 --os=windows gmake && make CXX=x86_64-w64-mingw32-g++ -j$(nproc)
+	RUN cmake -DCMAKE_TOOLCHAIN_FILE=/opt/qt6-host/toolchain-mingw.cmake -B build \
+		&& make -j8 -C build
 
-	# Build iconograph
 	RUN cd iconograph \
-		&& PATH=/opt/qt5-win-x64/bin:$PATH qmake -spec win32-g++ iconograph.pro \
-		&& make -j$(nproc)
-	# RUN make -f iconograph.make -j$(nproc)
+		&& cmake -DCMAKE_TOOLCHAIN_FILE=/opt/qt6-host/toolchain-mingw.cmake -DQT_HOST_PATH=/opt/qt6-host -DQt6_ROOT=/usr/local/Qt-6.11.0 -B build \
+		&& make -j8 -C build
+
 	RUN cd packages && ./windows
 	SAVE ARTIFACT --keep-ts packages/*.7z AS LOCAL build/windows/
+
+# -DQt6_ROOT=/usr/local/Qt-6.11.0

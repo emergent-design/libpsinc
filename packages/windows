@@ -7,22 +7,24 @@ mkdir $dst
 mkdir $dst/platforms
 mkdir $dst/styles
 
-# cp /usr/lib/gcc/x86_64-w64-mingw32/5.3-posix/libgcc_s_seh-1.dll $dst/
-# cp /usr/lib/gcc/x86_64-w64-mingw32/5.3-posix/libstdc++-6.dll $dst/
-cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libgcc_s_seh-1.dll $dst/
-cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libstdc++-6.dll $dst/
+# cp /usr/lib/gcc/x86_64-w64-mingw32/13-posix/libgcc_s_seh-1.dll $dst/
+# cp /usr/lib/gcc/x86_64-w64-mingw32/13-posix/libstdc++-6.dll $dst/
+cp /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libgcc_s_seh-1.dll $dst/
+cp /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libstdc++-6.dll $dst/
 cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $dst/
 cp /usr/x86_64-w64-mingw32/lib/freeimage.dll $dst/
-cp /usr/x86_64-w64-mingw32/lib/libusb-1.0.dll $dst/
-# cp ../lib/psinc.dll $dst/
-# cp ../lib/psinc.lib $dst/
 
-cp /opt/qt5-win-x64/bin/Qt5Core.dll $dst/
-cp /opt/qt5-win-x64/bin/Qt5Gui.dll $dst/
-cp /opt/qt5-win-x64/bin/Qt5Widgets.dll $dst/
-cp /opt/qt5-win-x64/plugins/platforms/qwindows.dll $dst/platforms/
-cp /opt/qt5-win-x64/plugins/styles/qwindowsvistastyle.dll $dst/styles/
-cp ../iconograph/bin/iconograph.exe $dst/
+# not sure why this needs to be renamed - but mingw64 is doing something strange when
+# linking libpsinc and iconograph
+cp /usr/x86_64-w64-mingw32/lib/libusb-1.0.dll $dst/msys-usb-1.0.dll
+
+cp /usr/local/Qt-6.11.0/bin/Qt6Core.dll $dst/
+cp /usr/local/Qt-6.11.0/bin/Qt6Gui.dll $dst/
+cp /usr/local/Qt-6.11.0/bin/Qt6Widgets.dll $dst/
+cp /usr/local/Qt-6.11.0/plugins/platforms/qwindows.dll $dst/platforms/
+cp /usr/local/Qt-6.11.0/plugins/styles/qmodernwindowsstyle.dll $dst/styles/
+cp ../iconograph/build/iconograph.exe $dst/
+cp ../build/libpsinc.dll $dst/
 
 7z a $dst-`cat version`.7z $dst
 rm -r $dst
@@ -34,8 +36,7 @@ mkdir -p $dst/include
 mkdir -p $dst/lib
 
 cp -r ../include/psinc $dst/include/
-# cp ../lib/psinc.dll $dst/lib/
-cp ../lib/psinc.lib $dst/lib/
+cp ../build/libpsinc.dll $dst/lib
 
 7z a $dst-`cat version`.7z $dst
 rm -r $dst

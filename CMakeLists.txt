@@ -13,13 +13,12 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_EXTENSIONS off)
-set(CMAKE_CXX_COMPILER clang++)
-set(CMAKE_CXX_COMPILER_LINKER clang++)
+# set(CMAKE_CXX_COMPILER clang++)
+# set(CMAKE_CXX_COMPILER_LINKER clang++)
 
 
 include_directories(include)
 add_compile_options(-Wall -Wextra -Wpedantic -fno-omit-frame-pointer -fPIC -D_FORTIFY_SOURCE=2)
-add_link_options(-rdynamic)
 
 file(GLOB_RECURSE psinc_sources
 	src/psinc/*.cpp

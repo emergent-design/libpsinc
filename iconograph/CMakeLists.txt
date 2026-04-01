@@ -29,12 +29,15 @@ file(GLOB_RECURSE iconograph_sources
 
 qt_add_resources(iconograph_sources resources/iconograph.qrc)
 qt_add_executable(iconograph ${iconograph_sources})
-# qt_add_ui(iconograph SOURCES ui/mainwindow.ui)
 
 target_include_directories(iconograph PUBLIC include ../include)
 target_link_directories(iconograph PUBLIC ../build)
 target_link_libraries(
 	iconograph PRIVATE
 	Qt6::Widgets
-	psinc freeimage
+	psinc freeimage usb-1.0
 )
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	set_target_properties(iconograph PROPERTIES WIN32_EXECUTABLE true)
+endif()
