@@ -11,7 +11,7 @@ jobs:
       strategy:
         matrix:
           arch: [amd64, arm64]
-          dist: [noble, trixie]
+          dist: [jammy, noble, trixie]
 
       steps:
         - uses: actions/checkout@v4
