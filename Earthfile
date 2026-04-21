@@ -22,13 +22,13 @@ image:
 	RUN curl -so /usr/share/keyrings/emergent.gpg https://apt.emergent-design.co.uk/emergent.gpg \
 		&& echo "deb [signed-by=/usr/share/keyrings/emergent.gpg] https://apt.emergent-design.co.uk/public $DISTRIBUTION main" > /etc/apt/sources.list.d/emergent.list
 
-	RUN apt-get -q update && apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev libtbb-dev libemergent-dev
+	RUN apt-get -q update && apt-get install -y --no-install-recommends libfreeimage-dev libusb-1.0-0-dev libtbb-dev libemergent-dev libentity-dev
 
 build:
 	FROM +image
 	COPY --dir include packages src CMakeLists.txt .
 	RUN cmake -B build \
-		&& make -j8 -C build
+		&& make -j8 -C build psinc
 
 package:
 	ARG DISTRIBUTION=noble
@@ -68,8 +68,17 @@ appimage:
 
 	SAVE ARTIFACT --keep-ts packages/Iconograph*.AppImage AS LOCAL build/
 
+flasc:
+	FROM +build --DISTRIBUTION=noble
+	RUN make -j8 -C build flasc
+	COPY packages/flasc.png .
+	RUN curl -sJL "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" -o linuxdeploy.AppImage \
+		&& chmod a+x linuxdeploy.AppImage \
+		&& APPIMAGE_EXTRACT_AND_RUN=1 ./linuxdeploy.AppImage -e build/flasc --appdir appdir --create-desktop-file -i flasc.png --output appimage
+	SAVE ARTIFACT flasc*.AppImage AS LOCAL build/
+
 windows:
-	FROM teadriven/essential-qt-mingw:6.11
+	FROM teadriven/essential-qt-mingw:6.11-2
 	# FROM DOCKERFILE packages/docker-qt6/
 
 	WORKDIR /code
@@ -77,8 +86,9 @@ windows:
 	RUN curl -so /usr/share/keyrings/emergent.gpg https://apt.emergent-design.co.uk/emergent.gpg \
 		&& echo "deb [signed-by=/usr/share/keyrings/emergent.gpg] https://apt.emergent-design.co.uk/public noble main" > /etc/apt/sources.list.d/emergent.list \
 		&& apt-get -q update \
-		&& apt-get install -y --no-install-recommends libemergent-dev p7zip-full unzip \
-		&& ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/
+		&& apt-get install -y --no-install-recommends libemergent-dev libentity-dev p7zip-full unzip \
+		&& ln -s /usr/include/emergent /usr/x86_64-w64-mingw32/include/ \
+		&& ln -s /usr/include/entity /usr/x86_64-w64-mingw32/include/
 
 	# Install libusb
 	RUN mkdir libusb && cd libusb \

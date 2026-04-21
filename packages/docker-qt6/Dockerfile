@@ -1,6 +1,7 @@
 # teadriven/essential-qt-mingw
 
-FROM ubuntu:24.04
+# FROM ubuntu:26.04
+FROM debian:trixie
 
 RUN apt-get -q update \
 	&& apt-get install -y --no-install-recommends ca-certificates curl build-essential cmake ninja-build git mingw-w64

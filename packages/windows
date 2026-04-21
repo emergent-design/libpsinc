@@ -9,8 +9,8 @@ mkdir $dst/styles
 
 # cp /usr/lib/gcc/x86_64-w64-mingw32/13-posix/libgcc_s_seh-1.dll $dst/
 # cp /usr/lib/gcc/x86_64-w64-mingw32/13-posix/libstdc++-6.dll $dst/
-cp /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libgcc_s_seh-1.dll $dst/
-cp /usr/lib/gcc/x86_64-w64-mingw32/13-win32/libstdc++-6.dll $dst/
+cp /usr/lib/gcc/x86_64-w64-mingw32/14-win32/libgcc_s_seh-1.dll $dst/
+cp /usr/lib/gcc/x86_64-w64-mingw32/14-win32/libstdc++-6.dll $dst/
 cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $dst/
 cp /usr/x86_64-w64-mingw32/lib/freeimage.dll $dst/
 
@@ -34,9 +34,11 @@ rm -r $dst
 dst="libpsinc"
 mkdir -p $dst/include
 mkdir -p $dst/lib
+mkdir -p $dst/bin
 
 cp -r ../include/psinc $dst/include/
-cp ../build/libpsinc.dll $dst/lib
+cp ../build/libpsinc.dll $dst/lib/
+cp ../build/flasc.exe $dst/bin/
 
 7z a $dst-`cat version`.7z $dst
 rm -r $dst

@@ -163,7 +163,7 @@ struct Parameters
 	int exposure	= 200;
 	int gain		= 3;
 	Colour colour	= presets[1];
-	int effects		= 0;
+	// int effects		= 0;
 	int selected	= 0;
 	float fps		= 0.0;
 
@@ -303,124 +303,32 @@ bool keys(Parameters &p)
 }
 
 
-// Not to be left in
-#include <imp/fiducials/Detector.h>
-#include <imp/filter/EdgeDetect.h>
-#include <imp/feature/EdgeRefine.h>
-#include <imp/feature/ObjectExtract.h>
-#include <imp/image/Draw.hpp>
-#include <imp/image/Text.h>
+// void process(Parameters &p, Output &output, emg::Image<byte, rgb> &src)
+// {
+// 	static emg::Timer timer;
+// 	static int count = 0;
 
+// 	switch (p.effects)
+// 	{
+// 		case 1: process_invert(output, src);					break;
+// 		case 2: process_edge(output, src);						break;
+// 		case 3: process_fiducials(output, src);					break;
+// 		default: process_quiz(output, src, p);					break;
+// 		// case 4: process_quiz(output, src, p);					break;
+// 		// default: write(output.fd, src.Data(), src.Size() * 3);	break;
+// 	}
 
-void process_fiducials(Output &output, emg::Image<byte, rgb> &src)
-{
-	static const auto format = imp::Text::Format().Size(18).Colour(emg::RGB::Cyan).Background(emg::RGB::Black).Align(imp::Alignment::Auto).Offset(4);
-
-	static imp::Text text;
-	static imp::fiducials::Detector detector;
-	static emg::Image<byte> buffer;
-	static emg::Image<byte, rgb> dst;
-
-	buffer = dst = src;
-
-	for (auto &f : detector.Find({}, buffer))
-	{
-		if (f.code < 0)
-		{
-			imp::Draw::Ellipse(dst, emg::RGB::Magenta, f.base);
-			imp::Draw::Cross(dst, emg::RGB::Magenta, f.position, 2);
-		}
-		else
-		{
-			const auto &m	= f.base.matrix;
-			double dx		= 0.75 * cos(f.orientation);
-			double dy		= 0.75 * sin(f.orientation);
-			double x		= f.position.x + m[0] * dx + m[1] * dy;
-			double y		= f.position.y + m[2] * dx + m[3] * dy;
-
-			imp::Draw::SmoothLine(dst, emg::RGB::Cyan, f.position.x, f.position.y, x, y);
-
-			text.Render(dst, String::format("%d", f.code), format, lrint(f.position.x), lrint(f.position.y));
-		}
-	}
-
-	write(output.fd, dst.Data(), dst.Size() * 3);
-}
-
-
-void process_edge(Output &output, emg::Image<byte, rgb> &src)
-{
-	static imp::EdgeDetect edge;
-	static imp::EdgeRefine refine;
-	static imp::ObjectExtract oe;
-	static emg::Image<byte> grey, buffer;
-	static emg::Image<byte, rgb> dst;
-
-	dst.Resize(src.Width(), src.Height());
-	dst		= 0;
-	grey	= src;
-
-	edge.FindEdges(&grey, &buffer, -1);
-	auto objects = oe.Search(&buffer);
-	refine.Process(&grey, objects);
-
-	dst = src;
-	imp::Draw::Objects(dst, emg::RGB::White, objects);
-
-	write(output.fd, dst.Data(), dst.Size() * 3);
-}
-
-
-void process_invert(Output &output, emg::Image<byte, rgb> &src)
-{
-	src.Invert();
-	write(output.fd, src.Data(), src.Size() * 3);
-}
-
-void process_quiz(Output &output, emg::Image<byte, rgb> &src, const Parameters &p)
-{
-	static auto format = imp::Text::Format()
-		.Align(imp::Alignment::Centre)
-		.Size(512)
-		.Colour(emg::RGB::White);
-
-	static imp::Text text;
-
-	if (p.quiz && !p.overlay.empty())
-	{
-		text.Render(src, p.overlay, format, src.Width() / 2, src.Height() / 2);
-	}
-
-	write(output.fd, src.Data(), src.Size() * 3);
-}
-
-
-void process(Parameters &p, Output &output, emg::Image<byte, rgb> &src)
-{
-	static emg::Timer timer;
-	static int count = 0;
-
-	switch (p.effects)
-	{
-		case 1: process_invert(output, src);					break;
-		case 2: process_edge(output, src);						break;
-		case 3: process_fiducials(output, src);					break;
-		default: process_quiz(output, src, p);					break;
-		// case 4: process_quiz(output, src, p);					break;
-		// default: write(output.fd, src.Data(), src.Size() * 3);	break;
-	}
-
-	if (timer.Elapsed() > 2000)
-	{
-		p.fps = 1000.0 * count / timer.Elapsed();
-		count = 0;
-		timer.Reset();
-	}
-	else
-	{
-		count++;
-	}
-}
+// 	if (timer.Elapsed() > 2000)
+// 	{
+// 		p.fps = 1000.0 * count / timer.Elapsed();
+// 		count = 0;
+// 		timer.Reset();
+// 	}
+// 	else
+// 	{
+// 		count++;
+// 	}
+// }
 
 
 int main(int argc, char *argv[])
@@ -462,8 +370,8 @@ int main(int argc, char *argv[])
 				}
 			}
 
-			process(parameters, output, buffer);
-			// write(output.fd, buffer.Data(), buffer.Size() * 3);
+			// process(parameters, output, buffer);
+			write(output.fd, buffer.Data(), buffer.Size() * 3);
 		}
 
 		return stream;
@@ -495,4 +403,3 @@ int main(int argc, char *argv[])
 		std::this_thread::sleep_for(10ms);
 	}
 }
-
