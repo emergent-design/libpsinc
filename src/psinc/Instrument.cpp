@@ -1,8 +1,6 @@
 #include "psinc/Instrument.h"
 #include "psinc/driver/Commands.h"
 
-#include <emergent/logger/Logger.hpp>
-#include <future>
 
 using std::string;
 using namespace std::chrono_literals;

@@ -1,10 +1,10 @@
 #include "psinc/driver/Feature.h"
 
-#include <emergent/logger/Logger.hpp>
+// #include <emergent/logger/Logger.hpp>
 
 using namespace std;
 using namespace pugi;
-using namespace emergent;
+// using namespace emergent;
 
 
 namespace psinc
@@ -37,13 +37,13 @@ namespace psinc
 		if (values.size())
 		{
 			char *check;
-			auto ranges = String::explode(values, ",");
+			auto ranges = emg::String::explode(values, ",");
 
 			for (string &range : ranges)
 			{
 				if (range.size())
 				{
-					auto limits	= String::explode(range, "-");
+					auto limits	= emg::String::explode(range, "-");
 					int start	= strtol(limits[0].c_str(), &check, 0);
 
 					if (check > limits[0].c_str())

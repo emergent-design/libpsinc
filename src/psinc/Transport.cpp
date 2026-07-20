@@ -1,6 +1,8 @@
 #include "psinc/Transport.h"
-#include <emergent/logger/Logger.hpp>
+// #include <emergent/logger/Logger.hpp>
 #include <emergent/String.hpp>
+#include <fmt/core.h>
+#include <spdlog/spdlog.h>
 #include <regex>
 // #include <cstring>
 
@@ -50,7 +52,11 @@ namespace psinc
 			libusb_hotplug_deregister_callback(this->context, this->hotplug);
 			this->registered = false;
 		}
-		else emg::Log::Info("USB hotplug not supported on this platform, running in legacy mode");
+		else
+		{
+			//emg::Log::Info("USB hotplug not supported on this platform, running in legacy mode");
+			spdlog::info("USB hotplug not supported on this platform, running in legacy mode");
+		}
 
 		return true;
 	}
@@ -127,7 +133,8 @@ namespace psinc
 
 			if (libusb_hotplug_register_callback(this->context, events, LIBUSB_HOTPLUG_ENUMERATE, LIBUSB_HOTPLUG_MATCH_ANY, this->product, LIBUSB_HOTPLUG_MATCH_ANY, &OnHotplug, this, &this->hotplug))
 			{
-				emg::Log::Error("Unable to register USB hotplug callback");
+				// emg::Log::Error("Unable to register USB hotplug callback");
+				spdlog::error("Unable to register USB hotplug callback");
 				return;
 			}
 
@@ -216,12 +223,18 @@ namespace psinc
 						{
 							this->version = (descriptor.bcdUSB >> 8) & 0xff;
 
-							emg::Log::Info(
-								"%u: USB (v%d.%d) device claimed - %s",
-								emg::Timestamp::LogTime(),
-								this->version,
-								descriptor.bcdUSB & 0xff,
-								this->id);
+							// emg::Log::Info(
+							// 	"%u: USB (v%d.%d) device claimed - %s",
+							// 	emg::Timestamp::LogTime(),
+							// 	this->version,
+							// 	descriptor.bcdUSB & 0xff,
+							// 	this->id);
+
+							spdlog::info(
+								"USB (v{}.{}) device claimed - {}",
+								this->version, descriptor.bcdDevice & 0xff, this->id
+							);
+
 							return true;
 						}
 					}
@@ -260,20 +273,32 @@ namespace psinc
 					libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 128);
 					string serial = emg::String::trim(reinterpret_cast<char *>(data), ' ');
 
+
 					libusb_get_string_descriptor_ascii(handle, descriptor.iProduct, data, 128);
 					result[serial] = {
 						reinterpret_cast<char *>(data),
-						emg::String::format(
-							"v%d.%d",
+						fmt::format(
+							"v{}.{}",
 							(descriptor.bcdUSB >> 8) & 0xff,
 							descriptor.bcdUSB & 0xff
 						),
-						emg::String::format(
-							"%d:%d:%d",
+						fmt::format(
+							"{}:{}:{}",
 							libusb_get_bus_number(*device),
 							libusb_get_port_number(*device),
 							libusb_get_device_address(*device)
 						)
+						// emg::String::format(
+						// 	"v%d.%d",
+						// 	(descriptor.bcdUSB >> 8) & 0xff,
+						// 	descriptor.bcdUSB & 0xff
+						// ),
+						// emg::String::format(
+						// 	"%d:%d:%d",
+						// 	libusb_get_bus_number(*device),
+						// 	libusb_get_port_number(*device),
+						// 	libusb_get_device_address(*device)
+						// )
 					};
 
 					libusb_close(handle);
@@ -307,7 +332,8 @@ namespace psinc
 			libusb_release_interface(this->handle, 0);
 			libusb_close(this->handle);
 
-			emg::Log::Info("%u: USB deviced released - %s", emg::Timestamp::LogTime(), this->id);
+			// emg::Log::Info("%u: USB deviced released - %s", emg::Timestamp::LogTime(), this->id);
+			spdlog::info("USB deviced released - {}", this->id);
 
 			this->disconnect	= true;
 			this->handle		= nullptr;
@@ -339,7 +365,8 @@ namespace psinc
 				// and must be cleaned up.
 				this->Release();
 
-				emg::Log::Error("Problem resetting USB device, handle has been released");
+				// emg::Log::Error("Problem resetting USB device, handle has been released");
+				spdlog::error("Problem resetting USB device, handle has been released");
 			}
 		}
 
@@ -399,9 +426,17 @@ namespace psinc
 
 				if (!result)
 				{
-					emg::Log::Error(
-						"%u: USB device %s - Incomplete transfer when %s (%d of %d bytes)",
-						emg::Timestamp::LogTime(),
+					// emg::Log::Error(
+					// 	"%u: USB device %s - Incomplete transfer when %s (%d of %d bytes)",
+					// 	emg::Timestamp::LogTime(),
+					// 	this->id,
+					// 	write ? "writing" : "reading",
+					// 	transferred,
+					// 	buffer->size()
+					// );
+
+					spdlog::error(
+						"USB device {} - Incomplete transfer when {} ({} of {} bytes)",
 						this->id,
 						write ? "writing" : "reading",
 						transferred,
@@ -411,13 +446,22 @@ namespace psinc
 			}
 			else if (this->legacy && (err == LIBUSB_ERROR_NO_DEVICE || err == LIBUSB_ERROR_IO))
 			{
-				emg::Log::Error("%u: USB device %s - Device has been disconnected", emg::Timestamp::LogTime(), this->id);
+				// emg::Log::Error("%u: USB device %s - Device has been disconnected", emg::Timestamp::LogTime(), this->id);
+				spdlog::error("USB device %s - Device has been disconnected", this->id);
 				this->Release();
 			}
 			else
 			{
 				// std::cout << "time spent transferring: " << time << "us\n";
-				emg::Log::Error("%u: USB device %s - %s (%d) when %s (%d bytes transferred)", emg::Timestamp::LogTime(), this->id, libusb_error_name(err), err, write ? "writing" : "reading", transferred);
+				// emg::Log::Error("%u: USB device %s - %s (%d) when %s (%d bytes transferred)", emg::Timestamp::LogTime(), this->id, libusb_error_name(err), err, write ? "writing" : "reading", transferred);
+
+				spdlog::error("USB device {} - {} ({}) when {} ({} bytes transferred)",
+					this->id,
+					libusb_error_name(err),
+					err,
+					write ? "writing" : "reading",
+					transferred
+				);
 			}
 
 			return result;
@@ -426,4 +470,3 @@ namespace psinc
 		return true;
 	}
 }
-

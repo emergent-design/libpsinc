@@ -10,7 +10,9 @@
 #include <emergent/FS.hpp>
 
 #include <iostream>
-#include <errno.h>
+#include <spdlog/common.h>
+#include <spdlog/spdlog-inl.h>
+// #include <errno.h>
 
 #ifndef FLASC_VERSION
 	#define FLASC_VERSION "1.0.0"
@@ -486,6 +488,7 @@ int main(int argc, char *argv[])
 {
 	bool help		= false;
 	bool version	= false;
+	bool verbose	= false;
 	int timeout		= 500;
 	string serial, id, cmd, data;
 
@@ -498,13 +501,16 @@ int main(int argc, char *argv[])
 	clap['c'].Name("command")	.Describe("command")										.Bind(cmd);
 	clap['d'].Name("data")		.Describe("command specific data")							.Bind(data);
 	clap['t'].Name("timeout")	.Describe("override USB timeout in ms (default is 500)")	.Bind(timeout);
+	clap['l'].Name("verbose")	.Describe("verbose logging")								.Bind(verbose);
 	clap[1].Name("command")		.Describe("command")										.Bind(cmd);
 	clap[2].Name("data")		.Describe("command specific data")							.Bind(data);
 
-	emg::Log::Initialise({ std::make_unique<emg::logger::Console>() });
-	// Log::Verbosity(Severity::Info);
+	// emg::Log::Initialise({ std::make_unique<emg::logger::Console>() });
 
 	clap.Parse(argc, argv);
+
+	spdlog::set_level(verbose ? spdlog::level::info : spdlog::level::err);
+	// Log::Verbosity(verbose ? Severity::Info : Severity::Error);
 
 	if (help)
 	{

@@ -1,9 +1,10 @@
 #include "psinc/Camera.h"
 #include "psinc/xml/Devices.h"
 #include "psinc/driver/Commands.h"
-#include <emergent/logger/Logger.hpp>
-#include <emergent/Timer.hpp>
-#include <future>
+// #include <emergent/logger/Logger.hpp>
+// #include <emergent/Timer.hpp>
+#include <spdlog/spdlog.h>
+
 
 #define REFRESH_ATTEMPTS 3
 
@@ -201,12 +202,14 @@ namespace psinc
 						if (r.second.Page() == page) r.second.Refresh(data);
 					}
 
-					emg::Log::Info("%u: Successfully refreshed registers for page %d", emg::Timestamp::LogTime(), page);
+					// emg::Log::Info("%u: Successfully refreshed registers for page %d", emg::Timestamp::LogTime(), page);
+					spdlog::info("Successfully refreshed registers for page {}", page);
 					break;
 				}
 				else
 				{
-					emg::Log::Error("%u: Failed to refresh registers for page %d", emg::Timestamp::LogTime(), page);
+					// emg::Log::Error("%u: Failed to refresh registers for page %d", emg::Timestamp::LogTime(), page);
+					spdlog::error("Failed to refresh registers for page %d", page);
 				}
 			}
 		}

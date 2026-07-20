@@ -18,6 +18,7 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ui)
 add_compile_options(-Wall -Wextra -Wpedantic -fno-omit-frame-pointer -fPIC -frtti)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(spdlog REQUIRED)
 
 qt_standard_project_setup()
 
@@ -35,7 +36,7 @@ target_link_directories(iconograph PUBLIC ../build)
 target_link_libraries(
 	iconograph PRIVATE
 	Qt6::Widgets
-	psinc freeimage usb-1.0
+	psinc freeimage usb-1.0 spdlog::spdlog
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")

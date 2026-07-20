@@ -2,8 +2,11 @@
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
-#include <emergent/logger/Logger.hpp>
-#include <iostream>
+// #include <emergent/logger/Logger.hpp>
+#include <emergent/logger/Timestamp.hpp>
+// #include <iostream>
+#include <spdlog/spdlog-inl.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 
 //using namespace std;
@@ -13,18 +16,28 @@
 //using namespace ent;
 using std::string;
 using emg::byte;
-using emg::Log;
+// using emg::Log;
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-	#ifdef __linux__
-		Log::Initialise({ std::unique_ptr<emg::logger::Sink>(new emg::logger::Console()) });
-	#else
-		Log::Initialise({ std::unique_ptr<emg::logger::Sink>(new emg::logger::LogFile("iconograph.log")) });
+	// #ifdef __linux__
+	// 	Log::Initialise({ std::unique_ptr<emg::logger::Sink>(new emg::logger::Console()) });
+	// #else
+	// 	Log::Initialise({ std::unique_ptr<emg::logger::Sink>(new emg::logger::LogFile("iconograph.log")) });
+	// #endif
+
+	// Log::Verbosity(emg::Severity::Info);
+	spdlog::set_level(spdlog::level::info);
+	spdlog::set_pattern("[%T.%e] [%^%5l%$] %v");
+
+
+	#ifndef __linux__
+		spdlog::set_default_logger(
+			spdlog::basic_logger_mt("basic_logger", "iconograph.log")
+		);
 	#endif
 
-	Log::Verbosity(emg::Severity::Info);
 
 	connect(this, SIGNAL(connectionChanged(bool)), this, SLOT(onConnection(bool)));
 	connect(this, SIGNAL(imageGrabbed(QImage*)), this, SLOT(onGrab(QImage*)));
@@ -583,7 +596,8 @@ void MainWindow::on_regionButton_clicked()
 		this->ui->widthRegionBox->value(), this->ui->heightRegionBox->value()
 	))
 	{
-		Log::Error("Failed to set window region parameters");
+		// Log::Error("Failed to set window region parameters");
+		spdlog::error("Failed to set windows region parameters");
 	}
 }
 
@@ -639,8 +653,3 @@ void MainWindow::on_faultResetButton_clicked()
 //{
 //	this->ui->lensCheck->setChecked(false);
 //}
-
-
-
-
-
