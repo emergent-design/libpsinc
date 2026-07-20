@@ -1,6 +1,7 @@
 #include "psinc/Transport.h"
 #include <emergent/logger/Logger.hpp>
 #include <emergent/String.hpp>
+#include <libusb-1.0/libusb.h>
 #include <regex>
 // #include <cstring>
 
@@ -149,13 +150,20 @@ namespace psinc
 	}
 
 
-	bool Transport::Match(libusb_device_handle *device, int index)
+	std::string Transport::ReadDescriptor(libusb_device_handle *device, const uint8_t index)
 	{
-		unsigned char data[128];
+		unsigned char data[128] = { 0 };
+		const int length		= libusb_get_string_descriptor_ascii(device, index, data, 128);
 
-		libusb_get_string_descriptor_ascii(device, index, data, 128);
+		return length > 0
+			? emg::String::trim(std::string { reinterpret_cast<char *>(data), (size_t)length }, ' ')
+			: std::string {};
+	}
 
-		this->id = emg::String::trim(reinterpret_cast<char *>(data), ' ');
+
+	bool Transport::Match(libusb_device_handle *device, const uint8_t index)
+	{
+		this->id = Transport::ReadDescriptor(device, index);
 
 		return this->serial.empty() ? true : regex_match(this->id, std::regex(this->serial));
 	}
@@ -242,7 +250,7 @@ namespace psinc
 	{
 		std::map<string, Info> result;
 
-		unsigned char data[128];
+		// unsigned char data[128];
 		libusb_device **list;
 		libusb_device_descriptor descriptor;
 		libusb_device_handle *handle;
@@ -257,12 +265,11 @@ namespace psinc
 			{
 				if (libusb_open(*device, &handle) == 0)
 				{
-					libusb_get_string_descriptor_ascii(handle, descriptor.iSerialNumber, data, 128);
-					string serial = emg::String::trim(reinterpret_cast<char *>(data), ' ');
+					const string serial	= Transport::ReadDescriptor(handle, descriptor.iSerialNumber);
+					const string name	= Transport::ReadDescriptor(handle, descriptor.iProduct);
 
-					libusb_get_string_descriptor_ascii(handle, descriptor.iProduct, data, 128);
 					result[serial] = {
-						reinterpret_cast<char *>(data),
+						name,
 						emg::String::format(
 							"v%d.%d",
 							(descriptor.bcdUSB >> 8) & 0xff,
@@ -426,4 +433,3 @@ namespace psinc
 		return true;
 	}
 }
-

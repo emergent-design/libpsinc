@@ -83,7 +83,7 @@ namespace psinc
 			/// Retrieve the serial number of the device (then stored as id).
 			/// If a particular pattern is required then return true if there
 			/// is a match.
-			bool Match(libusb_device_handle *device, int index);
+			bool Match(libusb_device_handle *device, const uint8_t index);
 
 
 			/// In the case where hotplug is not supported (looking at you Windows),
@@ -106,6 +106,10 @@ namespace psinc
 
 			/// Releases the device.
 			void Release();
+
+
+			/// Safely read a string from a libusb descriptor
+			static std::string ReadDescriptor(libusb_device_handle *device, const uint8_t index);
 
 
 			/// List of supported vendor IDs
