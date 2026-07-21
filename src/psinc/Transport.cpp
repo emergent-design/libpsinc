@@ -153,10 +153,10 @@ namespace psinc
 	std::string Transport::ReadDescriptor(libusb_device_handle *device, const uint8_t index)
 	{
 		unsigned char data[128] = { 0 };
-		const int length		= libusb_get_string_descriptor_ascii(device, index, data, 128);
+		const int length		= libusb_get_string_descriptor_ascii(device, index, data, 127);
 
-		return length > 0
-			? emg::String::trim(std::string { reinterpret_cast<char *>(data), (size_t)length }, ' ')
+		return length > 0 && length < 127
+			? emg::String::trim(reinterpret_cast<char *>(data), ' ')
 			: std::string {};
 	}
 
