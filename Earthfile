@@ -60,7 +60,7 @@ appimage:
 		&& cp build/libpsinc.so.0 packages/appdir/usr/lib/libpsinc.so.0
 
 	RUN cd packages \
-		&& curl -sJL "https://github.com/probonopd/go-appimage/releases/download/continuous/appimagetool-940-x86_64.AppImage" -o appimagetool.AppImage \
+		&& curl -sJL "https://github.com/probonopd/go-appimage/releases/download/continuous/appimagetool-947-x86_64.AppImage" -o appimagetool.AppImage \
 		&& chmod a+x appimagetool.AppImage \
 		&& ./appimagetool.AppImage --appimage-extract \
 		&& ARCH=x86_64 ./squashfs-root/usr/bin/appimagetool -s deploy appdir/usr/share/applications/iconograph.desktop \
