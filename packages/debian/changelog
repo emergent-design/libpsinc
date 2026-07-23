@@ -1,3 +1,9 @@
+libpsinc0 (0.2.6) unstable; urgency=medium
+
+  * Handle multiple nulls in the libusb string descriptors
+
+ -- Dan Parnham <dan@emergent-design.co.uk>  Thu, 23 Jul 2026 15:55:06 +0100
+
 libpsinc0 (0.2.5) unstable; urgency=medium
 
   * Moved build to cmake
