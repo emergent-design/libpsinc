@@ -6,6 +6,8 @@
 #include <entity/json.hpp>
 #include <emergent/FS.hpp>
 #include <emergent/Io.hpp>
+#include <emergent/logger/Timestamp.hpp>
+#include <iostream>
 
 
 // Utilities for bootstrapping (initial flashing) a camera
@@ -22,6 +24,7 @@ class Bootstrap
 
 			string serial;				// Updated with the serial of the device once it has been bootstrapped so that each subsequent stage can connect to the same device
 			int timeout 	= 60'000;	// Timeout for the USB transfers
+			int wait		= 2000;		// Wait time between operations (such as toggling camera mode)
 
 			string id		= "";	// Empty ID is not transmitted
 			byte lighting	= 0x00;
@@ -29,7 +32,7 @@ class Bootstrap
 
 			emap(
 				eref(bootstrap), eref(updater), eref(bootloader), eref(application),
-				eref(timeout), eref(id), eref(lighting), eref(watchdog)
+				eref(timeout), eref(wait), eref(id), eref(lighting), eref(watchdog)
 			)
 		};
 
@@ -44,7 +47,7 @@ class Bootstrap
 				&& WriteBootloader(flasc, instrument, configuration)
 				&& WaitForDevice(flasc, configuration)
 				&& flasc.Update(-1, "Writing application firmware")
-				&& flasc.Flash(configuration.serial + ".*", configuration.application)
+				&& flasc.Flash(configuration.serial + ".*", configuration.application, configuration.wait)
 				&& ConfigureDevice(flasc, configuration)
 				&& GenerateReport(flasc, configuration)
 			;
@@ -325,4 +328,3 @@ class Bootstrap
 			return result.str();
 		}
 };
-

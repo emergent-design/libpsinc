@@ -59,6 +59,8 @@ namespace psinc
 			/// @return True if a device appears to be connected.
 			virtual bool Connected() const;
 
+			void ForceDisconnect();
+
 			/// Create a custom device instance if you know the index instead of
 			/// using the map of named devices below.
 			Device CustomDevice(byte index);

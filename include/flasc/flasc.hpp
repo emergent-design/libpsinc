@@ -1,10 +1,11 @@
 #pragma once
 
-#include <emergent/logger/Logger.hpp>
+#include <chrono>
 #include <emergent/Uuid.hpp>
 #include <emergent/Io.hpp>
 #include <psinc/Instrument.h>
 #include <iomanip>
+#include <optional>
 
 using namespace std::chrono;
 using namespace psinc;
@@ -65,6 +66,46 @@ class Flasc
 			}
 
 			return result;
+		}
+
+
+		struct Basics
+		{
+			std::string type;
+			std::string hardware;
+			std::string firmware;
+			bool bayer = false;		// bayer sensor (monochrome if false)
+			bool flash = false;		// in flash mode
+		};
+
+		std::optional<Basics> BasicInfo(const std::string &serial)
+		{
+			Instrument instrument;
+
+			if (this->ConnectWait(instrument, Instrument::Type::Camera, serial, 100, 50))
+			{
+				Basics info;
+
+				auto query = instrument.devices["Query"].Read();
+
+				if (query.size() && query[0] > 1)
+				{
+					info.type	= TYPE_TABLE[query[1]];
+					info.bayer	= query[2] & 0x01;
+					info.flash	= query[2] & 0x80;
+				}
+				else
+				{
+					return std::nullopt;
+				}
+
+				info.hardware = String::trim(to_string(instrument.CustomDevice(0x0b).Read()), '\0');
+				info.firmware = String::trim(to_string(instrument.CustomDevice(0x0f).Read()), '\0');
+
+				return info;
+			}
+
+			return std::nullopt;
 		}
 
 
@@ -179,7 +220,7 @@ class Flasc
 		}
 
 
-		bool Flash(string serial, string path)
+		bool Flash(const string &serial, const string &path, const int wait)
 		{
 			Instrument instrument;
 			std::vector<byte> reference;
@@ -199,7 +240,10 @@ class Flasc
 				{
 					this->Update(-1, "Switching to flash mode");
 					instrument.CustomDevice(0x12).Initialise(0x00);
-					std::this_thread::sleep_for(milliseconds(1000));
+					// since hotplug doesn't work on windows it will not detect the disconnect until it next attempts communicating with the device
+					// so instead force the instrument to forget it
+					instrument.ForceDisconnect();
+					std::this_thread::sleep_for(milliseconds(wait));
 				}
 			}
 			else this->Update(-1, "Checking if any device is waiting in flash mode (warning this may not be the device you expect if there are multiple devices in flash mode on this system)");
@@ -208,7 +252,9 @@ class Flasc
 
 			if (firmware.size())
 			{
-				return legacy ? this->FlashLegacy(instrument, reference, firmware) : this->Flash(instrument, firmware);
+				return legacy
+					? this->FlashLegacy(instrument, reference, firmware)
+					: this->Flash(instrument, firmware);
 			}
 
 			return !this->Update(-1, "Firmware file not found or specified, aborting");
@@ -216,7 +262,7 @@ class Flasc
 
 
 		// Toggle update mode
-		bool Toggle(string serial)
+		bool Toggle(const string &serial, const int wait)
 		{
 			Instrument instrument;
 
@@ -225,7 +271,10 @@ class Flasc
 				this->Update(-1, "Toggling flash mode");
 
 				instrument.CustomDevice(0x12).Initialise(0x00);
-				std::this_thread::sleep_for(milliseconds(1000));
+				// since hotplug doesn't work on windows it will not detect the disconnect until it next attempts communicating with the device
+				// so instead force the instrument to forget it
+				instrument.ForceDisconnect();
+				std::this_thread::sleep_for(milliseconds(wait));
 
 				if (this->ConnectWait(instrument, 1000, 30))
 				{
@@ -234,6 +283,15 @@ class Flasc
 					if (query.size() && query[0] > 1 && query[1] > 0x00)
 					{
 						return this->Update(-1, String::format("Success, device is now in %s mode", query[2] & 0x80 ? "flash" : "normal"));
+					}
+					else
+					{
+						return this->Update(-1, String::format(
+							"Incorrect device type for this flash mode (size=%d, header=%d, type=%d)",
+							(int)query.size(),
+							query.size() ? (int)query[0] : -1,
+							query.size() && query[0] > 1 ? (int)query[1] : -1
+						));
 					}
 				}
 
@@ -564,6 +622,10 @@ class Flasc
 						this->Update(-1, "done");
 						this->Wait(5);
 
+						// since hotplug doesn't work on windows it will not detect the disconnect until it next attempts communicating with the device
+						// so instead force the instrument to forget it
+						instrument.ForceDisconnect();
+
 						if (this->ConnectWait(instrument, 1000, 30))
 						{
 							return this->Update(-1, "Device reconnected, flashing was successful");
@@ -575,7 +637,12 @@ class Flasc
 					}
 					else this->Update(-1, "Device is not in update mode, aborting");
 				}
-				else this->Update(-1, "Incorrect device type for this flash mode");
+				else this->Update(-1, String::format(
+					"Incorrect device type for this flash mode (size=%d, header=%d, type=%d)",
+					(int)query.size(),
+					query.size() ? (int)query[0] : -1,
+					query.size() && query[0] > 1 ? (int)query[1] : -1
+				));
 			}
 
 			return false;
@@ -594,7 +661,7 @@ class Flasc
 				{
 					int size = firmware.size();
 
-					this->Update(0.0, String::format("Writing firmware (%d bytes)  ", size));
+					this->Update(0.0, String::format("Writing firmware [legacy] (%d bytes)  ", size));
 
 					for (int i=0; i<size; i+=BLOCKSIZE)
 					{
@@ -612,6 +679,10 @@ class Flasc
 							return !this->Update(-1, "failed");
 						}
 					}
+
+					// since hotplug doesn't work on windows it will not detect the disconnect until it next attempts communicating with the device
+					// so instead force the instrument to forget it
+					instrument.ForceDisconnect();
 
 					this->Update(-1, "done");
 
@@ -768,4 +839,3 @@ class Flasc
 			{ 0x01, "mt9" }
 		};
 };
-

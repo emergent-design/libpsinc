@@ -20,6 +20,10 @@ namespace psinc
 		libusb_init(&this->context);
 
 		this->legacy = !libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG);
+
+		// for testing on windows - please remove
+		// emg::Log::Initialise({ std::make_unique<emg::logger::Console>() });
+		// emg::Log::Verbosity(emg::Severity::Info);
 	}
 
 
@@ -280,7 +284,9 @@ namespace psinc
 							libusb_get_bus_number(*device),
 							libusb_get_port_number(*device),
 							libusb_get_device_address(*device)
-						)
+						),
+						descriptor.idVendor,
+						descriptor.idProduct
 					};
 
 					libusb_close(handle);

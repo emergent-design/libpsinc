@@ -159,6 +159,12 @@ namespace psinc
 	}
 
 
+	void Instrument::ForceDisconnect()
+	{
+		this->transport.Disconnect();
+	}
+
+
 	bool Instrument::Reset(ResetLevel level)
 	{
 		switch (level)

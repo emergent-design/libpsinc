@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <emergent/Emergent.hpp>
 // #include <psinc/TransportBuffer.hpp>
 #include <libusb-1.0/libusb.h>
@@ -29,6 +30,9 @@ namespace psinc
 				std::string description;	// product description
 				std::string version;		// USB version
 				std::string address;		// [bus]:[port]:[address]
+
+				uint16_t vendor		= 0x00;
+				uint16_t product	= 0x00;
 			};
 
 

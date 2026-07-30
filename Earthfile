@@ -92,7 +92,7 @@ windows:
 
 	# Install libusb
 	RUN mkdir libusb && cd libusb \
-		&& curl -Ls https://github.com/libusb/libusb/releases/download/v1.0.29/libusb-1.0.29.7z --output libusb.7z \
+		&& curl -Ls https://github.com/libusb/libusb/releases/download/v1.0.30/libusb-1.0.30.7z --output libusb.7z \
 		&& p7zip -d libusb.7z \
 		&& mkdir -p /usr/x86_64-w64-mingw32/include/libusb-1.0 \
 		&& cp -r include/libusb.h /usr/x86_64-w64-mingw32/include/libusb-1.0/ \

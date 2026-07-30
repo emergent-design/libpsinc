@@ -1,5 +1,6 @@
 #include "flasc/flasc.hpp"
 #include "flasc/bootstrap.hpp"
+#include "flasc/multi.hpp"
 
 #include <emergent/Clap.hpp>
 #include <entity/entity.hpp>
@@ -8,9 +9,11 @@
 #include <psinc/Camera.h>
 #include <psinc/Psinc.h>
 #include <emergent/FS.hpp>
+#include <emergent/logger/Logger.hpp>
 
 #include <iostream>
-#include <errno.h>
+// #include <errno.h>
+#include <thread>
 
 #ifndef FLASC_VERSION
 	#define FLASC_VERSION "1.0.0"
@@ -40,13 +43,14 @@ struct Storage
 
 struct Params
 {
-	int timeout = 500;
+	int timeout		= 500;
+	int wait		= 2000;
 	string serial;
 	string data;
 
 	Params() {}
 
-	Params(int timeout, const string &id, const string &serial, const string &data) : timeout(timeout), data(data)
+	Params(const int timeout, const int wait, const string &id, const string &serial, const string &data) : timeout(timeout), wait(wait), data(data)
 	{
 		// Construct the serial lookup string based on the specified ID and serial number.
 		// For no ID or serial it is simply a wildcard ".*"
@@ -151,7 +155,7 @@ void version(Flasc &flasc, const Params &params)
 
 void flash(Flasc &flasc, const Params &params)
 {
-	flasc.Flash(params.serial, params.data);
+	flasc.Flash(params.serial, params.data, params.wait);
 }
 
 
@@ -193,7 +197,7 @@ void lighting(Flasc &flasc, const Params &params)
 
 void toggle(Flasc &flasc, const Params &params)
 {
-	flasc.Toggle(params.serial);
+	flasc.Toggle(params.serial, params.wait);
 }
 
 
@@ -431,6 +435,24 @@ void bootstrap(Flasc &flasc, const Params &params)
 }
 
 
+void multiflash(Flasc &flasc, const Params &params)
+{
+	const string data = emg::String::load(params.data);
+
+	if (data.empty())
+	{
+		std::cout << "  Multiflash configuration file is empty or does not exist, aborting\n";
+		return;
+	}
+
+	flasc::MultiFlash::Go(
+		flasc,
+		ent::decode<ent::json, flasc::MultiFlash::Configuration>(data),
+		std::filesystem::path(params.data).parent_path()
+	);
+}
+
+
 void command(const string &cmd, const Params &params)
 {
 	static const std::map<string, Command> commands = {
@@ -452,7 +474,8 @@ void command(const string &cmd, const Params &params)
 		{ "read",		{ &read_storage,	"read storage from channel <data>" }},
 		{ "reset",		{ &reset,			"force a reset of the device" }},
 		{ "dump",		{ &dump,			"dump all of the current feature values from a camera" }},
-		{ "bootstrap",	{ &bootstrap,		"bootstrap a new device from <data> configuration file" }}
+		{ "bootstrap",	{ &bootstrap,		"bootstrap a new device from <data> configuration file" }},
+		{ "multiflash",	{ &multiflash, 		"flash multiple devices based on a <data> configuration file" }}
 	};
 
 
@@ -479,32 +502,37 @@ void command(const string &cmd, const Params &params)
 }
 
 
-
-
-
 int main(int argc, char *argv[])
 {
 	bool help		= false;
 	bool version	= false;
+	bool verbose	= false;
 	int timeout		= 500;
+	int wait		= 2000;
 	string serial, id, cmd, data;
 
 	emg::Clap clap;
 
-	clap['h'].Name("help")		.Describe("display this help and exit")						.Bind(help);
-	clap['v'].Name("version")	.Describe("display libpsinc version")						.Bind(version);
-	clap['s'].Name("serial")	.Describe("connect to device with the given serial number")	.Bind(serial);
-	clap['i'].Name("id")		.Describe("connect to device with the given ID")			.Bind(id);
-	clap['c'].Name("command")	.Describe("command")										.Bind(cmd);
-	clap['d'].Name("data")		.Describe("command specific data")							.Bind(data);
-	clap['t'].Name("timeout")	.Describe("override USB timeout in ms (default is 500)")	.Bind(timeout);
-	clap[1].Name("command")		.Describe("command")										.Bind(cmd);
-	clap[2].Name("data")		.Describe("command specific data")							.Bind(data);
-
-	emg::Log::Initialise({ std::make_unique<emg::logger::Console>() });
-	// Log::Verbosity(Severity::Info);
+	clap['h'].Name("help")		.Describe("display this help and exit")									.Bind(help);
+	clap['v'].Name("version")	.Describe("display libpsinc version")									.Bind(version);
+	clap['s'].Name("serial")	.Describe("connect to device with the given serial number")				.Bind(serial);
+	clap['i'].Name("id")		.Describe("connect to device with the given ID")						.Bind(id);
+	clap['c'].Name("command")	.Describe("command")													.Bind(cmd);
+	clap['d'].Name("data")		.Describe("command specific data")										.Bind(data);
+	clap['t'].Name("timeout")	.Describe("override USB timeout in ms (default is 500)")				.Bind(timeout);
+	clap['w'].Name("wait")		.Describe("time to wait between operations in ms (default is 2000)")	.Bind(wait);
+	clap['z'].Name("verbose")	.Describe("enable verbose logging")										.Bind(verbose);
+	clap[1].Name("command")		.Describe("command")													.Bind(cmd);
+	clap[2].Name("data")		.Describe("command specific data")										.Bind(data);
 
 	clap.Parse(argc, argv);
+
+	emg::Log::Initialise({ std::make_unique<emg::logger::Console>() });
+
+	if (verbose)
+	{
+		emg::Log::Verbosity(emg::Severity::Info);
+	}
 
 	if (help)
 	{
@@ -519,8 +547,10 @@ int main(int argc, char *argv[])
 	else
 	{
 		// command(cmd, serial, id, data, timeout);
-		command(cmd, Params(timeout, id, serial, data));
+		command(cmd, Params(timeout, wait, id, serial, data));
 	}
+
+	std::this_thread::sleep_for(100ms);
 
 	return 0;
 }

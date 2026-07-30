@@ -7,7 +7,7 @@ project(
 	LANGUAGES CXX
 )
 
-set(FLASC_VERSION 1.1.2)
+set(FLASC_VERSION 1.1.4)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
@@ -15,6 +15,7 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_EXTENSIONS off)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if ("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 	set(CMAKE_CXX_COMPILER clang++)
@@ -24,6 +25,11 @@ endif()
 
 include_directories(include)
 add_compile_options(-Wall -Wextra -Wpedantic -fno-omit-frame-pointer -D_FORTIFY_SOURCE=2)
+# add_link_options(-rdynamic)
+
+if (MINGW)
+	add_compile_options(-march=nehalem)
+endif()
 
 file(GLOB_RECURSE psinc_sources
 	src/psinc/*.cpp
