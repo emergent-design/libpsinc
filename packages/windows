@@ -1,22 +1,33 @@
 #!/bin/bash
 set -e
 
+
+core_dependencies()
+{
+	if [ -d "$1" ]; then
+		cp /usr/lib/gcc/x86_64-w64-mingw32/14-win32/libgcc_s_seh-1.dll $1/
+		cp /usr/lib/gcc/x86_64-w64-mingw32/14-win32/libstdc++-6.dll $1/
+		cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $1/
+		cp /usr/x86_64-w64-mingw32/lib/freeimage.dll $1/
+
+		# not sure why this needs to be renamed - but mingw64 is doing something strange when
+		# linking libpsinc and iconograph
+		cp /usr/x86_64-w64-mingw32/lib/libusb-1.0.dll $1/msys-usb-1.0.dll
+
+		cp ../build/libpsinc.dll $1/
+	else
+		echo "invalid destination directory: $1"
+		exit 1
+	fi
+}
+
 # A full iconograph package containing all required dependencies
 dst="iconograph"
 mkdir $dst
 mkdir $dst/platforms
 mkdir $dst/styles
 
-# cp /usr/lib/gcc/x86_64-w64-mingw32/13-posix/libgcc_s_seh-1.dll $dst/
-# cp /usr/lib/gcc/x86_64-w64-mingw32/13-posix/libstdc++-6.dll $dst/
-cp /usr/lib/gcc/x86_64-w64-mingw32/14-win32/libgcc_s_seh-1.dll $dst/
-cp /usr/lib/gcc/x86_64-w64-mingw32/14-win32/libstdc++-6.dll $dst/
-cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $dst/
-cp /usr/x86_64-w64-mingw32/lib/freeimage.dll $dst/
-
-# not sure why this needs to be renamed - but mingw64 is doing something strange when
-# linking libpsinc and iconograph
-cp /usr/x86_64-w64-mingw32/lib/libusb-1.0.dll $dst/msys-usb-1.0.dll
+core_dependencies $dst
 
 cp /usr/local/Qt-6.11.0/bin/Qt6Core.dll $dst/
 cp /usr/local/Qt-6.11.0/bin/Qt6Gui.dll $dst/
@@ -24,7 +35,17 @@ cp /usr/local/Qt-6.11.0/bin/Qt6Widgets.dll $dst/
 cp /usr/local/Qt-6.11.0/plugins/platforms/qwindows.dll $dst/platforms/
 cp /usr/local/Qt-6.11.0/plugins/styles/qmodernwindowsstyle.dll $dst/styles/
 cp ../iconograph/build/iconograph.exe $dst/
-cp ../build/libpsinc.dll $dst/
+
+7z a $dst-`cat version`.7z $dst
+rm -r $dst
+
+
+# A package for flasc with dependencies
+dst="flasc"
+mkdir $dst
+core_dependencies $dst
+
+cp ../build/flasc.exe $dst/
 
 7z a $dst-`cat version`.7z $dst
 rm -r $dst
