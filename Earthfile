@@ -72,10 +72,21 @@ flasc:
 	FROM +build --DISTRIBUTION=noble
 	RUN make -j8 -C build flasc
 	COPY packages/flasc.png .
-	RUN curl -sJL "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" -o linuxdeploy.AppImage \
-		&& chmod a+x linuxdeploy.AppImage \
+
+	ARG TARGETARCH
+	IF [ "$TARGETARCH" = "arm64" ]
+		# weird bug with linuxdeploy arm64 when run in a qemu container - modification to the binary based on
+		# https://github.com/netpanzer/netpanzer/commit/241a664ada9bb8fe52000e360b043c579162590e
+		RUN curl -sJL "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-aarch64.AppImage" -o linuxdeploy.AppImage \
+			&& dd if=/dev/zero of=linuxdeploy.AppImage conv=notrunc bs=1 count=3 seek=8
+	ELSE
+		RUN curl -sJL "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" -o linuxdeploy.AppImage
+	END
+
+	RUN chmod a+x linuxdeploy.AppImage \
 		&& APPIMAGE_EXTRACT_AND_RUN=1 ./linuxdeploy.AppImage -e build/flasc --appdir appdir --create-desktop-file -i flasc.png --output appimage
-	SAVE ARTIFACT flasc*.AppImage AS LOCAL build/
+
+	SAVE ARTIFACT --keep-ts flasc*.AppImage AS LOCAL build/
 
 windows:
 	FROM teadriven/essential-qt-mingw:6.11-2
